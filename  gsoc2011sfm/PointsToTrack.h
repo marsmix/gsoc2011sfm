@@ -36,26 +36,42 @@ namespace OpencvSfM{
     * This method is used to compute both Keypoints and descriptors...
     * @return the number of points
     */
-    virtual int computeKeypointsAndDesc()=0;
+    virtual int computeKeypointsAndDesc();
     /**
     * This method is used to compute only Keypoints...
     * @return the number of points
     */
-    virtual int computeKeypoints()=0;
+    virtual int computeKeypoints();
     /**
     * This method is used to compute only descriptors...
-    * the keypoints given in parameters a mixed with previous computed keypoints (if they exist) and features are computed
-    * @param keypoints points are added to keypoints_ before descriptor computation.
     */
-    virtual void computeDescriptors(std::vector<cv::KeyPoint> keypoints=std::vector<cv::KeyPoint>(0))=0;
+    virtual void computeDescriptors();
+    /**
+    * This method is used to add Keypoints...
+    * @param keypoints Keypoints to add
+    * @param descriptors of points, if any
+    * @param computeMissingDescriptor if true, the missing descriptors are computed.
+    */
+    virtual void addKeypoints(std::vector<cv::KeyPoint> keypoints,cv::Mat descriptors=cv::Mat(),bool computeMissingDescriptor=false);
+    /**
+    * this method return the points coordinates and sometimes orientation and size
+    * @return points coordinates and sometimes orientation and size
+    */
+    cv::Mat getKeypoints(){return keypoints_;};
+    /**
+    * this method return the descritors for each points in a matrix with size (n*m), where n is the number of points and m is the desciptor size.
+    * @return descritors for each points in a matrix with size (n*m), where n is the number of points and m is the desciptor size.
+    */
+    cv::Mat getDescriptors(){return descriptors_;};
     /**
     * To show the points on image, use this function to draw points on it.
-    * @param image surface where points will be draw
-    * @param withSize if true, points are drawn using circle with radius=size, else only points.
-    * @param color color to use when drawing the points
-    * @param thickness – Thickness of the points outline
+    * @param image Source image.
+    * @param outImg Output image. Its content depends on flags value what is drawn in output image. See possible flags bit values.
+    * @param color Color of keypoints
+    * @param flags Possible flags bit values is defined by DrawMatchesFlags (see http://opencv.willowgarage.com/documentation/cpp/features2d_drawing_function_of_keypoints_and_matches.html#cv-drawmatches)
     */
-    void printPointsOnImage(cv::Mat &image,bool withSize=true,cv::Scalar color=cv::Scalar(0),int thickness = 1) const;
+    //
+    void printPointsOnImage(const cv::Mat &image, cv::Mat& outImg, const cv::Scalar& color=cv::Scalar::all(-1), int flags=cv::DrawMatchesFlags::DEFAULT) const;
   };
 
 }

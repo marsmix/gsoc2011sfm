@@ -19,31 +19,48 @@ namespace OpencvSfM{
     keypoints_.clear();
     descriptors_.release();
   }
-
-  void PointsToTrack::printPointsOnImage(Mat &image,bool withSize,Scalar color,int thickness) const
+  
+  int PointsToTrack::computeKeypointsAndDesc()
   {
-    vector<KeyPoint>::const_iterator iterOnPoints=keypoints_.begin();
-    while(iterOnPoints!=keypoints_.end()){
-      if(withSize)
-      {
-        float sizeOfPoint=iterOnPoints->size;
-        if(iterOnPoints->size<1.0)
-          sizeOfPoint=1;//because the circle won't be correctly drawn!
-        if(iterOnPoints->angle!=-1)//the angle information is set!
-        {                          //Draw the orientation:
-          double sin_dir = sin((float)iterOnPoints->angle*(CV_PI/180.0));
-          double cos_dir = cos((float)iterOnPoints->angle*(CV_PI/180.0));
+    int nbPoints=computeKeypoints();
+    computeDescriptors();
+    return nbPoints;
+  }
 
-          line(image, Point((int)iterOnPoints->pt.x,(int)iterOnPoints->pt.y),
-            Point((int)(iterOnPoints->pt.x+sizeOfPoint*cos_dir),(int)(iterOnPoints->pt.y-sizeOfPoint*sin_dir)),color,thickness);
-        }
-        circle( image, Point((int)iterOnPoints->pt.x,(int)iterOnPoints->pt.y),(int)sizeOfPoint,color,thickness);
-      }
-      else
+
+  int PointsToTrack::computeKeypoints()
+  {//we don't have data to compute keypoints...
+    return keypoints_.size();
+  }
+
+
+  void PointsToTrack::computeDescriptors()
+  {//we don't have data to compute descriptors...
+  }
+
+  void PointsToTrack::addKeypoints(std::vector<cv::KeyPoint> keypoints,cv::Mat descriptors/*=cv::Mat()*/,bool computeMissingDescriptor/*=false*/)
+  {
+    //add the keypoints to the end of our points vector:
+    this->keypoints_.insert( this->keypoints_.end(),keypoints.begin(),keypoints.end());
+    if(!computeMissingDescriptor)
+    {
+      if(!descriptors_.empty())
       {
-        circle( image, Point((int)iterOnPoints->pt.x,(int)iterOnPoints->pt.y),(int)thickness,color,-thickness);
+        Mat newDescriptors( this->keypoints_.size(), this->descriptors_.cols, this->descriptors_.type());
+        newDescriptors( cv::Rect(0, 0, this->descriptors_.cols,this->descriptors_.rows) ) = this->descriptors_;
+        newDescriptors( cv::Rect(0, this->descriptors_.rows, this->descriptors_.cols,descriptors.rows) ) = descriptors;
+        this->descriptors_=newDescriptors;
       }
-      iterOnPoints++;
     }
+    else
+    {
+      this->computeDescriptors();
+    }
+  }
+  void PointsToTrack::printPointsOnImage(const Mat &image, Mat& outImg, const Scalar& color/*=Scalar::all(-1)*/, int flags/*=DrawMatchesFlags::DEFAULT*/) const
+  {
+    if(outImg.empty())
+      outImg=image.clone();
+    cv::drawKeypoints(image, keypoints_, outImg, color, flags);
   }
 }

@@ -1,4 +1,4 @@
-#include "PointsToTrackSIFT.h"
+#include "PointsToTrackWithImage.h"
 #include "MotionProcessor.h"
 
 #include <iostream>
@@ -29,6 +29,7 @@ void main(){
   mp.setProperty(CV_CAP_PROP_FRAME_HEIGHT,450);//idem...
 
   //universal method to get the current image:
+  Mat imgWithPoints;
   Mat imgT0001=mp.getFrame();
   if(imgT0001.empty())
   {
@@ -37,31 +38,27 @@ void main(){
   else
   {
     //if the image is loaded, find the points:
-    double threshold=SIFT::DetectorParams::GET_DEFAULT_THRESHOLD()/2;
-    PointsToTrackSIFT ptt(imgT0001,Mat(),threshold,SIFT::DescriptorParams::GET_DEFAULT_MAGNIFICATION());
+    int threshold=5;
+
+    //create the two detection algorithm:
+    Ptr<FeatureDetector> fastDetect;
+    fastDetect=Ptr<FeatureDetector>(new FastFeatureDetector(threshold));
+    Ptr<DescriptorExtractor> SIFTDetect;
+    SIFTDetect=Ptr<DescriptorExtractor>(new SiftDescriptorExtractor());
+
+    PointsToTrackWithImage ptt(imgT0001,Mat(),fastDetect,SIFTDetect);
     int nbPoints;
-    Mat imgTmp;
     for(int i=0;i<10;i++){
       nbPoints=ptt.computeKeypointsAndDesc();
-      cout<<nbPoints<<" points found using "<<threshold<<" as SIFT threshold and computeKeypointsAndDesc"<<endl;
+      cout<<nbPoints<<" points found using "<<threshold<<endl;
       //show key points:
-      imgTmp=imgT0001.clone();
       //print points on it:
-      ptt.printPointsOnImage(imgTmp,false,Scalar(255));
-      imshow("PointsToTrackSIFT key points",imgTmp);
+      ptt.printPointsOnImage(imgT0001,imgWithPoints,Scalar(255));
+      imshow("PointsToTrackWithImage key points",imgWithPoints);
+      cv::waitKey(20);
 
-
-      nbPoints=ptt.computeKeypoints();
-      cout<<nbPoints<<" points found using "<<threshold<<" as SIFT threshold and computeKeypoints"<<endl;
-      //show key points:
-      imgTmp=imgT0001.clone();
-      //print points on it:
-      ptt.printPointsOnImage(imgTmp,false,Scalar(255));
-      imshow("PointsToTrackSIFT key points",imgTmp);
-
-
-      threshold*=1.1;
-      ptt=PointsToTrackSIFT(imgT0001,Mat(),threshold,SIFT::DescriptorParams::GET_DEFAULT_MAGNIFICATION());
+      threshold++;
+      ptt.setFeatureDetector(Ptr<FeatureDetector>(new FastFeatureDetector(threshold)));
     }
   }
 }
