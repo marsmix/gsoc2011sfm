@@ -57,11 +57,11 @@ std::vector$<$ \hyperlink{class_opencv_sf_m_1_1_field_of_view}{FieldOfView} $>$ 
 \subsection{Detailed Description}
 This class represent the physical device which take the pictures. It is not related to a 3D position which is the role of the class \hyperlink{class_opencv_sf_m_1_1_field_of_view}{FieldOfView}. The role of the class is to store only device related informations like intra parameters, radial and tangential distotion. 
 
-This class can be used to store device related informations like intra parameters, radial and tangential distortion. We use the so-\/called pinhole camera model. That is, a scene view is formed by projecting 3D points into the image plane using a perspective transformation. Usual notation says that a point \mbox{[}u,v\mbox{]} from an image is related to the point \mbox{[}X,Y,Z\mbox{]} using the following notation : /f\mbox{[} s \{bmatrix\} u $\backslash$ v $\backslash$ 1 \{bmatrix\} = \{bmatrix\}f\_\-x \& 0 \& c\_\-x $\backslash$ 0 \& f\_\-y \& c\_\-y $\backslash$ 0 \& 0 \& 1 \{bmatrix\} \{bmatrix\} r\_\-\{11\} \& r\_\-\{12\} \& r\_\-\{13\} \& t\_\-1 $\backslash$ r\_\-\{21\} \& r\_\-\{22\} \& r\_\-\{23\} \& t\_\-2 $\backslash$ r\_\-\{31\} \& r\_\-\{32\} \& r\_\-\{33\} \& t\_\-3 \{bmatrix\} \{bmatrix\} X $\backslash$ Y $\backslash$ Z $\backslash$ 1 \{bmatrix\} /f\mbox{]}
+This class can be used to store device related informations like intra parameters, radial and tangential distortion. We use the so-\/called pinhole camera model. That is, a scene view is formed by projecting 3D points into the image plane using a perspective transformation. Usual notation says that a point \mbox{[}u,v\mbox{]} from an image is related to the point \mbox{[}X,Y,Z\mbox{]} using the following notation : \[ s \begin{bmatrix} u \\ v \\ 1 \end{bmatrix} = \begin{bmatrix}f_x & 0 & c_x \\ 0 & f_y & c_y \\ 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} r_{11} & r_{12} & r_{13} & t_1 \\ r_{21} & r_{22} & r_{23} & t_2 \\ r_{31} & r_{32} & r_{33} & t_3 \end{bmatrix} \begin{bmatrix} X \\ Y \\ Z \\ 1 \end{bmatrix} \]
 
-This leads to the following relation between local coordinates and global ones: /f\mbox{[} \{array\}\{l\} \{10pt\} \{bmatrix\} x $\backslash$ y $\backslash$ z \{bmatrix\} = R \{bmatrix\} X $\backslash$ Y $\backslash$ Z \{bmatrix\} + t $\backslash$ x' = x/z $\backslash$ y' = y/z \{10pt\} \{array\} /f\mbox{]}
+This leads to the following relation between local coordinates and global ones: \[ \begin{array}{l} \vspace{10pt} \begin{bmatrix} x \\ y \\ z \end{bmatrix} = R \begin{bmatrix} X \\ Y \\ Z \end{bmatrix} + t \\ x' = x/z \\ y' = y/z \vspace{10pt} \end{array} \]
 
-Additionnal radial and tangeancial distortion are modelized like this: /f\mbox{[} \{array\}\{l\} \{10pt\} x'' = x' \{1 + k\_\-1 r$^\wedge$2 + k\_\-2 r$^\wedge$4 + k\_\-3 r$^\wedge$6\}\{1 + k\_\-4 r$^\wedge$2 + k\_\-5 r$^\wedge$4 + k\_\-6 r$^\wedge$6\} + 2 p\_\-1 x' y' + p\_\-2(r$^\wedge$2 + 2 x'$^\wedge$2) $\backslash$ \{10pt\} y'' = y' \{1 + k\_\-1 r$^\wedge$2 + k\_\-2 r$^\wedge$4 + k\_\-3 r$^\wedge$6\}\{1 + k\_\-4 r$^\wedge$2 + k\_\-5 r$^\wedge$4 + k\_\-6 r$^\wedge$6\} + p\_\-1 (r$^\wedge$2 + 2 y'$^\wedge$2) + 2 p\_\-2 x' y' $\backslash$ \{where\}  r$^\wedge$2 = x'$^\wedge$2 + y'$^\wedge$2 $\backslash$ u = f\_\-x$\ast$x'' + c\_\-x $\backslash$ v = f\_\-y$\ast$y'' + c\_\-y \{array\} /f\mbox{]} radial\_\-dist\_\- can be used to store /f\$k\_\-1/f\$ to /f\$k\_\-6/f\$ tangential\_\-dist\_\- can be used to store /f\$p\_\-1/f\$ and /f\$p\_\-2/f\$ 
+Additionnal radial and tangeancial distortion are modelized like this: \[ \begin{array}{l} \vspace{10pt} x'' = x' \dfrac{1 + k_1 r^2 + k_2 r^4 + k_3 r^6}{1 + k_4 r^2 + k_5 r^4 + k_6 r^6} + 2 p_1 x' y' + p_2(r^2 + 2 x'^2) \\ \vspace{10pt} y'' = y' \dfrac{1 + k_1 r^2 + k_2 r^4 + k_3 r^6}{1 + k_4 r^2 + k_5 r^4 + k_6 r^6} + p_1 (r^2 + 2 y'^2) + 2 p_2 x' y' \\ \text{where} \quad r^2 = x'^2 + y'^2 \\ u = f_x*x'' + c_x \\ v = f_y*y'' + c_y \end{array} \] radial\_\-dist\_\- can be used to store /f\$k\_\-1/f\$ to /f\$k\_\-6/f\$ tangential\_\-dist\_\- can be used to store /f\$p\_\-1/f\$ and /f\$p\_\-2/f\$ 
 
 Definition at line 48 of file Camera.h.
 
@@ -69,5 +69,5 @@ Definition at line 48 of file Camera.h.
 
 The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
 \item 
-src/Camera.h\item 
-src/Camera.cpp\end{DoxyCompactItemize}
+D:/Travail/These/Determination caracteristiques camera/GSoC/SfM/src/Camera.h\item 
+D:/Travail/These/Determination caracteristiques camera/GSoC/SfM/src/Camera.cpp\end{DoxyCompactItemize}
