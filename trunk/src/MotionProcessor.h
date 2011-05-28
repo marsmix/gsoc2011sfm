@@ -66,7 +66,7 @@ public:
   * @param type of input (can be either IS_DIRECTORY, IS_VIDEO or IS_SINGLE_FILE)
   * @return true if input source opened without problems
   */
-  bool setInputSource(std::string nameOfFile,TypeOfMotionProcessor inputType=IS_VIDEO);
+  bool setInputSource(std::string nameOfFile,TypeOfMotionProcessor inputType=IS_SINGLE_FILE);
   /**
   * You can attach this camera to a list of file.
   * use this method to set the input source!

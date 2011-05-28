@@ -92,7 +92,7 @@ void main(){
   //The goal below this class is to open a folder of images the same way we open a video stream.
   //For example, we could set input to webcam like this :
   //mp.setInputSource(0);
-  mp.setInputSource("../Medias/temple/temple0001.png",OpencvSfM::TypeOfMotionProcessor::IS_SINGLE_FILE);
+  mp.setInputSource("../Medias/temple/temple0001.png",IS_SINGLE_FILE);
 
   //Configure input (not needed, but show how we can do 
   mp.setProperty(CV_CAP_PROP_CONVERT_RGB,0);//Only greyscale, due to SIFT
