@@ -4,6 +4,7 @@
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+#include "dirent.h"
 #include <string>
 #include <sstream>
 #include <vector>
@@ -15,6 +16,7 @@ namespace OpencvSfM{
     IS_SINGLE_FILE,///<Mask used to know if the input is a single file
     IS_LIST_FILES,///<Mask used to know if the input is a list of files
     IS_WEBCAM,///<Mask used to know if the input is a webcam
+    IS_DIRECTORY,///<Mask used to know if the input is an entire directory
     IS_VIDEO///<Mask used to know if the input is a video file
   };
 
@@ -61,10 +63,10 @@ public:
   * You can attach this camera to a video file or a single picture.
   * use this method to set it as the input source!
   * @param nameOfFile name of the media file (picture or avi movie)
-  * @param openAsMovie true if the file is a move, false if it's a picture
+  * @param type of input (can be either IS_DIRECTORY, IS_VIDEO or IS_SINGLE_FILE)
   * @return true if input source opened without problems
   */
-  bool setInputSource(std::string nameOfFile,bool openAsMovie=false);
+  bool setInputSource(std::string nameOfFile,TypeOfMotionProcessor inputType=IS_VIDEO);
   /**
   * You can attach this camera to a list of file.
   * use this method to set the input source!

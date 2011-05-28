@@ -3,10 +3,15 @@
 using cv::Mat;
 using cv::Size;
 using cv::Vec;
+using cv::Ptr;
 using cv::VideoCapture;
 using std::string;
 using cv::imread;
 using std::ostringstream;
+
+namespace cv{
+  CVAPI(int) cvHaveImageReader( const char* filename );
+}
 
 namespace OpencvSfM{
 
@@ -27,9 +32,11 @@ namespace OpencvSfM{
     case IS_VIDEO:
       capture_.release();
       break;
+    case IS_DIRECTORY:
     case IS_LIST_FILES:
     case IS_SINGLE_FILE:
-      break;//nothing to do...
+      nameOfFiles_.clear();
+      break;
     }
   }
 
@@ -49,17 +56,36 @@ namespace OpencvSfM{
     return false;
   };
 
-  bool MotionProcessor::setInputSource(string nameOfFile,bool openAsMovie)
-  {
+  bool MotionProcessor::setInputSource(string nameOfFile,TypeOfMotionProcessor inputType/*=IS_VIDEO*/)
+  {//IS_DIRECTORY, IS_VIDEO or IS_SINGLE_FILE
     this->sourceName_=nameOfFile;
-    //first try to open the file as a video:
-    if(openAsMovie)
+    this->type_of_input_=inputType;
+
+    if(inputType == IS_VIDEO)
+      return this->capture_.open(nameOfFile);
+
+    if(inputType == IS_DIRECTORY)
     {
-      this->capture_.open(nameOfFile);
-      this->type_of_input_=IS_VIDEO;
-      return true;
-    }else{
-      this->type_of_input_=IS_SINGLE_FILE;
+
+      DIR* dirTmp = opendir(nameOfFile.c_str());
+      if (dirTmp == NULL) {
+        return false;
+      }
+      struct dirent *entry; 
+      while((entry = readdir(dirTmp)))
+      {
+        string longFileName=nameOfFile+entry->d_name;
+        if( cv::cvHaveImageReader(longFileName.c_str()) )
+          nameOfFiles_.push_back(longFileName);
+      }
+
+      closedir(dirTmp);
+      //if we don't have loaded files, return an error!
+      if(nameOfFiles_.empty())
+        return false;
+      //File loading order is OS dependant, so we order list file to be sure:
+      // using object as comp
+      std::sort (nameOfFiles_.begin(), nameOfFiles_.end());
     }
     return true;
   };
@@ -98,8 +124,8 @@ namespace OpencvSfM{
           {
             capture_.retrieve(imgTmp);
           }
-          break;
         }
+        break;
       case IS_LIST_FILES:
         {
           ostringstream oss;
@@ -117,6 +143,15 @@ namespace OpencvSfM{
           nameOfFiles_.push_back(oss.str());//add the new file
           if(! imgTmp.empty())
             this->numFrame_++;
+        }
+        break;
+      case IS_DIRECTORY:
+        {
+          if(numFrame_<nameOfFiles_.size())
+          {
+            imgTmp=imread(nameOfFiles_[numFrame_],convertToRGB_);
+            this->numFrame_++;//and move to the next frame
+          }
         }
         break;
       case IS_SINGLE_FILE:
@@ -192,10 +227,8 @@ namespace OpencvSfM{
       break;
     case CV_CAP_PROP_FORMAT://The format of the Mat objects returned by retrieve()
     case CV_CAP_PROP_POS_MSEC://Film current position in milliseconds or video capture timestamp
-    case CV_CAP_PROP_POS_AVI_RATIO://Relative position of the video file (0 - start of the film, 1 - end of the film)
     case CV_CAP_PROP_FPS://Frame rate
     case CV_CAP_PROP_FOURCC://4-character code of codec
-    case CV_CAP_PROP_FRAME_COUNT://Number of frames in the video file
     case CV_CAP_PROP_MODE:// A backend-specific value indicating the current capture mode
     case CV_CAP_PROP_BRIGHTNESS:// Brightness of the image (only for cameras)
     case CV_CAP_PROP_CONTRAST:// Contrast of the image (only for cameras)
@@ -203,10 +236,27 @@ namespace OpencvSfM{
     case CV_CAP_PROP_HUE:// Hue of the image (only for cameras)
     case CV_CAP_PROP_GAIN:// Gain of the image (only for cameras)
     case CV_CAP_PROP_EXPOSURE:// Exposure (only for cameras)
+    case CV_CAP_PROP_FRAME_COUNT://Number of frames in the video file
       //case CV_CAP_PROP_WHITE_BALANCE://Currently unsupported
     case CV_CAP_PROP_RECTIFICATION://TOWRITE (note: only supported by DC1394 v 2.x backend currently)
-      if(type_of_input_==IS_LIST_FILES||type_of_input_==IS_SINGLE_FILE)
-        return false;
+      {
+        if(type_of_input_==IS_LIST_FILES||type_of_input_==IS_SINGLE_FILE||type_of_input_==IS_DIRECTORY)
+          return false;
+        //else, do nothing as the property is already assigned
+      }
+      break;
+    case CV_CAP_PROP_POS_AVI_RATIO://Relative position of the video file (0 - start of the film, 1 - end of the film)
+      {
+        if(type_of_input_==IS_LIST_FILES||type_of_input_==IS_SINGLE_FILE)
+          return false;
+        else
+        {
+          if(type_of_input_==IS_DIRECTORY)
+          {
+            numFrame_=(unsigned int) (_value*nameOfFiles_.size());
+          }
+        }
+      }
       break;
     default:
       return false;
@@ -251,12 +301,36 @@ namespace OpencvSfM{
             valOut=numFrame_;
           };
           break;
+        case CV_CAP_PROP_POS_AVI_RATIO://Relative position of the video file (0 - start of the film, 1 - end of the film)
+          {
+            if(type_of_input_==IS_LIST_FILES||type_of_input_==IS_SINGLE_FILE)
+              CV_Error( CV_StsBadArg, "MotionProcessor unknow property !" );
+            else
+            {
+              if(type_of_input_==IS_DIRECTORY)
+              {
+                valOut=((double)numFrame_/nameOfFiles_.size());
+              }
+            }
+          }
+          break;
+        case CV_CAP_PROP_FRAME_COUNT://Number of frames in the video file
+          {
+            if(type_of_input_==IS_LIST_FILES||type_of_input_==IS_SINGLE_FILE)
+              CV_Error( CV_StsBadArg, "MotionProcessor unknow property !" );
+            else
+            {
+              if(type_of_input_==IS_DIRECTORY)
+              {
+                numFrame_=(unsigned int)idProp;
+              }
+            }
+          }
+          break;
         case CV_CAP_PROP_FORMAT://The format of the Mat objects returned by retrieve()
         case CV_CAP_PROP_POS_MSEC://Film current position in milliseconds or video capture timestamp
-        case CV_CAP_PROP_POS_AVI_RATIO://Relative position of the video file (0 - start of the film, 1 - end of the film)
         case CV_CAP_PROP_FPS://Frame rate
         case CV_CAP_PROP_FOURCC://4-character code of codec
-        case CV_CAP_PROP_FRAME_COUNT://Number of frames in the video file
         case CV_CAP_PROP_MODE:// A backend-specific value indicating the current capture mode
         case CV_CAP_PROP_BRIGHTNESS:// Brightness of the image (only for cameras)
         case CV_CAP_PROP_CONTRAST:// Contrast of the image (only for cameras)

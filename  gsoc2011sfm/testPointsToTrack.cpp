@@ -1,5 +1,7 @@
 #include "PointsToTrackWithImage.h"
 #include "MotionProcessor.h"
+#include "PointsMatcher.h"
+#include <opencv2/calib3d/calib3d.hpp>
 
 #include <iostream>
 
@@ -8,11 +10,80 @@ using namespace cv;
 using namespace OpencvSfM;
 
 //////////////////////////////////////////////////////////////////////////
-//Only to see how we can use PointsToTracks
 //This file will not be in the final version of API, consider it like a tuto/draft...
 //You will need files to test. Download the temple dataset here : http://vision.middlebury.edu/mview/data/
 //////////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////////////
+//Only to see how we can use PointsMatcher
+//////////////////////////////////////////////////////////////////////////
+
+void main(){
+  MotionProcessor mp;
+
+  //first load images:
+  //Here we will a folder with a lot of images, but we can do the same thing with any other type of input
+  mp.setInputSource("../Medias/temple/",IS_DIRECTORY);
+
+  //Configure input (not needed, but show how we can do 
+  mp.setProperty(CV_CAP_PROP_CONVERT_RGB,0);//Only greyscale, due to SIFT
+  mp.setProperty(CV_CAP_PROP_FRAME_WIDTH,1024);//for test
+  mp.setProperty(CV_CAP_PROP_FRAME_HEIGHT,768);//idem...
+
+  //universal method to get the current image:
+  Mat firstImage=mp.getFrame();
+  Mat secondImage=mp.getFrame();
+
+  if(firstImage.empty()||secondImage.empty())
+  {
+    cout<<"test can not be run... can't find two different images..."<<endl;
+  }
+  else
+  {
+    //if the images are loaded, find the points:
+    
+    cout<<"creation of two detection algorithm..."<<endl;
+    Ptr<FeatureDetector> fastDetect;
+    fastDetect=Ptr<FeatureDetector>(new SiftFeatureDetector());
+    Ptr<DescriptorExtractor> SIFTDetect;
+    SIFTDetect=Ptr<DescriptorExtractor>(new SiftDescriptorExtractor());
+
+    cout<<"now create the two set of points with features..."<<endl;
+    Ptr<PointsToTrack> ptt1;
+    ptt1=Ptr<PointsToTrack>(new PointsToTrackWithImage (firstImage,Mat(),fastDetect,SIFTDetect));
+    Ptr<PointsToTrack> ptt2;
+    ptt2=Ptr<PointsToTrack>(new PointsToTrackWithImage (secondImage,Mat(),fastDetect,SIFTDetect));
+
+    cout<<"now try to find matches, so we create a matcher (classic bruteForce)"<<endl<<endl;
+    Ptr<DescriptorMatcher> matcher;
+    matcher=Ptr<DescriptorMatcher>(new BruteForceMatcher<L2<float>>());
+
+    //The point matcher will now be created like this:
+    PointsMatcher matches(matcher);
+    //The matches vector is:
+    vector<vector<DMatch> > matchesVectorKNN;
+
+    //We want to find points in img1 which are also in img2.
+    //So we set ptt2 as training data:
+    cout<<"Add points of image 2 as references points"<<endl;
+    matches.add(ptt2);
+
+    cout<<"and try using knn to find best points matches in img1"<<endl<<endl;
+    matches.knnMatch(ptt1,matchesVectorKNN,1,vector<Mat>(),false);
+
+    cout<<"Displaying the "<<matchesVectorKNN.size()<<"points..."<<endl;
+    Mat outImg;
+    drawMatches(firstImage, ptt1->getKeypoints(), secondImage, ptt2->getKeypoints(), matchesVectorKNN, outImg);
+    imshow("PointsMatcher key points (knnMatch)",outImg);
+    cv::waitKey(0);
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+//Only to see how we can use PointsToTracks
+//////////////////////////////////////////////////////////////////////////
+/*
 void main(){
   MotionProcessor mp;
 
@@ -21,7 +92,7 @@ void main(){
   //The goal below this class is to open a folder of images the same way we open a video stream.
   //For example, we could set input to webcam like this :
   //mp.setInputSource(0);
-  mp.setInputSource("../Medias/temple/temple0001.png");
+  mp.setInputSource("../Medias/temple/temple0001.png",OpencvSfM::TypeOfMotionProcessor::IS_SINGLE_FILE);
 
   //Configure input (not needed, but show how we can do 
   mp.setProperty(CV_CAP_PROP_CONVERT_RGB,0);//Only greyscale, due to SIFT
@@ -62,3 +133,4 @@ void main(){
     }
   }
 }
+*/

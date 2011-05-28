@@ -57,12 +57,12 @@ namespace OpencvSfM{
     * this method return the points coordinates and sometimes orientation and size
     * @return points coordinates and sometimes orientation and size
     */
-    cv::Mat getKeypoints(){return keypoints_;};
+    std::vector<cv::KeyPoint> getKeypoints() const {return keypoints_;};
     /**
     * this method return the descritors for each points in a matrix with size (n*m), where n is the number of points and m is the desciptor size.
     * @return descritors for each points in a matrix with size (n*m), where n is the number of points and m is the desciptor size.
     */
-    cv::Mat getDescriptors(){return descriptors_;};
+    cv::Mat getDescriptors() const {return descriptors_;};
     /**
     * To show the points on image, use this function to draw points on it.
     * @param image Source image.
@@ -72,6 +72,10 @@ namespace OpencvSfM{
     */
     //
     void printPointsOnImage(const cv::Mat &image, cv::Mat& outImg, const cv::Scalar& color=cv::Scalar::all(-1), int flags=cv::DrawMatchesFlags::DEFAULT) const;
+
+    void read( const cv::FileNode& fn );
+
+    void write (cv::FileStorage& fs) const;
   };
 
 }
