@@ -123,9 +123,15 @@ unsigned char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" h
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>This class represent the 3D position of the device which take the pictures. The role of the class is to store everything related to the filed of view: picture, 3D position, points, matches and 3D points. </p>
-<p>We use the so-called pinhole camera model. That is, a scene view is formed by projecting 3D points into the image plane using a perspective transformation. Usual notation says that a point [u,v] from an image is related to the point [X,Y,Z] using the following notation : /f[ s {bmatrix} u \ v \ 1 {bmatrix} = {bmatrix}f_x &amp; 0 &amp; c_x \ 0 &amp; f_y &amp; c_y \ 0 &amp; 0 &amp; 1 {bmatrix} {bmatrix} r_{11} &amp; r_{12} &amp; r_{13} &amp; t_1 \ r_{21} &amp; r_{22} &amp; r_{23} &amp; t_2 \ r_{31} &amp; r_{32} &amp; r_{33} &amp; t_3 {bmatrix} {bmatrix} X \ Y \ Z \ 1 {bmatrix} /f]</p>
-<p>This leads to the following relation between local coordinates and global ones: /f[ {array}{l} {10pt} {bmatrix} x \ y \ z {bmatrix} = R {bmatrix} X \ Y \ Z {bmatrix} + t \ x' = x/z \ y' = y/z {10pt} {array} /f] </p>
-
+<p>We use the so-called pinhole camera model. That is, a scene view is formed by projecting 3D points into the image plane using a perspective transformation. Usual notation says that a point [u,v] from an image is related to the point [X,Y,Z] using the following notation : </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ s \begin{bmatrix} u \\ v \\ 1 \end{bmatrix} = \begin{bmatrix}f_x &amp; 0 &amp; c_x \\ 0 &amp; f_y &amp; c_y \\ 0 &amp; 0 &amp; 1 \end{bmatrix} \begin{bmatrix} r_{11} &amp; r_{12} &amp; r_{13} &amp; t_1 \\ r_{21} &amp; r_{22} &amp; r_{23} &amp; t_2 \\ r_{31} &amp; r_{32} &amp; r_{33} &amp; t_3 \end{bmatrix} \begin{bmatrix} X \\ Y \\ Z \\ 1 \end{bmatrix} \]" src="form_0.png"/>
+</p>
+<p>This leads to the following relation between local coordinates and global ones: </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ \begin{array}{l} \vspace{10pt} \begin{bmatrix} x \\ y \\ z \end{bmatrix} = R \begin{bmatrix} X \\ Y \\ Z \end{bmatrix} + t \\ x' = x/z \\ y' = y/z \vspace{10pt} \end{array} \]" src="form_1.png"/>
+</p>
+ 
 <p>Definition at line <a class="el" href="_field_of_view_8h_source.html#l00047">47</a> of file <a class="el" href="_field_of_view_8h_source.html">FieldOfView.h</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a28445368ae4bb987cbd12556cf507489"></a><!-- doxytag: member="OpencvSfM::FieldOfView::FieldOfView" ref="a28445368ae4bb987cbd12556cf507489" args="()" -->
@@ -363,8 +369,8 @@ unsigned char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" h
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>src/<a class="el" href="_field_of_view_8h_source.html">FieldOfView.h</a></li>
-<li>src/<a class="el" href="_field_of_view_8cpp_source.html">FieldOfView.cpp</a></li>
+<li>D:/Travail/These/Determination caracteristiques camera/GSoC/SfM/src/<a class="el" href="_field_of_view_8h_source.html">FieldOfView.h</a></li>
+<li>D:/Travail/These/Determination caracteristiques camera/GSoC/SfM/src/<a class="el" href="_field_of_view_8cpp_source.html">FieldOfView.cpp</a></li>
 </ul>
 </div>
 <!-- window showing the filter options -->
@@ -381,7 +387,7 @@ unsigned char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" h
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Sat May 28 2011 17:05:41 for GSoC2011SfM by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Sat May 28 2011 17:45:45 for GSoC2011SfM by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

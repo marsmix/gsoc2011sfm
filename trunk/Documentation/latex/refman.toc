@@ -1,0 +1,59 @@
+\contentsline {chapter}{\numberline {1}Class Index}{1}{chapter.1}
+\contentsline {section}{\numberline {1.1}Class Hierarchy}{1}{section.1.1}
+\contentsline {chapter}{\numberline {2}Class Index}{3}{chapter.2}
+\contentsline {section}{\numberline {2.1}Class List}{3}{section.2.1}
+\contentsline {chapter}{\numberline {3}Class Documentation}{5}{chapter.3}
+\contentsline {section}{\numberline {3.1}OpencvSfM::Camera Class Reference}{5}{section.3.1}
+\contentsline {subsection}{\numberline {3.1.1}Detailed Description}{6}{subsection.3.1.1}
+\contentsline {section}{\numberline {3.2}OpencvSfM::ExternPosEstim Class Reference}{6}{section.3.2}
+\contentsline {subsection}{\numberline {3.2.1}Detailed Description}{7}{subsection.3.2.1}
+\contentsline {section}{\numberline {3.3}OpencvSfM::FieldOfView Class Reference}{7}{section.3.3}
+\contentsline {subsection}{\numberline {3.3.1}Detailed Description}{8}{subsection.3.3.1}
+\contentsline {subsection}{\numberline {3.3.2}Constructor \& Destructor Documentation}{8}{subsection.3.3.2}
+\contentsline {subsubsection}{\numberline {3.3.2.1}FieldOfView}{8}{subsubsection.3.3.2.1}
+\contentsline {subsubsection}{\numberline {3.3.2.2}FieldOfView}{9}{subsubsection.3.3.2.2}
+\contentsline {subsubsection}{\numberline {3.3.2.3}FieldOfView}{9}{subsubsection.3.3.2.3}
+\contentsline {subsubsection}{\numberline {3.3.2.4}FieldOfView}{9}{subsubsection.3.3.2.4}
+\contentsline {subsubsection}{\numberline {3.3.2.5}FieldOfView}{10}{subsubsection.3.3.2.5}
+\contentsline {subsubsection}{\numberline {3.3.2.6}$\sim $FieldOfView}{10}{subsubsection.3.3.2.6}
+\contentsline {subsection}{\numberline {3.3.3}Member Function Documentation}{10}{subsection.3.3.3}
+\contentsline {subsubsection}{\numberline {3.3.3.1}isRealFoV}{10}{subsubsection.3.3.3.1}
+\contentsline {section}{\numberline {3.4}OpencvSfM::MotionProcessor Class Reference}{10}{section.3.4}
+\contentsline {subsection}{\numberline {3.4.1}Detailed Description}{11}{subsection.3.4.1}
+\contentsline {subsection}{\numberline {3.4.2}Member Function Documentation}{11}{subsection.3.4.2}
+\contentsline {subsubsection}{\numberline {3.4.2.1}getFrame}{11}{subsubsection.3.4.2.1}
+\contentsline {subsubsection}{\numberline {3.4.2.2}getProperty}{12}{subsubsection.3.4.2.2}
+\contentsline {subsubsection}{\numberline {3.4.2.3}setInputSource}{12}{subsubsection.3.4.2.3}
+\contentsline {subsubsection}{\numberline {3.4.2.4}setInputSource}{12}{subsubsection.3.4.2.4}
+\contentsline {subsubsection}{\numberline {3.4.2.5}setInputSource}{13}{subsubsection.3.4.2.5}
+\contentsline {subsubsection}{\numberline {3.4.2.6}setProperty}{13}{subsubsection.3.4.2.6}
+\contentsline {subsection}{\numberline {3.4.3}Member Data Documentation}{13}{subsection.3.4.3}
+\contentsline {subsubsection}{\numberline {3.4.3.1}sourceName\_\discretionary {-}{}{}}{13}{subsubsection.3.4.3.1}
+\contentsline {subsubsection}{\numberline {3.4.3.2}suffix\_\discretionary {-}{}{}}{13}{subsubsection.3.4.3.2}
+\contentsline {section}{\numberline {3.5}OpencvSfM::Points3DEstim Class Reference}{14}{section.3.5}
+\contentsline {subsection}{\numberline {3.5.1}Detailed Description}{14}{subsection.3.5.1}
+\contentsline {section}{\numberline {3.6}OpencvSfM::PointsMatcher Class Reference}{14}{section.3.6}
+\contentsline {subsection}{\numberline {3.6.1}Detailed Description}{15}{subsection.3.6.1}
+\contentsline {section}{\numberline {3.7}OpencvSfM::PointsToTrack Class Reference}{15}{section.3.7}
+\contentsline {subsection}{\numberline {3.7.1}Detailed Description}{16}{subsection.3.7.1}
+\contentsline {subsection}{\numberline {3.7.2}Constructor \& Destructor Documentation}{16}{subsection.3.7.2}
+\contentsline {subsubsection}{\numberline {3.7.2.1}PointsToTrack}{16}{subsubsection.3.7.2.1}
+\contentsline {subsubsection}{\numberline {3.7.2.2}$\sim $PointsToTrack}{16}{subsubsection.3.7.2.2}
+\contentsline {subsection}{\numberline {3.7.3}Member Function Documentation}{16}{subsection.3.7.3}
+\contentsline {subsubsection}{\numberline {3.7.3.1}addKeypoints}{16}{subsubsection.3.7.3.1}
+\contentsline {subsubsection}{\numberline {3.7.3.2}computeDescriptors}{17}{subsubsection.3.7.3.2}
+\contentsline {subsubsection}{\numberline {3.7.3.3}computeKeypoints}{17}{subsubsection.3.7.3.3}
+\contentsline {subsubsection}{\numberline {3.7.3.4}computeKeypointsAndDesc}{17}{subsubsection.3.7.3.4}
+\contentsline {subsubsection}{\numberline {3.7.3.5}getDescriptors}{17}{subsubsection.3.7.3.5}
+\contentsline {subsubsection}{\numberline {3.7.3.6}getKeypoints}{18}{subsubsection.3.7.3.6}
+\contentsline {subsubsection}{\numberline {3.7.3.7}printPointsOnImage}{18}{subsubsection.3.7.3.7}
+\contentsline {section}{\numberline {3.8}OpencvSfM::PointsToTrackWithImage Class Reference}{18}{section.3.8}
+\contentsline {subsection}{\numberline {3.8.1}Detailed Description}{19}{subsection.3.8.1}
+\contentsline {subsection}{\numberline {3.8.2}Constructor \& Destructor Documentation}{19}{subsection.3.8.2}
+\contentsline {subsubsection}{\numberline {3.8.2.1}PointsToTrackWithImage}{20}{subsubsection.3.8.2.1}
+\contentsline {subsubsection}{\numberline {3.8.2.2}PointsToTrackWithImage}{20}{subsubsection.3.8.2.2}
+\contentsline {subsection}{\numberline {3.8.3}Member Function Documentation}{20}{subsection.3.8.3}
+\contentsline {subsubsection}{\numberline {3.8.3.1}computeDescriptors}{21}{subsubsection.3.8.3.1}
+\contentsline {subsubsection}{\numberline {3.8.3.2}computeKeypoints}{21}{subsubsection.3.8.3.2}
+\contentsline {subsubsection}{\numberline {3.8.3.3}setDescriptorExtractor}{21}{subsubsection.3.8.3.3}
+\contentsline {subsubsection}{\numberline {3.8.3.4}setFeatureDetector}{21}{subsubsection.3.8.3.4}

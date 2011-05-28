@@ -108,14 +108,24 @@ std::vector&lt; <a class="el" href="class_opencv_sf_m_1_1_field_of_view.html">Fi
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>This class represent the physical device which take the pictures. It is not related to a 3D position which is the role of the class <a class="el" href="class_opencv_sf_m_1_1_field_of_view.html" title="This class represent the 3D position of the device which take the pictures. The role of the class is ...">FieldOfView</a>. The role of the class is to store only device related informations like intra parameters, radial and tangential distotion. </p>
-<p>This class can be used to store device related informations like intra parameters, radial and tangential distortion. We use the so-called pinhole camera model. That is, a scene view is formed by projecting 3D points into the image plane using a perspective transformation. Usual notation says that a point [u,v] from an image is related to the point [X,Y,Z] using the following notation : /f[ s {bmatrix} u \ v \ 1 {bmatrix} = {bmatrix}f_x &amp; 0 &amp; c_x \ 0 &amp; f_y &amp; c_y \ 0 &amp; 0 &amp; 1 {bmatrix} {bmatrix} r_{11} &amp; r_{12} &amp; r_{13} &amp; t_1 \ r_{21} &amp; r_{22} &amp; r_{23} &amp; t_2 \ r_{31} &amp; r_{32} &amp; r_{33} &amp; t_3 {bmatrix} {bmatrix} X \ Y \ Z \ 1 {bmatrix} /f]</p>
-<p>This leads to the following relation between local coordinates and global ones: /f[ {array}{l} {10pt} {bmatrix} x \ y \ z {bmatrix} = R {bmatrix} X \ Y \ Z {bmatrix} + t \ x' = x/z \ y' = y/z {10pt} {array} /f]</p>
-<p>Additionnal radial and tangeancial distortion are modelized like this: /f[ {array}{l} {10pt} x'' = x' {1 + k_1 r^2 + k_2 r^4 + k_3 r^6}{1 + k_4 r^2 + k_5 r^4 + k_6 r^6} + 2 p_1 x' y' + p_2(r^2 + 2 x'^2) \ {10pt} y'' = y' {1 + k_1 r^2 + k_2 r^4 + k_3 r^6}{1 + k_4 r^2 + k_5 r^4 + k_6 r^6} + p_1 (r^2 + 2 y'^2) + 2 p_2 x' y' \ {where}  r^2 = x'^2 + y'^2 \ u = f_x*x'' + c_x \ v = f_y*y'' + c_y {array} /f] radial_dist_ can be used to store /f$k_1/f$ to /f$k_6/f$ tangential_dist_ can be used to store /f$p_1/f$ and /f$p_2/f$ </p>
+<p>This class can be used to store device related informations like intra parameters, radial and tangential distortion. We use the so-called pinhole camera model. That is, a scene view is formed by projecting 3D points into the image plane using a perspective transformation. Usual notation says that a point [u,v] from an image is related to the point [X,Y,Z] using the following notation : </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ s \begin{bmatrix} u \\ v \\ 1 \end{bmatrix} = \begin{bmatrix}f_x &amp; 0 &amp; c_x \\ 0 &amp; f_y &amp; c_y \\ 0 &amp; 0 &amp; 1 \end{bmatrix} \begin{bmatrix} r_{11} &amp; r_{12} &amp; r_{13} &amp; t_1 \\ r_{21} &amp; r_{22} &amp; r_{23} &amp; t_2 \\ r_{31} &amp; r_{32} &amp; r_{33} &amp; t_3 \end{bmatrix} \begin{bmatrix} X \\ Y \\ Z \\ 1 \end{bmatrix} \]" src="form_0.png"/>
+</p>
+<p>This leads to the following relation between local coordinates and global ones: </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ \begin{array}{l} \vspace{10pt} \begin{bmatrix} x \\ y \\ z \end{bmatrix} = R \begin{bmatrix} X \\ Y \\ Z \end{bmatrix} + t \\ x' = x/z \\ y' = y/z \vspace{10pt} \end{array} \]" src="form_1.png"/>
+</p>
+<p>Additionnal radial and tangeancial distortion are modelized like this: </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ \begin{array}{l} \vspace{10pt} x'' = x' \dfrac{1 + k_1 r^2 + k_2 r^4 + k_3 r^6}{1 + k_4 r^2 + k_5 r^4 + k_6 r^6} + 2 p_1 x' y' + p_2(r^2 + 2 x'^2) \\ \vspace{10pt} y'' = y' \dfrac{1 + k_1 r^2 + k_2 r^4 + k_3 r^6}{1 + k_4 r^2 + k_5 r^4 + k_6 r^6} + p_1 (r^2 + 2 y'^2) + 2 p_2 x' y' \\ \text{where} \quad r^2 = x'^2 + y'^2 \\ u = f_x*x'' + c_x \\ v = f_y*y'' + c_y \end{array} \]" src="form_2.png"/>
+</p>
+<p> radial_dist_ can be used to store /f$k_1/f$ to /f$k_6/f$ tangential_dist_ can be used to store /f$p_1/f$ and /f$p_2/f$ </p>
 
 <p>Definition at line <a class="el" href="_camera_8h_source.html#l00048">48</a> of file <a class="el" href="_camera_8h_source.html">Camera.h</a>.</p>
 </div><hr/>The documentation for this class was generated from the following files:<ul>
-<li>src/<a class="el" href="_camera_8h_source.html">Camera.h</a></li>
-<li>src/<a class="el" href="_camera_8cpp_source.html">Camera.cpp</a></li>
+<li>D:/Travail/These/Determination caracteristiques camera/GSoC/SfM/src/<a class="el" href="_camera_8h_source.html">Camera.h</a></li>
+<li>D:/Travail/These/Determination caracteristiques camera/GSoC/SfM/src/<a class="el" href="_camera_8cpp_source.html">Camera.cpp</a></li>
 </ul>
 </div>
 <!-- window showing the filter options -->
@@ -132,7 +142,7 @@ std::vector&lt; <a class="el" href="class_opencv_sf_m_1_1_field_of_view.html">Fi
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Sat May 28 2011 17:05:41 for GSoC2011SfM by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Sat May 28 2011 17:45:45 for GSoC2011SfM by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>
