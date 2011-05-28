@@ -1,0 +1,197 @@
+\hypertarget{class_opencv_sf_m_1_1_points_to_track_with_image}{
+\section{OpencvSfM::PointsToTrackWithImage Class Reference}
+\label{class_opencv_sf_m_1_1_points_to_track_with_image}\index{OpencvSfM::PointsToTrackWithImage@{OpencvSfM::PointsToTrackWithImage}}
+}
+
+
+This class can be used to find points and features in pictures using SIFT detector.  
+
+
+
+
+{\ttfamily \#include $<$PointsToTrackWithImage.h$>$}
+
+Inheritance diagram for OpencvSfM::PointsToTrackWithImage:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_opencv_sf_m_1_1_points_to_track_with_image}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_opencv_sf_m_1_1_points_to_track_with_image_a16b5fffabd61a2e728c1d677307d221e}{PointsToTrackWithImage} (cv::Mat imageToAnalyse, cv::Mat maskOfAnalyse, cv::Ptr$<$ cv::FeatureDetector $>$ feature\_\-detector=0, cv::Ptr$<$ cv::DescriptorExtractor $>$ descriptor\_\-detector=0)
+\item 
+\hyperlink{class_opencv_sf_m_1_1_points_to_track_with_image_a617869848cca4ee8f7933b203eaf8638}{PointsToTrackWithImage} (cv::Mat imageToAnalyse, cv::Mat maskOfAnalyse, std::string feature\_\-detector, std::string descriptor\_\-detector=\char`\"{}SIFT\char`\"{})
+\item 
+void \hyperlink{class_opencv_sf_m_1_1_points_to_track_with_image_a08e85521d6884eec1d113dd81354502f}{setFeatureDetector} (cv::Ptr$<$ cv::FeatureDetector $>$ feature\_\-detector)
+\item 
+void \hyperlink{class_opencv_sf_m_1_1_points_to_track_with_image_a3438e554c9ef0d807ccad6799209bb50}{setDescriptorExtractor} (cv::Ptr$<$ cv::DescriptorExtractor $>$ descriptor\_\-detector)
+\item 
+int \hyperlink{class_opencv_sf_m_1_1_points_to_track_with_image_a4fba046ec6498fcea5b38253d19b80f9}{computeKeypoints} ()
+\item 
+void \hyperlink{class_opencv_sf_m_1_1_points_to_track_with_image_aee97104c9c66601e5c51237717cb2522}{computeDescriptors} ()
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_opencv_sf_m_1_1_points_to_track_with_image_a22779db7344fed472cebc4a00ecef631}{
+cv::Ptr$<$ cv::FeatureDetector $>$ \hyperlink{class_opencv_sf_m_1_1_points_to_track_with_image_a22779db7344fed472cebc4a00ecef631}{feature\_\-detector\_\-}}
+\label{class_opencv_sf_m_1_1_points_to_track_with_image_a22779db7344fed472cebc4a00ecef631}
+
+\begin{DoxyCompactList}\small\item\em class which will find the points \end{DoxyCompactList}\item 
+\hypertarget{class_opencv_sf_m_1_1_points_to_track_with_image_ac43985b39b4b99ffff25926f1e9ece66}{
+cv::Ptr$<$ cv::DescriptorExtractor $>$ \hyperlink{class_opencv_sf_m_1_1_points_to_track_with_image_ac43985b39b4b99ffff25926f1e9ece66}{descriptor\_\-detector\_\-}}
+\label{class_opencv_sf_m_1_1_points_to_track_with_image_ac43985b39b4b99ffff25926f1e9ece66}
+
+\begin{DoxyCompactList}\small\item\em class which will compute the descriptors \end{DoxyCompactList}\item 
+\hypertarget{class_opencv_sf_m_1_1_points_to_track_with_image_adccc33e14b09ecbe0d5963b405e58d48}{
+cv::Mat \hyperlink{class_opencv_sf_m_1_1_points_to_track_with_image_adccc33e14b09ecbe0d5963b405e58d48}{imageToAnalyse\_\-}}
+\label{class_opencv_sf_m_1_1_points_to_track_with_image_adccc33e14b09ecbe0d5963b405e58d48}
+
+\begin{DoxyCompactList}\small\item\em Picture from where points are detected. \end{DoxyCompactList}\item 
+\hypertarget{class_opencv_sf_m_1_1_points_to_track_with_image_a4fe39d059ba8a892abe3a1d998626806}{
+cv::Mat \hyperlink{class_opencv_sf_m_1_1_points_to_track_with_image_a4fe39d059ba8a892abe3a1d998626806}{maskOfAnalyse\_\-}}
+\label{class_opencv_sf_m_1_1_points_to_track_with_image_a4fe39d059ba8a892abe3a1d998626806}
+
+\begin{DoxyCompactList}\small\item\em Mask of analyse. Everything out of this mask is ignored. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This class can be used to find points and features in pictures using SIFT detector. 
+
+To create a structure from motion, most methods use points to compute the structure. This class focus on the first task in SfM: find points in image which are easy to track... When available, a feature vector for each points is very helpful: the matching will be easier. 
+
+Definition at line 14 of file PointsToTrackWithImage.h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_opencv_sf_m_1_1_points_to_track_with_image_a16b5fffabd61a2e728c1d677307d221e}{
+\index{OpencvSfM::PointsToTrackWithImage@{OpencvSfM::PointsToTrackWithImage}!PointsToTrackWithImage@{PointsToTrackWithImage}}
+\index{PointsToTrackWithImage@{PointsToTrackWithImage}!OpencvSfM::PointsToTrackWithImage@{OpencvSfM::PointsToTrackWithImage}}
+\subsubsection[{PointsToTrackWithImage}]{\setlength{\rightskip}{0pt plus 5cm}OpencvSfM::PointsToTrackWithImage::PointsToTrackWithImage (
+\begin{DoxyParamCaption}
+\item[{cv::Mat}]{imageToAnalyse, }
+\item[{cv::Mat}]{maskOfAnalyse, }
+\item[{cv::Ptr$<$ cv::FeatureDetector $>$}]{feature\_\-detector = {\ttfamily 0}, }
+\item[{cv::Ptr$<$ cv::DescriptorExtractor $>$}]{descriptor\_\-detector = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)}}
+\label{class_opencv_sf_m_1_1_points_to_track_with_image_a16b5fffabd61a2e728c1d677307d221e}
+First constructor used to create a list of points to track using a feature and a descriptor algorithm. 
+\begin{DoxyParams}{Parameters}
+{\em imageToAnalyse} & Image to use for keypoints and features search \\
+\hline
+{\em maskOfAnalyse} & Mask used to hide part of image \\
+\hline
+{\em feature\_\-detector} & Algorithm to use for features detection (see \href{http://opencv.willowgarage.com/documentation/cpp/common_interfaces_for_feature_detection_and_descriptor_extraction.html#featuredetector}{\tt http://opencv.willowgarage.com/documentation/cpp/common\_\-interfaces\_\-for\_\-feature\_\-detection\_\-and\_\-descriptor\_\-extraction.html\#featuredetector}) \\
+\hline
+{\em descriptor\_\-detector} & Algorithm to use for descriptors detection (see \href{http://opencv.willowgarage.com/documentation/cpp/common_interfaces_for_feature_detection_and_descriptor_extraction.html#descriptorextractor}{\tt http://opencv.willowgarage.com/documentation/cpp/common\_\-interfaces\_\-for\_\-feature\_\-detection\_\-and\_\-descriptor\_\-extraction.html\#descriptorextractor}) \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_opencv_sf_m_1_1_points_to_track_with_image_a617869848cca4ee8f7933b203eaf8638}{
+\index{OpencvSfM::PointsToTrackWithImage@{OpencvSfM::PointsToTrackWithImage}!PointsToTrackWithImage@{PointsToTrackWithImage}}
+\index{PointsToTrackWithImage@{PointsToTrackWithImage}!OpencvSfM::PointsToTrackWithImage@{OpencvSfM::PointsToTrackWithImage}}
+\subsubsection[{PointsToTrackWithImage}]{\setlength{\rightskip}{0pt plus 5cm}OpencvSfM::PointsToTrackWithImage::PointsToTrackWithImage (
+\begin{DoxyParamCaption}
+\item[{cv::Mat}]{imageToAnalyse, }
+\item[{cv::Mat}]{maskOfAnalyse, }
+\item[{std::string}]{feature\_\-detector, }
+\item[{std::string}]{descriptor\_\-detector = {\ttfamily \char`\"{}SIFT\char`\"{}}}
+\end{DoxyParamCaption}
+)}}
+\label{class_opencv_sf_m_1_1_points_to_track_with_image_a617869848cca4ee8f7933b203eaf8638}
+Second constructor used to create a list of points to track using a feature and a descriptor algorithm. 
+\begin{DoxyParams}{Parameters}
+{\em imageToAnalyse} & Image to use for keypoints and features search \\
+\hline
+{\em maskOfAnalyse} & Mask used to hide part of image \\
+\hline
+{\em feature\_\-detector} & name of the algorithm to use for features detection (see \href{http://opencv.willowgarage.com/documentation/cpp/common_interfaces_for_feature_detection_and_descriptor_extraction.html#featuredetector}{\tt http://opencv.willowgarage.com/documentation/cpp/common\_\-interfaces\_\-for\_\-feature\_\-detection\_\-and\_\-descriptor\_\-extraction.html\#featuredetector}) \\
+\hline
+{\em descriptor\_\-detector} & name of the algorithm to use for descriptors detection (see \href{http://opencv.willowgarage.com/documentation/cpp/common_interfaces_for_feature_detection_and_descriptor_extraction.html#descriptorextractor}{\tt http://opencv.willowgarage.com/documentation/cpp/common\_\-interfaces\_\-for\_\-feature\_\-detection\_\-and\_\-descriptor\_\-extraction.html\#descriptorextractor}) \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_opencv_sf_m_1_1_points_to_track_with_image_aee97104c9c66601e5c51237717cb2522}{
+\index{OpencvSfM::PointsToTrackWithImage@{OpencvSfM::PointsToTrackWithImage}!computeDescriptors@{computeDescriptors}}
+\index{computeDescriptors@{computeDescriptors}!OpencvSfM::PointsToTrackWithImage@{OpencvSfM::PointsToTrackWithImage}}
+\subsubsection[{computeDescriptors}]{\setlength{\rightskip}{0pt plus 5cm}void OpencvSfM::PointsToTrackWithImage::computeDescriptors (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{class_opencv_sf_m_1_1_points_to_track_with_image_aee97104c9c66601e5c51237717cb2522}
+This method is used to compute only descriptors... 
+
+Reimplemented from \hyperlink{class_opencv_sf_m_1_1_points_to_track_a1e5ef9b8da87d1b412c348ad813d0267}{OpencvSfM::PointsToTrack}.
+
+
+
+Definition at line 45 of file PointsToTrackWithImage.cpp.
+
+\hypertarget{class_opencv_sf_m_1_1_points_to_track_with_image_a4fba046ec6498fcea5b38253d19b80f9}{
+\index{OpencvSfM::PointsToTrackWithImage@{OpencvSfM::PointsToTrackWithImage}!computeKeypoints@{computeKeypoints}}
+\index{computeKeypoints@{computeKeypoints}!OpencvSfM::PointsToTrackWithImage@{OpencvSfM::PointsToTrackWithImage}}
+\subsubsection[{computeKeypoints}]{\setlength{\rightskip}{0pt plus 5cm}int OpencvSfM::PointsToTrackWithImage::computeKeypoints (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{class_opencv_sf_m_1_1_points_to_track_with_image_a4fba046ec6498fcea5b38253d19b80f9}
+This method is used to compute only Keypoints... \begin{DoxyReturn}{Returns}
+the number of points 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{class_opencv_sf_m_1_1_points_to_track_ac7009164560dac1f4d3283c4bf1181a3}{OpencvSfM::PointsToTrack}.
+
+
+
+Definition at line 39 of file PointsToTrackWithImage.cpp.
+
+\hypertarget{class_opencv_sf_m_1_1_points_to_track_with_image_a3438e554c9ef0d807ccad6799209bb50}{
+\index{OpencvSfM::PointsToTrackWithImage@{OpencvSfM::PointsToTrackWithImage}!setDescriptorExtractor@{setDescriptorExtractor}}
+\index{setDescriptorExtractor@{setDescriptorExtractor}!OpencvSfM::PointsToTrackWithImage@{OpencvSfM::PointsToTrackWithImage}}
+\subsubsection[{setDescriptorExtractor}]{\setlength{\rightskip}{0pt plus 5cm}void OpencvSfM::PointsToTrackWithImage::setDescriptorExtractor (
+\begin{DoxyParamCaption}
+\item[{cv::Ptr$<$ cv::DescriptorExtractor $>$}]{descriptor\_\-detector}
+\end{DoxyParamCaption}
+)}}
+\label{class_opencv_sf_m_1_1_points_to_track_with_image_a3438e554c9ef0d807ccad6799209bb50}
+Use this function to set the descriptor extractor. Can be useful to update parameters, for example! 
+\begin{DoxyParams}{Parameters}
+{\em descriptor\_\-detector} & new pointer of a descriptor extractor algorithm. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 28 of file PointsToTrackWithImage.cpp.
+
+\hypertarget{class_opencv_sf_m_1_1_points_to_track_with_image_a08e85521d6884eec1d113dd81354502f}{
+\index{OpencvSfM::PointsToTrackWithImage@{OpencvSfM::PointsToTrackWithImage}!setFeatureDetector@{setFeatureDetector}}
+\index{setFeatureDetector@{setFeatureDetector}!OpencvSfM::PointsToTrackWithImage@{OpencvSfM::PointsToTrackWithImage}}
+\subsubsection[{setFeatureDetector}]{\setlength{\rightskip}{0pt plus 5cm}void OpencvSfM::PointsToTrackWithImage::setFeatureDetector (
+\begin{DoxyParamCaption}
+\item[{cv::Ptr$<$ cv::FeatureDetector $>$}]{feature\_\-detector}
+\end{DoxyParamCaption}
+)}}
+\label{class_opencv_sf_m_1_1_points_to_track_with_image_a08e85521d6884eec1d113dd81354502f}
+Use this function to set the feature detector. Can be useful to update parameters, for example! 
+\begin{DoxyParams}{Parameters}
+{\em feature\_\-detector} & new pointer of a feature detector algorithm. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 23 of file PointsToTrackWithImage.cpp.
+
+
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+src/PointsToTrackWithImage.h\item 
+src/PointsToTrackWithImage.cpp\end{DoxyCompactItemize}

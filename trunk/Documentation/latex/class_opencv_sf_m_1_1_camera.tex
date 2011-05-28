@@ -1,0 +1,73 @@
+\hypertarget{class_opencv_sf_m_1_1_camera}{
+\section{OpencvSfM::Camera Class Reference}
+\label{class_opencv_sf_m_1_1_camera}\index{OpencvSfM::Camera@{OpencvSfM::Camera}}
+}
+
+
+This class represent the physical device which take the pictures. It is not related to a 3D position which is the role of the class \hyperlink{class_opencv_sf_m_1_1_field_of_view}{FieldOfView}. The role of the class is to store only device related informations like intra parameters, radial and tangential distotion.  
+
+
+
+
+{\ttfamily \#include $<$Camera.h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_opencv_sf_m_1_1_camera_a5c689d729d8a8bee7b3f57d5dd764cd7}{
+{\bfseries Camera} (cv::Mat intra\_\-params=cv::Mat::eye(3, 3, CV\_\-64F), cv::Vec$<$ double, 6 $>$ radial\_\-dist=cv::Vec$<$ double, 6 $>$(0.0, 0.0, 0.0, 0.0, 0.0, 0.0), cv::Vec$<$ double, 2 $>$ tangential\_\-dist=cv::Vec$<$ double, 2 $>$(0.0, 0.0))}
+\label{class_opencv_sf_m_1_1_camera_a5c689d729d8a8bee7b3f57d5dd764cd7}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_opencv_sf_m_1_1_camera_ab8ba859298ee9c13374477a99dd4241e}{
+cv::Mat \hyperlink{class_opencv_sf_m_1_1_camera_ab8ba859298ee9c13374477a99dd4241e}{intra\_\-params\_\-}}
+\label{class_opencv_sf_m_1_1_camera_ab8ba859298ee9c13374477a99dd4241e}
+
+\begin{DoxyCompactList}\small\item\em store intra parameters(3$\ast$3 matrix). This matrix contains focal informations, principal point coordinates and skew of axis \end{DoxyCompactList}\item 
+\hypertarget{class_opencv_sf_m_1_1_camera_a78c5473c4630de99d70d2d26d8321117}{
+cv::Mat \hyperlink{class_opencv_sf_m_1_1_camera_a78c5473c4630de99d70d2d26d8321117}{inv\_\-intra\_\-params\_\-}}
+\label{class_opencv_sf_m_1_1_camera_a78c5473c4630de99d70d2d26d8321117}
+
+\begin{DoxyCompactList}\small\item\em This is the inverse transformation of intra\_\-params\_\-. Used to speed up calculus... \end{DoxyCompactList}\item 
+\hypertarget{class_opencv_sf_m_1_1_camera_aa944a739f433b8fa984a963478f6d1f8}{
+cv::Vec$<$ double, 6 $>$ \hyperlink{class_opencv_sf_m_1_1_camera_aa944a739f433b8fa984a963478f6d1f8}{radial\_\-dist\_\-}}
+\label{class_opencv_sf_m_1_1_camera_aa944a739f433b8fa984a963478f6d1f8}
+
+\begin{DoxyCompactList}\small\item\em used to store radial dist parameters (/f\$k\_\-1/f\$ to /f\$k\_\-6/f\$) \end{DoxyCompactList}\item 
+\hypertarget{class_opencv_sf_m_1_1_camera_aca7121c3867cfd9af58c888b206581b9}{
+cv::Vec$<$ double, 2 $>$ \hyperlink{class_opencv_sf_m_1_1_camera_aca7121c3867cfd9af58c888b206581b9}{tangential\_\-dist\_\-}}
+\label{class_opencv_sf_m_1_1_camera_aca7121c3867cfd9af58c888b206581b9}
+
+\begin{DoxyCompactList}\small\item\em used to store tangential dist parameters (/f\$p\_\-1/f\$ and /f\$p\_\-2/f\$) \end{DoxyCompactList}\item 
+\hypertarget{class_opencv_sf_m_1_1_camera_a8d0f1e2b2467b256b34fee4a5df31e4d}{
+unsigned char \hyperlink{class_opencv_sf_m_1_1_camera_a8d0f1e2b2467b256b34fee4a5df31e4d}{config\_\-}}
+\label{class_opencv_sf_m_1_1_camera_a8d0f1e2b2467b256b34fee4a5df31e4d}
+
+\begin{DoxyCompactList}\small\item\em This attribut is used to know what we should estimate... If equal to 0, everything should be estimated... \end{DoxyCompactList}\item 
+\hypertarget{class_opencv_sf_m_1_1_camera_aa12601d4d667646d9be47e5355eebe04}{
+std::vector$<$ \hyperlink{class_opencv_sf_m_1_1_field_of_view}{FieldOfView} $>$ \hyperlink{class_opencv_sf_m_1_1_camera_aa12601d4d667646d9be47e5355eebe04}{pointsOfView\_\-}}
+\label{class_opencv_sf_m_1_1_camera_aa12601d4d667646d9be47e5355eebe04}
+
+\begin{DoxyCompactList}\small\item\em vector of the differents positions of the camera. This will store images too. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This class represent the physical device which take the pictures. It is not related to a 3D position which is the role of the class \hyperlink{class_opencv_sf_m_1_1_field_of_view}{FieldOfView}. The role of the class is to store only device related informations like intra parameters, radial and tangential distotion. 
+
+This class can be used to store device related informations like intra parameters, radial and tangential distortion. We use the so-\/called pinhole camera model. That is, a scene view is formed by projecting 3D points into the image plane using a perspective transformation. Usual notation says that a point \mbox{[}u,v\mbox{]} from an image is related to the point \mbox{[}X,Y,Z\mbox{]} using the following notation : /f\mbox{[} s \{bmatrix\} u $\backslash$ v $\backslash$ 1 \{bmatrix\} = \{bmatrix\}f\_\-x \& 0 \& c\_\-x $\backslash$ 0 \& f\_\-y \& c\_\-y $\backslash$ 0 \& 0 \& 1 \{bmatrix\} \{bmatrix\} r\_\-\{11\} \& r\_\-\{12\} \& r\_\-\{13\} \& t\_\-1 $\backslash$ r\_\-\{21\} \& r\_\-\{22\} \& r\_\-\{23\} \& t\_\-2 $\backslash$ r\_\-\{31\} \& r\_\-\{32\} \& r\_\-\{33\} \& t\_\-3 \{bmatrix\} \{bmatrix\} X $\backslash$ Y $\backslash$ Z $\backslash$ 1 \{bmatrix\} /f\mbox{]}
+
+This leads to the following relation between local coordinates and global ones: /f\mbox{[} \{array\}\{l\} \{10pt\} \{bmatrix\} x $\backslash$ y $\backslash$ z \{bmatrix\} = R \{bmatrix\} X $\backslash$ Y $\backslash$ Z \{bmatrix\} + t $\backslash$ x' = x/z $\backslash$ y' = y/z \{10pt\} \{array\} /f\mbox{]}
+
+Additionnal radial and tangeancial distortion are modelized like this: /f\mbox{[} \{array\}\{l\} \{10pt\} x'' = x' \{1 + k\_\-1 r$^\wedge$2 + k\_\-2 r$^\wedge$4 + k\_\-3 r$^\wedge$6\}\{1 + k\_\-4 r$^\wedge$2 + k\_\-5 r$^\wedge$4 + k\_\-6 r$^\wedge$6\} + 2 p\_\-1 x' y' + p\_\-2(r$^\wedge$2 + 2 x'$^\wedge$2) $\backslash$ \{10pt\} y'' = y' \{1 + k\_\-1 r$^\wedge$2 + k\_\-2 r$^\wedge$4 + k\_\-3 r$^\wedge$6\}\{1 + k\_\-4 r$^\wedge$2 + k\_\-5 r$^\wedge$4 + k\_\-6 r$^\wedge$6\} + p\_\-1 (r$^\wedge$2 + 2 y'$^\wedge$2) + 2 p\_\-2 x' y' $\backslash$ \{where\}  r$^\wedge$2 = x'$^\wedge$2 + y'$^\wedge$2 $\backslash$ u = f\_\-x$\ast$x'' + c\_\-x $\backslash$ v = f\_\-y$\ast$y'' + c\_\-y \{array\} /f\mbox{]} radial\_\-dist\_\- can be used to store /f\$k\_\-1/f\$ to /f\$k\_\-6/f\$ tangential\_\-dist\_\- can be used to store /f\$p\_\-1/f\$ and /f\$p\_\-2/f\$ 
+
+Definition at line 48 of file Camera.h.
+
+
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+src/Camera.h\item 
+src/Camera.cpp\end{DoxyCompactItemize}

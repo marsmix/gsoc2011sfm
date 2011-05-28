@@ -1,0 +1,233 @@
+\hypertarget{class_opencv_sf_m_1_1_field_of_view}{
+\section{OpencvSfM::FieldOfView Class Reference}
+\label{class_opencv_sf_m_1_1_field_of_view}\index{OpencvSfM::FieldOfView@{OpencvSfM::FieldOfView}}
+}
+
+
+This class represent the 3D position of the device which take the pictures. The role of the class is to store everything related to the filed of view: picture, 3D position, points, matches and 3D points.  
+
+
+
+
+{\ttfamily \#include $<$FieldOfView.h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_opencv_sf_m_1_1_field_of_view_a28445368ae4bb987cbd12556cf507489}{FieldOfView} ()
+\item 
+\hyperlink{class_opencv_sf_m_1_1_field_of_view_af5840e7345294668ed5adda8b66cb801}{FieldOfView} (\hyperlink{class_opencv_sf_m_1_1_camera}{Camera} $\ast$device, std::string imgFileName, cv::Mat rotation=cv::Mat::eye(3, 3, CV\_\-64F), cv::Vec$<$ double, 3 $>$ translation=cv::Vec$<$ double, 3 $>$(0.0, 0.0, 0.0))
+\item 
+\hyperlink{class_opencv_sf_m_1_1_field_of_view_ad7f1e3fcb46cacb23de274ea0626e7ab}{FieldOfView} (\hyperlink{class_opencv_sf_m_1_1_camera}{Camera} $\ast$device, cv::Mat image, cv::Mat rotation=cv::Mat::eye(3, 3, CV\_\-64F), cv::Vec$<$ double, 3 $>$ translation=cv::Vec$<$ double, 3 $>$(0.0, 0.0, 0.0))
+\item 
+\hyperlink{class_opencv_sf_m_1_1_field_of_view_a55c9d18ac6dc35027bf007ed8c6787da}{FieldOfView} (\hyperlink{class_opencv_sf_m_1_1_camera}{Camera} $\ast$device, \hyperlink{class_opencv_sf_m_1_1_points_to_track}{PointsToTrack} $\ast$points, \hyperlink{class_opencv_sf_m_1_1_points_matcher}{PointsMatcher} $\ast$matches=NULL, cv::Mat rotation=cv::Mat::eye(3, 3, CV\_\-64F), cv::Vec$<$ double, 3 $>$ translation=cv::Vec$<$ double, 3 $>$(0.0, 0.0, 0.0))
+\item 
+\hyperlink{class_opencv_sf_m_1_1_field_of_view_ab9ac603aaea80b30ccfe20279b2453a3}{FieldOfView} (\hyperlink{class_opencv_sf_m_1_1_field_of_view}{FieldOfView} \&otherFieldOfView)
+\item 
+virtual \hyperlink{class_opencv_sf_m_1_1_field_of_view_a15cdc4b6936cfd126419c68be464342b}{$\sim$FieldOfView} (void)
+\item 
+bool \hyperlink{class_opencv_sf_m_1_1_field_of_view_a6617003b67eda0d09b8da81ed7dad83d}{isRealFoV} ()
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_opencv_sf_m_1_1_field_of_view_a7fdf881267569181344ffc63e8558610}{
+cv::Mat \hyperlink{class_opencv_sf_m_1_1_field_of_view_a7fdf881267569181344ffc63e8558610}{image\_\-}}
+\label{class_opencv_sf_m_1_1_field_of_view_a7fdf881267569181344ffc63e8558610}
+
+\begin{DoxyCompactList}\small\item\em The picture we get from this position... Could be RGB, B\&W... \end{DoxyCompactList}\item 
+\hypertarget{class_opencv_sf_m_1_1_field_of_view_af65a2a69ee83e7d380104136b47554ac}{
+cv::Mat \hyperlink{class_opencv_sf_m_1_1_field_of_view_af65a2a69ee83e7d380104136b47554ac}{rotation\_\-}}
+\label{class_opencv_sf_m_1_1_field_of_view_af65a2a69ee83e7d380104136b47554ac}
+
+\begin{DoxyCompactList}\small\item\em Rotation matrix R. \end{DoxyCompactList}\item 
+\hypertarget{class_opencv_sf_m_1_1_field_of_view_a6a5933af068977d707e1823463b4ab05}{
+cv::Vec$<$ double, 3 $>$ \hyperlink{class_opencv_sf_m_1_1_field_of_view_a6a5933af068977d707e1823463b4ab05}{translation\_\-}}
+\label{class_opencv_sf_m_1_1_field_of_view_a6a5933af068977d707e1823463b4ab05}
+
+\begin{DoxyCompactList}\small\item\em Translation vector t. \end{DoxyCompactList}\item 
+\hypertarget{class_opencv_sf_m_1_1_field_of_view_a77a3658e69d8abc43ef22ec9f8b6df5a}{
+cv::Mat \hyperlink{class_opencv_sf_m_1_1_field_of_view_a77a3658e69d8abc43ef22ec9f8b6df5a}{projection\_\-matrix\_\-}}
+\label{class_opencv_sf_m_1_1_field_of_view_a77a3658e69d8abc43ef22ec9f8b6df5a}
+
+\begin{DoxyCompactList}\small\item\em redundancy but speed improvement \end{DoxyCompactList}\item 
+\hypertarget{class_opencv_sf_m_1_1_field_of_view_ae01ec341458e4170e918676cea8d1fd3}{
+\hyperlink{class_opencv_sf_m_1_1_camera}{Camera} $\ast$ \hyperlink{class_opencv_sf_m_1_1_field_of_view_ae01ec341458e4170e918676cea8d1fd3}{device\_\-}}
+\label{class_opencv_sf_m_1_1_field_of_view_ae01ec341458e4170e918676cea8d1fd3}
+
+\begin{DoxyCompactList}\small\item\em intra parameters and distortion coefs \end{DoxyCompactList}\item 
+\hypertarget{class_opencv_sf_m_1_1_field_of_view_a77cd3559de42f6a458272f784f17687f}{
+\hyperlink{class_opencv_sf_m_1_1_points_to_track}{PointsToTrack} $\ast$ \hyperlink{class_opencv_sf_m_1_1_field_of_view_a77cd3559de42f6a458272f784f17687f}{pointsInfo\_\-}}
+\label{class_opencv_sf_m_1_1_field_of_view_a77cd3559de42f6a458272f784f17687f}
+
+\begin{DoxyCompactList}\small\item\em Points which are found in the picture. \end{DoxyCompactList}\item 
+\hypertarget{class_opencv_sf_m_1_1_field_of_view_a2e55ed099fa404ede90edbc8652135a5}{
+\hyperlink{class_opencv_sf_m_1_1_points_matcher}{PointsMatcher} $\ast$ \hyperlink{class_opencv_sf_m_1_1_field_of_view_a2e55ed099fa404ede90edbc8652135a5}{matches\_\-}}
+\label{class_opencv_sf_m_1_1_field_of_view_a2e55ed099fa404ede90edbc8652135a5}
+
+\begin{DoxyCompactList}\small\item\em This object will store the differents matches estimations between this FoV and other related views... ! This object will be shared between different FoV ! \end{DoxyCompactList}\item 
+\hypertarget{class_opencv_sf_m_1_1_field_of_view_a7ddc8c9468643260946a927a302f9d7f}{
+\hyperlink{class_opencv_sf_m_1_1_extern_pos_estim}{ExternPosEstim} $\ast$ {\bfseries extern\_\-position\_\-}}
+\label{class_opencv_sf_m_1_1_field_of_view_a7ddc8c9468643260946a927a302f9d7f}
+
+\item 
+\hypertarget{class_opencv_sf_m_1_1_field_of_view_a5045c21d7eeaeed2293a1e2d7bbb9a9d}{
+\hyperlink{class_opencv_sf_m_1_1_points3_d_estim}{Points3DEstim} $\ast$ {\bfseries points3D\_\-}}
+\label{class_opencv_sf_m_1_1_field_of_view_a5045c21d7eeaeed2293a1e2d7bbb9a9d}
+
+\item 
+\hypertarget{class_opencv_sf_m_1_1_field_of_view_af47e74bc88efc7af4e1f6f802217561c}{
+unsigned char \hyperlink{class_opencv_sf_m_1_1_field_of_view_af47e74bc88efc7af4e1f6f802217561c}{config\_\-}}
+\label{class_opencv_sf_m_1_1_field_of_view_af47e74bc88efc7af4e1f6f802217561c}
+
+\begin{DoxyCompactList}\small\item\em This attribut is used to know what we should estimate... If equal to 0, everything should be estimated... \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This class represent the 3D position of the device which take the pictures. The role of the class is to store everything related to the filed of view: picture, 3D position, points, matches and 3D points. 
+
+We use the so-\/called pinhole camera model. That is, a scene view is formed by projecting 3D points into the image plane using a perspective transformation. Usual notation says that a point \mbox{[}u,v\mbox{]} from an image is related to the point \mbox{[}X,Y,Z\mbox{]} using the following notation : /f\mbox{[} s \{bmatrix\} u $\backslash$ v $\backslash$ 1 \{bmatrix\} = \{bmatrix\}f\_\-x \& 0 \& c\_\-x $\backslash$ 0 \& f\_\-y \& c\_\-y $\backslash$ 0 \& 0 \& 1 \{bmatrix\} \{bmatrix\} r\_\-\{11\} \& r\_\-\{12\} \& r\_\-\{13\} \& t\_\-1 $\backslash$ r\_\-\{21\} \& r\_\-\{22\} \& r\_\-\{23\} \& t\_\-2 $\backslash$ r\_\-\{31\} \& r\_\-\{32\} \& r\_\-\{33\} \& t\_\-3 \{bmatrix\} \{bmatrix\} X $\backslash$ Y $\backslash$ Z $\backslash$ 1 \{bmatrix\} /f\mbox{]}
+
+This leads to the following relation between local coordinates and global ones: /f\mbox{[} \{array\}\{l\} \{10pt\} \{bmatrix\} x $\backslash$ y $\backslash$ z \{bmatrix\} = R \{bmatrix\} X $\backslash$ Y $\backslash$ Z \{bmatrix\} + t $\backslash$ x' = x/z $\backslash$ y' = y/z \{10pt\} \{array\} /f\mbox{]} 
+
+Definition at line 47 of file FieldOfView.h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_opencv_sf_m_1_1_field_of_view_a28445368ae4bb987cbd12556cf507489}{
+\index{OpencvSfM::FieldOfView@{OpencvSfM::FieldOfView}!FieldOfView@{FieldOfView}}
+\index{FieldOfView@{FieldOfView}!OpencvSfM::FieldOfView@{OpencvSfM::FieldOfView}}
+\subsubsection[{FieldOfView}]{\setlength{\rightskip}{0pt plus 5cm}OpencvSfM::FieldOfView::FieldOfView (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{class_opencv_sf_m_1_1_field_of_view_a28445368ae4bb987cbd12556cf507489}
+If we use this contructor, the object is not correct! Indeed, we don't have the needed informations like the camera wich take this FoV. Use isRealFoV to test the validity of objects if needed. 
+
+Definition at line 12 of file FieldOfView.cpp.
+
+\hypertarget{class_opencv_sf_m_1_1_field_of_view_af5840e7345294668ed5adda8b66cb801}{
+\index{OpencvSfM::FieldOfView@{OpencvSfM::FieldOfView}!FieldOfView@{FieldOfView}}
+\index{FieldOfView@{FieldOfView}!OpencvSfM::FieldOfView@{OpencvSfM::FieldOfView}}
+\subsubsection[{FieldOfView}]{\setlength{\rightskip}{0pt plus 5cm}OpencvSfM::FieldOfView::FieldOfView (
+\begin{DoxyParamCaption}
+\item[{{\bf Camera} $\ast$}]{device, }
+\item[{std::string}]{imgFileName, }
+\item[{cv::Mat}]{rotation = {\ttfamily cv::Mat::eye(3,~3,~CV\_\-64F)}, }
+\item[{cv::Vec$<$ double, 3 $>$}]{translation = {\ttfamily cv::Vec$<$~double,~3~$>$(0.0,~0.0,~0.0)}}
+\end{DoxyParamCaption}
+)}}
+\label{class_opencv_sf_m_1_1_field_of_view_af5840e7345294668ed5adda8b66cb801}
+To create a field of view, we need two things : a camera, and an picture. Here we give an address of a \hyperlink{class_opencv_sf_m_1_1_camera}{Camera}, and the file name of the picture. If we have more informations, we can use the last parameters... 
+\begin{DoxyParams}{Parameters}
+{\em device} & address of existing \hyperlink{class_opencv_sf_m_1_1_camera}{Camera}. This camera can be calibrated or not... \\
+\hline
+{\em imgFileName} & file name of the image taken from the device... \\
+\hline
+{\em rotation} & Matrix of the known rotation (optional)... \\
+\hline
+{\em translation} & Vector of the known translation (optional)... \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_opencv_sf_m_1_1_field_of_view_ad7f1e3fcb46cacb23de274ea0626e7ab}{
+\index{OpencvSfM::FieldOfView@{OpencvSfM::FieldOfView}!FieldOfView@{FieldOfView}}
+\index{FieldOfView@{FieldOfView}!OpencvSfM::FieldOfView@{OpencvSfM::FieldOfView}}
+\subsubsection[{FieldOfView}]{\setlength{\rightskip}{0pt plus 5cm}OpencvSfM::FieldOfView::FieldOfView (
+\begin{DoxyParamCaption}
+\item[{{\bf Camera} $\ast$}]{device, }
+\item[{cv::Mat}]{image, }
+\item[{cv::Mat}]{rotation = {\ttfamily cv::Mat::eye(3,~3,~CV\_\-64F)}, }
+\item[{cv::Vec$<$ double, 3 $>$}]{translation = {\ttfamily cv::Vec$<$~double,~3~$>$(0.0,~0.0,~0.0)}}
+\end{DoxyParamCaption}
+)}}
+\label{class_opencv_sf_m_1_1_field_of_view_ad7f1e3fcb46cacb23de274ea0626e7ab}
+To create a field of view, we need two things : a camera, and an picture. Here we give an address of a \hyperlink{class_opencv_sf_m_1_1_camera}{Camera}, and the picture (matrix). If we have more informations, we can use the last parameters... 
+\begin{DoxyParams}{Parameters}
+{\em device} & address of existing \hyperlink{class_opencv_sf_m_1_1_camera}{Camera}. This camera can be calibrated or not... \\
+\hline
+{\em image} & Matrix of the image previously loaded... \\
+\hline
+{\em rotation} & Matrix of the known rotation (optional)... \\
+\hline
+{\em translation} & Vector of the known translation (optional)... \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_opencv_sf_m_1_1_field_of_view_a55c9d18ac6dc35027bf007ed8c6787da}{
+\index{OpencvSfM::FieldOfView@{OpencvSfM::FieldOfView}!FieldOfView@{FieldOfView}}
+\index{FieldOfView@{FieldOfView}!OpencvSfM::FieldOfView@{OpencvSfM::FieldOfView}}
+\subsubsection[{FieldOfView}]{\setlength{\rightskip}{0pt plus 5cm}OpencvSfM::FieldOfView::FieldOfView (
+\begin{DoxyParamCaption}
+\item[{{\bf Camera} $\ast$}]{device, }
+\item[{{\bf PointsToTrack} $\ast$}]{points, }
+\item[{{\bf PointsMatcher} $\ast$}]{matches = {\ttfamily NULL}, }
+\item[{cv::Mat}]{rotation = {\ttfamily cv::Mat::eye(3,~3,~CV\_\-64F)}, }
+\item[{cv::Vec$<$ double, 3 $>$}]{translation = {\ttfamily cv::Vec$<$~double,~3~$>$(0.0,~0.0,~0.0)}}
+\end{DoxyParamCaption}
+)}}
+\label{class_opencv_sf_m_1_1_field_of_view_a55c9d18ac6dc35027bf007ed8c6787da}
+To create a field of view, we need two things : a camera, and an picture. Somethinmes, we don't have the picture but only points: we can create the field of view using this constructor... If we have more informations, we can use the last parameters... 
+\begin{DoxyParams}{Parameters}
+{\em device} & address of existing \hyperlink{class_opencv_sf_m_1_1_camera}{Camera}. This camera can be calibrated or not... \\
+\hline
+{\em points} & points to track and optionally the associated features... \\
+\hline
+{\em matches} & object where matches between our points and other FoV's points (optional) \\
+\hline
+{\em rotation} & Matrix of the known rotation (optional)... \\
+\hline
+{\em translation} & Vector of the known translation (optional)... \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_opencv_sf_m_1_1_field_of_view_ab9ac603aaea80b30ccfe20279b2453a3}{
+\index{OpencvSfM::FieldOfView@{OpencvSfM::FieldOfView}!FieldOfView@{FieldOfView}}
+\index{FieldOfView@{FieldOfView}!OpencvSfM::FieldOfView@{OpencvSfM::FieldOfView}}
+\subsubsection[{FieldOfView}]{\setlength{\rightskip}{0pt plus 5cm}OpencvSfM::FieldOfView::FieldOfView (
+\begin{DoxyParamCaption}
+\item[{{\bf FieldOfView} \&}]{otherFieldOfView}
+\end{DoxyParamCaption}
+)}}
+\label{class_opencv_sf_m_1_1_field_of_view_ab9ac603aaea80b30ccfe20279b2453a3}
+This constructor will not copy values... This allow smart pointer behavior 
+
+Definition at line 84 of file FieldOfView.cpp.
+
+\hypertarget{class_opencv_sf_m_1_1_field_of_view_a15cdc4b6936cfd126419c68be464342b}{
+\index{OpencvSfM::FieldOfView@{OpencvSfM::FieldOfView}!$\sim$FieldOfView@{$\sim$FieldOfView}}
+\index{$\sim$FieldOfView@{$\sim$FieldOfView}!OpencvSfM::FieldOfView@{OpencvSfM::FieldOfView}}
+\subsubsection[{$\sim$FieldOfView}]{\setlength{\rightskip}{0pt plus 5cm}OpencvSfM::FieldOfView::$\sim$FieldOfView (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{class_opencv_sf_m_1_1_field_of_view_a15cdc4b6936cfd126419c68be464342b}
+Destructor of \hyperlink{class_opencv_sf_m_1_1_field_of_view}{FieldOfView}, release all vectors... TODO: define how we should release the vectors... 
+
+Definition at line 88 of file FieldOfView.cpp.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_opencv_sf_m_1_1_field_of_view_a6617003b67eda0d09b8da81ed7dad83d}{
+\index{OpencvSfM::FieldOfView@{OpencvSfM::FieldOfView}!isRealFoV@{isRealFoV}}
+\index{isRealFoV@{isRealFoV}!OpencvSfM::FieldOfView@{OpencvSfM::FieldOfView}}
+\subsubsection[{isRealFoV}]{\setlength{\rightskip}{0pt plus 5cm}bool OpencvSfM::FieldOfView::isRealFoV (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{class_opencv_sf_m_1_1_field_of_view_a6617003b67eda0d09b8da81ed7dad83d}
+Use isRealFoV to test the validity of objects if needed. \begin{DoxyReturn}{Returns}
+true is the object is correctly loaded, false if you should not use it ! 
+\end{DoxyReturn}
+
+
+Definition at line 112 of file FieldOfView.h.
+
+
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+src/FieldOfView.h\item 
+src/FieldOfView.cpp\end{DoxyCompactItemize}
