@@ -42,6 +42,10 @@ namespace OpencvSfM{
   {
     //add the keypoints to the end of our points vector:
     this->keypoints_.insert( this->keypoints_.end(),keypoints.begin(),keypoints.end());
+
+
+    cv::KeyPointsFilter::runByKeypointSize( keypoints_, std::numeric_limits<float>::epsilon() );
+
     if(!computeMissingDescriptor)
     {
       if(!descriptors_.empty())
@@ -62,5 +66,13 @@ namespace OpencvSfM{
     if(outImg.empty())
       outImg=image.clone();
     cv::drawKeypoints(image, keypoints_, outImg, color, flags);
+  }
+  void PointsToTrack::read( const cv::FileNode& fn )
+  {
+    //TODO!
+  };
+  void PointsToTrack::write (cv::FileStorage& fs) const
+  {
+    //TODO!
   }
 }

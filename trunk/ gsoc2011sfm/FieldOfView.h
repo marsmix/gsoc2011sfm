@@ -6,7 +6,7 @@
 
 #include "Camera.h"
 #include "PointsToTrack.h"
-#include "PointsMatched.h"
+#include "PointsMatcher.h"
 #include "ExternPosEstim.h"
 #include "Points3DEstim.h"
 #include <vector>
@@ -53,7 +53,7 @@ namespace OpencvSfM{
     cv::Mat projection_matrix_;///<redundancy but speed improvement
     Camera *device_;///<intra parameters and distortion coefs
     PointsToTrack* pointsInfo_;///<Points which are found in the picture
-    PointsMatched* matches_;///<This object will store the differents matches estimations between this FoV and other related views... ! This object will be shared between different FoV !
+    PointsMatcher* matches_;///<This object will store the differents matches estimations between this FoV and other related views... ! This object will be shared between different FoV !
     ExternPosEstim* extern_position_;//An object which can be used to compute a bundle adjustement, using the differents matching of points... ! This object will be shared between different FoV !
     Points3DEstim* points3D_;//for each point in pointsInfo, estimation of the 3D position... ! This object will be shared between different FoV !
 
@@ -95,7 +95,7 @@ namespace OpencvSfM{
     * @param rotation Matrix of the known rotation (optional)...
     * @param translation Vector of the known translation (optional)...
     */
-    FieldOfView(Camera *device,PointsToTrack *points,PointsMatched *matches=NULL,cv::Mat rotation=cv::Mat::eye(3, 3, CV_64F),cv::Vec<double, 3> translation=cv::Vec<double, 3>(0.0,0.0,0.0));
+    FieldOfView(Camera *device,PointsToTrack *points,PointsMatcher *matches=NULL,cv::Mat rotation=cv::Mat::eye(3, 3, CV_64F),cv::Vec<double, 3> translation=cv::Vec<double, 3>(0.0,0.0,0.0));
     /**
     * This constructor will not copy values... This allow smart pointer behavior
     */

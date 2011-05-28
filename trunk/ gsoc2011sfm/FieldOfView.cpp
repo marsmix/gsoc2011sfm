@@ -61,7 +61,7 @@ namespace OpencvSfM{
     this->config_=0;//everything should be estimated...
   }
 
-  FieldOfView::FieldOfView(Camera *device,PointsToTrack *points,PointsMatched *matches,Mat rotation /*=Mat::eye(3, 3, CV_64F)*/ ,Vec<double, 3> translation /*=Vec(0.0,0.0,0.0)*/ )
+  FieldOfView::FieldOfView(Camera *device,PointsToTrack *points,PointsMatcher *matches,Mat rotation /*=Mat::eye(3, 3, CV_64F)*/ ,Vec<double, 3> translation /*=Vec(0.0,0.0,0.0)*/ )
   {
     CV_Assert( device!=0 );
     CV_Assert( points!=0 );
