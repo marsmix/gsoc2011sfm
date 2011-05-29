@@ -7,8 +7,7 @@
 #include <vector>
 
 namespace OpencvSfM{
-  /**
-  *  A class used for matching descriptors that can be described as vectors in a finite-dimensional space
+  /*! \brief A class used for matching descriptors that can be described as vectors in a finite-dimensional space
   */
   class PointsMatcher
   {

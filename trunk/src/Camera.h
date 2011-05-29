@@ -8,18 +8,14 @@
 namespace OpencvSfM{
   class FieldOfView;///<We will need this class, but FieldOfView need our class too...
 
-#define MASK_FOCAL_OK      0x01  ///<Mask used to know if the focal parameters should be estimated or not
-#define MASK_SKEW_OK      0x02  ///<Mask used to know if the focal parameters should be estimated or not
-#define MASK_PRINCIPAL_POINT_OK 0x04  ///<Mask used to know if the focal parameters should be estimated or not
-#define MASK_RADIAL_OK      0x08  ///<Mask used to know if the radial parameters should be estimated or not
-#define MASK_TANGEANT_OK    0x10  ///<Mask used to know if the tangential parameters should be estimated or not
 
   /*! \brief This class represent the physical device which take the pictures. 
-  *      It is not related to a 3D position which is the role of the class FieldOfView.
+  *      It is not related to a 3D position which is the role of the FieldOfView class.
   *      The role of the class is to store only device related informations like intra parameters, radial and tangential distotion.
+  *      This abstract class is not related to a type of camera (fish eyes...)
   *
   * This class can be used to store device related informations like intra parameters, radial and tangential distortion.
-  * We use the so-called pinhole camera model. That is, a scene view is formed by projecting 3D points into the image plane using a perspective transformation.
+  * If we use the so-called pinhole camera model, a scene view is formed by projecting 3D points into the image plane using a perspective transformation.
   * Usual notation says that a point [u,v] from an image is related to the point [X,Y,Z] using the following notation :
   * \f[
   * s  \begin{bmatrix} u \\ v \\ 1 \end{bmatrix} =  \begin{bmatrix}f_x & 0 & c_x \\ 0 & f_y & c_y \\ 0 & 0 & 1 \end{bmatrix}
@@ -42,23 +38,38 @@ namespace OpencvSfM{
   * \vspace{10pt} y'' = y'  \dfrac{1 + k_1 r^2 + k_2 r^4 + k_3 r^6}{1 + k_4 r^2 + k_5 r^4 + k_6 r^6} + p_1 (r^2 + 2 y'^2) + 2 p_2 x' y'  \\
   * \text{where} \quad r^2 = x'^2 + y'^2  \\ u = f_x*x'' + c_x \\ v = f_y*y'' + c_y \end{array}
   * \f]
-  * radial_dist_ can be used to store /f$k_1/f$ to /f$k_6/f$
-  * tangential_dist_ can be used to store /f$p_1/f$ and /f$p_2/f$
+  * radial_dist_ can be used to store \f $k_1$\f to \f $k_6$\f
+  * tangential_dist_ can be used to store \f$p_1$\f and \f $p_2$\f
+  *
+  * So this class is devoted to the conversion between 2D points from pixel image coordinates and 2D points in normalized image coordinates,
+  * or ray projection using intra parameters.
   */
   class Camera
   {
   protected:
-    cv::Mat intra_params_;///<store intra parameters(3*3 matrix). This matrix contains focal informations, principal point coordinates and skew of axis
-    cv::Mat inv_intra_params_;///<This is the inverse transformation of intra_params_. Used to speed up calculus...
-    cv::Vec<double, 6> radial_dist_;///<used to store radial dist parameters (/f$k_1/f$ to /f$k_6/f$)
-    cv::Vec<double, 2> tangential_dist_;///<used to store tangential dist parameters (/f$p_1/f$ and /f$p_2/f$)
 
-    unsigned char config_;///<This attribut is used to know what we should estimate... If equal to 0, everything should be estimated...
-
-    std::vector<FieldOfView> pointsOfView_;///<vector of the differents positions of the camera. This will store images too.
+    std::vector<FieldOfView> pointsOfView_;///<vector of the differents positions of the camera.
   public:
-    Camera(cv::Mat intra_params=cv::Mat::eye(3, 3, CV_64F),cv::Vec<double, 6> radial_dist=cv::Vec<double, 6>(0.0,0.0,0.0,0.0,0.0,0.0),cv::Vec<double, 2> tangential_dist=cv::Vec<double, 2>(0.0,0.0));
+    Camera();
     virtual ~Camera(void);
+
+    /**
+    * This method can transform points from image to 3D rays (homogeneous coordinates)
+    */
+    virtual std::vector<cv::Vec4d> convertFromImageTo3Dray(std::vector<cv::Vec3d> points) =0;//we don't know how this transformation can be done, so pure virtual
+    
+    /**
+    * This method can convert 2D points from pixel image coordinates to 2D points in normalized image coordinates
+    * @param points 2D points in pixel image homogeneous coordinates.
+    * @return 2D points in normalized image homogeneous coordinates.
+    */
+    virtual std::vector<cv::Vec2d> imageToNormImageCoordinates(std::vector<cv::Vec2d> points) =0;//we don't know how this transformation can be done, so pure virtual
+    /**
+    * This method can convert 2D points from normalized image coordinates to 2D points in pixel image coordinates
+    * @param points 2D points in normalized image homogeneous coordinates.
+    * @return 2D points in pixel image homogeneous coordinates.
+    */
+    virtual std::vector<cv::Vec2d> normImageToPixelCoordinates(std::vector<cv::Vec2d> points) =0;//we don't know how this transformation can be done, so pure virtual
   };
 
 }
