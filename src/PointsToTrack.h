@@ -9,7 +9,7 @@
 namespace OpencvSfM{
 
 /*! \brief This class can be used to store informations about points and features. 
-  *      This is an abstract class: you can't use it directly. Use for instance PointsToTrackSIFT.
+  *      This is an abstract class: you can't use it directly. Use for instance PointsToTrackWithImage.
   *
   * To create a structure from motion, most methods use points to compute the structure.
   * This class focus on the first task in SfM: find points in image which are easy to track...
