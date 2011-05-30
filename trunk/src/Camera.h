@@ -2,15 +2,15 @@
 #define _GSOC_SFM_CAMERA_H 1
 
 #include "opencv2/core/core.hpp"
-#include "FieldOfView.h"
+#include "PointOfView.h"
 #include <vector>
 
 namespace OpencvSfM{
-  class FieldOfView;///<We will need this class, but FieldOfView need our class too...
+  class PointOfView;///<We will need this class, but PointOfView need our class too...
 
 
   /*! \brief This class represent the physical device which take the pictures. 
-  *      It is not related to a 3D position which is the role of the FieldOfView class.
+  *      It is not related to a 3D position which is the role of the PointOfView class.
   *      The role of the class is to store only device related informations like intra parameters, radial and tangential distotion.
   *      This abstract class is not related to a type of camera (fish eyes...)
   *
@@ -38,17 +38,18 @@ namespace OpencvSfM{
   * \vspace{10pt} y'' = y'  \dfrac{1 + k_1 r^2 + k_2 r^4 + k_3 r^6}{1 + k_4 r^2 + k_5 r^4 + k_6 r^6} + p_1 (r^2 + 2 y'^2) + 2 p_2 x' y'  \\
   * \text{where} \quad r^2 = x'^2 + y'^2  \\ u = f_x*x'' + c_x \\ v = f_y*y'' + c_y \end{array}
   * \f]
-  * radial_dist_ can be used to store \f $k_1$\f to \f $k_6$\f
-  * tangential_dist_ can be used to store \f$p_1$\f and \f $p_2$\f
+  * radial_dist_ can be used to store \f$k_1\f$ to \f$k_6\f$
+  * tangential_dist_ can be used to store \f$p_1\f$ and \f$p_2\f$
   *
   * So this class is devoted to the conversion between 2D points from pixel image coordinates and 2D points in normalized image coordinates,
   * or ray projection using intra parameters.
   */
   class Camera
   {
+    friend class PointOfView;//PointOfView is a good friend of Camera as it's intimately related!
   protected:
 
-    std::vector<FieldOfView> pointsOfView_;///<vector of the differents positions of the camera.
+    std::vector<PointOfView*> pointsOfView_;///<vector of the differents positions of the camera.
   public:
     Camera();
     virtual ~Camera(void);
@@ -63,13 +64,21 @@ namespace OpencvSfM{
     * @param points 2D points in pixel image homogeneous coordinates.
     * @return 2D points in normalized image homogeneous coordinates.
     */
-    virtual std::vector<cv::Vec2d> imageToNormImageCoordinates(std::vector<cv::Vec2d> points) =0;//we don't know how this transformation can be done, so pure virtual
+    virtual std::vector<cv::Vec2d> pixelToNormImageCoordinates(std::vector<cv::Vec2d> points) =0;//we don't know how this transformation can be done, so pure virtual
     /**
     * This method can convert 2D points from normalized image coordinates to 2D points in pixel image coordinates
     * @param points 2D points in normalized image homogeneous coordinates.
     * @return 2D points in pixel image homogeneous coordinates.
     */
     virtual std::vector<cv::Vec2d> normImageToPixelCoordinates(std::vector<cv::Vec2d> points) =0;//we don't know how this transformation can be done, so pure virtual
+    /**
+    * This method can create a projection matrix using intra parameters and given rotation and translation
+    * As we don't have intra parameters, this method only compute matrix [R|t]
+    * @param rotation rotation matrix
+    * @param translation translation vector
+    * @return Projection matrix (4*3)
+    */
+    virtual cv::Mat computeProjectionMatrix(const cv::Mat &rotation,const cv::Vec3d &translation);
   };
 
 }

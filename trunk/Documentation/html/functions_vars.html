@@ -72,8 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="class_opencv_sf_m_1_1_motion_processor.html#a90a1928ed4cc3a9dac1e6468fcd52634">OpencvSfM::MotionProcessor</a>
 </li>
 <li>config_
-: <a class="el" href="class_opencv_sf_m_1_1_camera.html#a8d0f1e2b2467b256b34fee4a5df31e4d">OpencvSfM::Camera</a>
-, <a class="el" href="class_opencv_sf_m_1_1_field_of_view.html#af47e74bc88efc7af4e1f6f802217561c">OpencvSfM::FieldOfView</a>
+: <a class="el" href="class_opencv_sf_m_1_1_point_of_view.html#ac644fc5f92709b33a31ee2370365f104">OpencvSfM::PointOfView</a>
 </li>
 <li>convertToRGB_
 : <a class="el" href="class_opencv_sf_m_1_1_motion_processor.html#a76b155ceb708b8fc1f5ea321e6424155">OpencvSfM::MotionProcessor</a>
@@ -85,22 +84,25 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="class_opencv_sf_m_1_1_points_to_track.html#adcbf3783bdf4a2a1d3e10c4b74224899">OpencvSfM::PointsToTrack</a>
 </li>
 <li>device_
-: <a class="el" href="class_opencv_sf_m_1_1_field_of_view.html#ae01ec341458e4170e918676cea8d1fd3">OpencvSfM::FieldOfView</a>
+: <a class="el" href="class_opencv_sf_m_1_1_point_of_view.html#a83bfd58fd1074d5950dad2be9630dbf8">OpencvSfM::PointOfView</a>
+</li>
+<li>distortionVector
+: <a class="el" href="class_opencv_sf_m_1_1_camera_pinhole_distor.html#af9ce33321472dbbb71668b266225060b">OpencvSfM::CameraPinholeDistor</a>
+</li>
+<li>estimation_needed_
+: <a class="el" href="class_opencv_sf_m_1_1_camera_pinhole.html#a024b01688fee19c5c2d592f4060d6063">OpencvSfM::CameraPinhole</a>
 </li>
 <li>feature_detector_
 : <a class="el" href="class_opencv_sf_m_1_1_points_to_track_with_image.html#a22779db7344fed472cebc4a00ecef631">OpencvSfM::PointsToTrackWithImage</a>
-</li>
-<li>image_
-: <a class="el" href="class_opencv_sf_m_1_1_field_of_view.html#a7fdf881267569181344ffc63e8558610">OpencvSfM::FieldOfView</a>
 </li>
 <li>imageToAnalyse_
 : <a class="el" href="class_opencv_sf_m_1_1_points_to_track_with_image.html#adccc33e14b09ecbe0d5963b405e58d48">OpencvSfM::PointsToTrackWithImage</a>
 </li>
 <li>intra_params_
-: <a class="el" href="class_opencv_sf_m_1_1_camera.html#ab8ba859298ee9c13374477a99dd4241e">OpencvSfM::Camera</a>
+: <a class="el" href="class_opencv_sf_m_1_1_camera_pinhole.html#ac60a2fb4ca15534d0b361628837f9286">OpencvSfM::CameraPinhole</a>
 </li>
 <li>inv_intra_params_
-: <a class="el" href="class_opencv_sf_m_1_1_camera.html#a78c5473c4630de99d70d2d26d8321117">OpencvSfM::Camera</a>
+: <a class="el" href="class_opencv_sf_m_1_1_camera_pinhole.html#ad6bf92278db0c35e220accd087a05701">OpencvSfM::CameraPinhole</a>
 </li>
 <li>keypoints_
 : <a class="el" href="class_opencv_sf_m_1_1_points_to_track.html#a08c9523080571e71e30b11a2f8b9c6b9">OpencvSfM::PointsToTrack</a>
@@ -108,29 +110,26 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>maskOfAnalyse_
 : <a class="el" href="class_opencv_sf_m_1_1_points_to_track_with_image.html#a4fe39d059ba8a892abe3a1d998626806">OpencvSfM::PointsToTrackWithImage</a>
 </li>
-<li>matches_
-: <a class="el" href="class_opencv_sf_m_1_1_field_of_view.html#a2e55ed099fa404ede90edbc8652135a5">OpencvSfM::FieldOfView</a>
-</li>
 <li>nameOfFiles_
 : <a class="el" href="class_opencv_sf_m_1_1_motion_processor.html#aa13299a7af4a16c9403a7cc68313a523">OpencvSfM::MotionProcessor</a>
+</li>
+<li>nb_radial_params_
+: <a class="el" href="class_opencv_sf_m_1_1_camera_pinhole_distor.html#a99247804700d8c8bfaf50a4e84cfb080">OpencvSfM::CameraPinholeDistor</a>
 </li>
 <li>numFrame_
 : <a class="el" href="class_opencv_sf_m_1_1_motion_processor.html#ab63e8294f6fdd2491b2bb06788278bfe">OpencvSfM::MotionProcessor</a>
 </li>
-<li>pointsInfo_
-: <a class="el" href="class_opencv_sf_m_1_1_field_of_view.html#a77cd3559de42f6a458272f784f17687f">OpencvSfM::FieldOfView</a>
-</li>
 <li>pointsOfView_
-: <a class="el" href="class_opencv_sf_m_1_1_camera.html#aa12601d4d667646d9be47e5355eebe04">OpencvSfM::Camera</a>
+: <a class="el" href="class_opencv_sf_m_1_1_camera.html#a51667a509ef8baa90262e5552017b131">OpencvSfM::Camera</a>
 </li>
 <li>projection_matrix_
-: <a class="el" href="class_opencv_sf_m_1_1_field_of_view.html#a77a3658e69d8abc43ef22ec9f8b6df5a">OpencvSfM::FieldOfView</a>
+: <a class="el" href="class_opencv_sf_m_1_1_point_of_view.html#a920f9386c300582a19e68908654d169c">OpencvSfM::PointOfView</a>
 </li>
 <li>radial_dist_
-: <a class="el" href="class_opencv_sf_m_1_1_camera.html#aa944a739f433b8fa984a963478f6d1f8">OpencvSfM::Camera</a>
+: <a class="el" href="class_opencv_sf_m_1_1_camera_pinhole_distor.html#ad3b352db4b127864bcd901e11d7e50dc">OpencvSfM::CameraPinholeDistor</a>
 </li>
 <li>rotation_
-: <a class="el" href="class_opencv_sf_m_1_1_field_of_view.html#af65a2a69ee83e7d380104136b47554ac">OpencvSfM::FieldOfView</a>
+: <a class="el" href="class_opencv_sf_m_1_1_point_of_view.html#a4593900dcb330a47fdb5a7a1c4e2ad93">OpencvSfM::PointOfView</a>
 </li>
 <li>sourceName_
 : <a class="el" href="class_opencv_sf_m_1_1_motion_processor.html#a9bb3fdc8916e6d6c00a7a81408a6bbfd">OpencvSfM::MotionProcessor</a>
@@ -139,13 +138,19 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="class_opencv_sf_m_1_1_motion_processor.html#abbf053cdaf47914a5fe9d5c918d81358">OpencvSfM::MotionProcessor</a>
 </li>
 <li>tangential_dist_
-: <a class="el" href="class_opencv_sf_m_1_1_camera.html#aca7121c3867cfd9af58c888b206581b9">OpencvSfM::Camera</a>
+: <a class="el" href="class_opencv_sf_m_1_1_camera_pinhole_distor.html#ae09ea3c12a8e19788d084b357f11a902">OpencvSfM::CameraPinholeDistor</a>
 </li>
 <li>translation_
-: <a class="el" href="class_opencv_sf_m_1_1_field_of_view.html#a6a5933af068977d707e1823463b4ab05">OpencvSfM::FieldOfView</a>
+: <a class="el" href="class_opencv_sf_m_1_1_point_of_view.html#a9ffbc9dc46273ab30f752c303b5c9848">OpencvSfM::PointOfView</a>
 </li>
 <li>type_of_input_
 : <a class="el" href="class_opencv_sf_m_1_1_motion_processor.html#a9bf4bec388b8e54cd70c21ab96d44dd3">OpencvSfM::MotionProcessor</a>
+</li>
+<li>undistMapX
+: <a class="el" href="class_opencv_sf_m_1_1_camera_pinhole_distor.html#acd36b9080acefe62757f4181d0bf4d70">OpencvSfM::CameraPinholeDistor</a>
+</li>
+<li>undistMapY
+: <a class="el" href="class_opencv_sf_m_1_1_camera_pinhole_distor.html#ad222bd2f13252a82410216bbfc79a158">OpencvSfM::CameraPinholeDistor</a>
 </li>
 <li>wantedHeight_
 : <a class="el" href="class_opencv_sf_m_1_1_motion_processor.html#a830a9edd5325e704b3bce8ed3ecffdba">OpencvSfM::MotionProcessor</a>
@@ -169,7 +174,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Sat May 28 2011 17:45:45 for GSoC2011SfM by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Mon May 30 2011 17:50:29 for GSoC2011SfM by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

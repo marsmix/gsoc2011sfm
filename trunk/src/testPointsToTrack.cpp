@@ -1,3 +1,7 @@
+//Set to 1 if you want to test the points detection and matching
+//But be aware to set other tests to 0...
+#if 0
+
 #include "PointsToTrackWithImage.h"
 #include "MotionProcessor.h"
 #include "PointsMatcher.h"
@@ -134,3 +138,5 @@ void main(){
   }
 }
 */
+
+#endif

@@ -4,66 +4,144 @@
 }
 
 
-This class represent the physical device which take the pictures. It is not related to a 3D position which is the role of the class \hyperlink{class_opencv_sf_m_1_1_field_of_view}{FieldOfView}. The role of the class is to store only device related informations like intra parameters, radial and tangential distotion.  
+We will need this class, but \hyperlink{class_opencv_sf_m_1_1_point_of_view}{PointOfView} need our class too...  
 
 
 
 
 {\ttfamily \#include $<$Camera.h$>$}
 
+Inheritance diagram for OpencvSfM::Camera:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{class_opencv_sf_m_1_1_camera}
+\end{center}
+\end{figure}
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{class_opencv_sf_m_1_1_camera_a5c689d729d8a8bee7b3f57d5dd764cd7}{
-{\bfseries Camera} (cv::Mat intra\_\-params=cv::Mat::eye(3, 3, CV\_\-64F), cv::Vec$<$ double, 6 $>$ radial\_\-dist=cv::Vec$<$ double, 6 $>$(0.0, 0.0, 0.0, 0.0, 0.0, 0.0), cv::Vec$<$ double, 2 $>$ tangential\_\-dist=cv::Vec$<$ double, 2 $>$(0.0, 0.0))}
-\label{class_opencv_sf_m_1_1_camera_a5c689d729d8a8bee7b3f57d5dd764cd7}
-
+virtual std::vector$<$ cv::Vec4d $>$ \hyperlink{class_opencv_sf_m_1_1_camera_aa1b338f09e0139185d71bf82e1807cb7}{convertFromImageTo3Dray} (std::vector$<$ cv::Vec3d $>$ points)=0
+\item 
+virtual std::vector$<$ cv::Vec2d $>$ \hyperlink{class_opencv_sf_m_1_1_camera_a9dde477a85f86e076c79d3ce01b5f974}{pixelToNormImageCoordinates} (std::vector$<$ cv::Vec2d $>$ points)=0
+\item 
+virtual std::vector$<$ cv::Vec2d $>$ \hyperlink{class_opencv_sf_m_1_1_camera_aaea15041e74b4a4246b533aa67d86e4b}{normImageToPixelCoordinates} (std::vector$<$ cv::Vec2d $>$ points)=0
+\item 
+virtual cv::Mat \hyperlink{class_opencv_sf_m_1_1_camera_af5fa11b3438e4f70a339c101cebbc16d}{computeProjectionMatrix} (const cv::Mat \&rotation, const cv::Vec3d \&translation)
 \end{DoxyCompactItemize}
 \subsection*{Protected Attributes}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{class_opencv_sf_m_1_1_camera_ab8ba859298ee9c13374477a99dd4241e}{
-cv::Mat \hyperlink{class_opencv_sf_m_1_1_camera_ab8ba859298ee9c13374477a99dd4241e}{intra\_\-params\_\-}}
-\label{class_opencv_sf_m_1_1_camera_ab8ba859298ee9c13374477a99dd4241e}
+\hypertarget{class_opencv_sf_m_1_1_camera_a51667a509ef8baa90262e5552017b131}{
+std::vector$<$ \hyperlink{class_opencv_sf_m_1_1_point_of_view}{PointOfView} $\ast$ $>$ \hyperlink{class_opencv_sf_m_1_1_camera_a51667a509ef8baa90262e5552017b131}{pointsOfView\_\-}}
+\label{class_opencv_sf_m_1_1_camera_a51667a509ef8baa90262e5552017b131}
 
-\begin{DoxyCompactList}\small\item\em store intra parameters(3$\ast$3 matrix). This matrix contains focal informations, principal point coordinates and skew of axis \end{DoxyCompactList}\item 
-\hypertarget{class_opencv_sf_m_1_1_camera_a78c5473c4630de99d70d2d26d8321117}{
-cv::Mat \hyperlink{class_opencv_sf_m_1_1_camera_a78c5473c4630de99d70d2d26d8321117}{inv\_\-intra\_\-params\_\-}}
-\label{class_opencv_sf_m_1_1_camera_a78c5473c4630de99d70d2d26d8321117}
+\begin{DoxyCompactList}\small\item\em vector of the differents positions of the camera. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_opencv_sf_m_1_1_camera_afe272cb7738811e04232a2a03c9c0224}{
+class {\bfseries PointOfView}}
+\label{class_opencv_sf_m_1_1_camera_afe272cb7738811e04232a2a03c9c0224}
 
-\begin{DoxyCompactList}\small\item\em This is the inverse transformation of intra\_\-params\_\-. Used to speed up calculus... \end{DoxyCompactList}\item 
-\hypertarget{class_opencv_sf_m_1_1_camera_aa944a739f433b8fa984a963478f6d1f8}{
-cv::Vec$<$ double, 6 $>$ \hyperlink{class_opencv_sf_m_1_1_camera_aa944a739f433b8fa984a963478f6d1f8}{radial\_\-dist\_\-}}
-\label{class_opencv_sf_m_1_1_camera_aa944a739f433b8fa984a963478f6d1f8}
-
-\begin{DoxyCompactList}\small\item\em used to store radial dist parameters (/f\$k\_\-1/f\$ to /f\$k\_\-6/f\$) \end{DoxyCompactList}\item 
-\hypertarget{class_opencv_sf_m_1_1_camera_aca7121c3867cfd9af58c888b206581b9}{
-cv::Vec$<$ double, 2 $>$ \hyperlink{class_opencv_sf_m_1_1_camera_aca7121c3867cfd9af58c888b206581b9}{tangential\_\-dist\_\-}}
-\label{class_opencv_sf_m_1_1_camera_aca7121c3867cfd9af58c888b206581b9}
-
-\begin{DoxyCompactList}\small\item\em used to store tangential dist parameters (/f\$p\_\-1/f\$ and /f\$p\_\-2/f\$) \end{DoxyCompactList}\item 
-\hypertarget{class_opencv_sf_m_1_1_camera_a8d0f1e2b2467b256b34fee4a5df31e4d}{
-unsigned char \hyperlink{class_opencv_sf_m_1_1_camera_a8d0f1e2b2467b256b34fee4a5df31e4d}{config\_\-}}
-\label{class_opencv_sf_m_1_1_camera_a8d0f1e2b2467b256b34fee4a5df31e4d}
-
-\begin{DoxyCompactList}\small\item\em This attribut is used to know what we should estimate... If equal to 0, everything should be estimated... \end{DoxyCompactList}\item 
-\hypertarget{class_opencv_sf_m_1_1_camera_aa12601d4d667646d9be47e5355eebe04}{
-std::vector$<$ \hyperlink{class_opencv_sf_m_1_1_field_of_view}{FieldOfView} $>$ \hyperlink{class_opencv_sf_m_1_1_camera_aa12601d4d667646d9be47e5355eebe04}{pointsOfView\_\-}}
-\label{class_opencv_sf_m_1_1_camera_aa12601d4d667646d9be47e5355eebe04}
-
-\begin{DoxyCompactList}\small\item\em vector of the differents positions of the camera. This will store images too. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{DoxyCompactItemize}
 
 
 \subsection{Detailed Description}
-This class represent the physical device which take the pictures. It is not related to a 3D position which is the role of the class \hyperlink{class_opencv_sf_m_1_1_field_of_view}{FieldOfView}. The role of the class is to store only device related informations like intra parameters, radial and tangential distotion. 
+We will need this class, but \hyperlink{class_opencv_sf_m_1_1_point_of_view}{PointOfView} need our class too... 
 
-This class can be used to store device related informations like intra parameters, radial and tangential distortion. We use the so-\/called pinhole camera model. That is, a scene view is formed by projecting 3D points into the image plane using a perspective transformation. Usual notation says that a point \mbox{[}u,v\mbox{]} from an image is related to the point \mbox{[}X,Y,Z\mbox{]} using the following notation : \[ s \begin{bmatrix} u \\ v \\ 1 \end{bmatrix} = \begin{bmatrix}f_x & 0 & c_x \\ 0 & f_y & c_y \\ 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} r_{11} & r_{12} & r_{13} & t_1 \\ r_{21} & r_{22} & r_{23} & t_2 \\ r_{31} & r_{32} & r_{33} & t_3 \end{bmatrix} \begin{bmatrix} X \\ Y \\ Z \\ 1 \end{bmatrix} \]
+This class represent the physical device which take the pictures. It is not related to a 3D position which is the role of the \hyperlink{class_opencv_sf_m_1_1_point_of_view}{PointOfView} class. The role of the class is to store only device related informations like intra parameters, radial and tangential distotion. This abstract class is not related to a type of camera (fish eyes...)
+
+This class can be used to store device related informations like intra parameters, radial and tangential distortion. If we use the so-\/called pinhole camera model, a scene view is formed by projecting 3D points into the image plane using a perspective transformation. Usual notation says that a point \mbox{[}u,v\mbox{]} from an image is related to the point \mbox{[}X,Y,Z\mbox{]} using the following notation : \[ s \begin{bmatrix} u \\ v \\ 1 \end{bmatrix} = \begin{bmatrix}f_x & 0 & c_x \\ 0 & f_y & c_y \\ 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} r_{11} & r_{12} & r_{13} & t_1 \\ r_{21} & r_{22} & r_{23} & t_2 \\ r_{31} & r_{32} & r_{33} & t_3 \end{bmatrix} \begin{bmatrix} X \\ Y \\ Z \\ 1 \end{bmatrix} \]
 
 This leads to the following relation between local coordinates and global ones: \[ \begin{array}{l} \vspace{10pt} \begin{bmatrix} x \\ y \\ z \end{bmatrix} = R \begin{bmatrix} X \\ Y \\ Z \end{bmatrix} + t \\ x' = x/z \\ y' = y/z \vspace{10pt} \end{array} \]
 
-Additionnal radial and tangeancial distortion are modelized like this: \[ \begin{array}{l} \vspace{10pt} x'' = x' \dfrac{1 + k_1 r^2 + k_2 r^4 + k_3 r^6}{1 + k_4 r^2 + k_5 r^4 + k_6 r^6} + 2 p_1 x' y' + p_2(r^2 + 2 x'^2) \\ \vspace{10pt} y'' = y' \dfrac{1 + k_1 r^2 + k_2 r^4 + k_3 r^6}{1 + k_4 r^2 + k_5 r^4 + k_6 r^6} + p_1 (r^2 + 2 y'^2) + 2 p_2 x' y' \\ \text{where} \quad r^2 = x'^2 + y'^2 \\ u = f_x*x'' + c_x \\ v = f_y*y'' + c_y \end{array} \] radial\_\-dist\_\- can be used to store /f\$k\_\-1/f\$ to /f\$k\_\-6/f\$ tangential\_\-dist\_\- can be used to store /f\$p\_\-1/f\$ and /f\$p\_\-2/f\$ 
+Additionnal radial and tangeancial distortion are modelized like this: \[ \begin{array}{l} \vspace{10pt} x'' = x' \dfrac{1 + k_1 r^2 + k_2 r^4 + k_3 r^6}{1 + k_4 r^2 + k_5 r^4 + k_6 r^6} + 2 p_1 x' y' + p_2(r^2 + 2 x'^2) \\ \vspace{10pt} y'' = y' \dfrac{1 + k_1 r^2 + k_2 r^4 + k_3 r^6}{1 + k_4 r^2 + k_5 r^4 + k_6 r^6} + p_1 (r^2 + 2 y'^2) + 2 p_2 x' y' \\ \text{where} \quad r^2 = x'^2 + y'^2 \\ u = f_x*x'' + c_x \\ v = f_y*y'' + c_y \end{array} \] radial\_\-dist\_\- can be used to store $k_1$ to $k_6$ tangential\_\-dist\_\- can be used to store $p_1$ and $p_2$
 
-Definition at line 48 of file Camera.h.
+So this class is devoted to the conversion between 2D points from pixel image coordinates and 2D points in normalized image coordinates, or ray projection using intra parameters. 
+
+Definition at line 47 of file Camera.h.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_opencv_sf_m_1_1_camera_af5fa11b3438e4f70a339c101cebbc16d}{
+\index{OpencvSfM::Camera@{OpencvSfM::Camera}!computeProjectionMatrix@{computeProjectionMatrix}}
+\index{computeProjectionMatrix@{computeProjectionMatrix}!OpencvSfM::Camera@{OpencvSfM::Camera}}
+\subsubsection[{computeProjectionMatrix}]{\setlength{\rightskip}{0pt plus 5cm}virtual cv::Mat OpencvSfM::Camera::computeProjectionMatrix (
+\begin{DoxyParamCaption}
+\item[{const cv::Mat \&}]{rotation, }
+\item[{const cv::Vec3d \&}]{translation}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{class_opencv_sf_m_1_1_camera_af5fa11b3438e4f70a339c101cebbc16d}
+This method can create a projection matrix using intra parameters and given rotation and translation As we don't have intra parameters, this method only compute matrix \mbox{[}R$|$t\mbox{]} 
+\begin{DoxyParams}{Parameters}
+{\em rotation} & rotation matrix \\
+\hline
+{\em translation} & translation vector \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Projection matrix (4$\ast$3) 
+\end{DoxyReturn}
+
+
+Reimplemented in \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_ad42158ee2722c73c6935a4744c152026}{OpencvSfM::CameraPinhole}.
+
+\hypertarget{class_opencv_sf_m_1_1_camera_aa1b338f09e0139185d71bf82e1807cb7}{
+\index{OpencvSfM::Camera@{OpencvSfM::Camera}!convertFromImageTo3Dray@{convertFromImageTo3Dray}}
+\index{convertFromImageTo3Dray@{convertFromImageTo3Dray}!OpencvSfM::Camera@{OpencvSfM::Camera}}
+\subsubsection[{convertFromImageTo3Dray}]{\setlength{\rightskip}{0pt plus 5cm}virtual std::vector$<$cv::Vec4d$>$ OpencvSfM::Camera::convertFromImageTo3Dray (
+\begin{DoxyParamCaption}
+\item[{std::vector$<$ cv::Vec3d $>$}]{points}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}pure virtual\mbox{]}}}}
+\label{class_opencv_sf_m_1_1_camera_aa1b338f09e0139185d71bf82e1807cb7}
+This method can transform points from image to 3D rays (homogeneous coordinates) 
+
+Implemented in \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_a694530f3c345a961bad11c28a68703ee}{OpencvSfM::CameraPinhole}, and \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_distor_a0fba2c497b42a751e77070885e964e7c}{OpencvSfM::CameraPinholeDistor}.
+
+\hypertarget{class_opencv_sf_m_1_1_camera_aaea15041e74b4a4246b533aa67d86e4b}{
+\index{OpencvSfM::Camera@{OpencvSfM::Camera}!normImageToPixelCoordinates@{normImageToPixelCoordinates}}
+\index{normImageToPixelCoordinates@{normImageToPixelCoordinates}!OpencvSfM::Camera@{OpencvSfM::Camera}}
+\subsubsection[{normImageToPixelCoordinates}]{\setlength{\rightskip}{0pt plus 5cm}virtual std::vector$<$cv::Vec2d$>$ OpencvSfM::Camera::normImageToPixelCoordinates (
+\begin{DoxyParamCaption}
+\item[{std::vector$<$ cv::Vec2d $>$}]{points}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}pure virtual\mbox{]}}}}
+\label{class_opencv_sf_m_1_1_camera_aaea15041e74b4a4246b533aa67d86e4b}
+This method can convert 2D points from normalized image coordinates to 2D points in pixel image coordinates 
+\begin{DoxyParams}{Parameters}
+{\em points} & 2D points in normalized image homogeneous coordinates. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+2D points in pixel image homogeneous coordinates. 
+\end{DoxyReturn}
+
+
+Implemented in \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_aa844cae56eaa43784b3420bcddaacdd6}{OpencvSfM::CameraPinhole}, and \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_distor_a9d93e59eeff696c413493377cc42bb3d}{OpencvSfM::CameraPinholeDistor}.
+
+\hypertarget{class_opencv_sf_m_1_1_camera_a9dde477a85f86e076c79d3ce01b5f974}{
+\index{OpencvSfM::Camera@{OpencvSfM::Camera}!pixelToNormImageCoordinates@{pixelToNormImageCoordinates}}
+\index{pixelToNormImageCoordinates@{pixelToNormImageCoordinates}!OpencvSfM::Camera@{OpencvSfM::Camera}}
+\subsubsection[{pixelToNormImageCoordinates}]{\setlength{\rightskip}{0pt plus 5cm}virtual std::vector$<$cv::Vec2d$>$ OpencvSfM::Camera::pixelToNormImageCoordinates (
+\begin{DoxyParamCaption}
+\item[{std::vector$<$ cv::Vec2d $>$}]{points}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}pure virtual\mbox{]}}}}
+\label{class_opencv_sf_m_1_1_camera_a9dde477a85f86e076c79d3ce01b5f974}
+This method can convert 2D points from pixel image coordinates to 2D points in normalized image coordinates 
+\begin{DoxyParams}{Parameters}
+{\em points} & 2D points in pixel image homogeneous coordinates. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+2D points in normalized image homogeneous coordinates. 
+\end{DoxyReturn}
+
+
+Implemented in \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_ac289202ffff97def7c6287cfb3e3040d}{OpencvSfM::CameraPinhole}, and \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_distor_a506e945a43e874cc6235625c2a9cc064}{OpencvSfM::CameraPinholeDistor}.
 
 
 

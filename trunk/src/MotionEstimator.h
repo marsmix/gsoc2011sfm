@@ -2,11 +2,11 @@
 #define _GSOC_SFM_EXTERN_POS_ESTIM_H 1
 
 namespace OpencvSfM{
-  class ExternPosEstim
+  class MotionEstimator
   {
   public:
-    ExternPosEstim(void);
-    ~ExternPosEstim(void);
+    MotionEstimator(void);
+    ~MotionEstimator(void);
   };
 
 }

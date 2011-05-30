@@ -1,19 +1,14 @@
 #include "Camera.h"
 
 using cv::Mat;
-using cv::Vec;
+using cv::Vec3d;
+using cv::Range;
 using std::vector;
 
 namespace OpencvSfM{
 
-  Camera::Camera(Mat intra_params/*=Mat::eye(3, 3, CV_64F)*/,Vec<double, 6> radial_dist/*=Vec(0.0)*/,Vec<double, 2> tangential_dist/*=Vec(0.0,0.0)*/)
+  Camera::Camera()
   {
-    CV_Assert( intra_params.rows==3 && intra_params.cols==3 );
-
-    this->intra_params_=intra_params;
-    this->radial_dist_=radial_dist;
-    this->tangential_dist_=tangential_dist;
-    this->config_=0;
   }
 
 
@@ -21,4 +16,18 @@ namespace OpencvSfM{
   {
   }
 
+  Mat Camera::computeProjectionMatrix(const Mat &rotation,const Vec3d &translation)
+  {
+    CV_Assert( !rotation.empty() && rotation.type()==CV_64F );
+    //P = K [R|t]
+    Mat Rt;
+    Rt.create(3,4,CV_64F);
+    //Copy R into Rt
+    rotation.copyTo(Rt(Range::all(),Range(0,3)));
+    //Copy t into Rt
+    ((Mat)translation).copyTo(Rt.col(3));
+
+    //compute K * Rt
+    return Rt;
+  }
 }
