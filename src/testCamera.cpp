@@ -1,6 +1,6 @@
 //Set to 1 if you want to test the cameras
 //But be aware to set other tests to 0...
-#if 1
+#if 0
 
 #include "CameraPinholeDistor.h"
 #include <iostream>

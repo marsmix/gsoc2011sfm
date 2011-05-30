@@ -1,0 +1,252 @@
+\hypertarget{class_opencv_sf_m_1_1_camera_pinhole}{
+\section{OpencvSfM::CameraPinhole Class Reference}
+\label{class_opencv_sf_m_1_1_camera_pinhole}\index{OpencvSfM::CameraPinhole@{OpencvSfM::CameraPinhole}}
+}
+
+
+This class represent the physical device which take the pictures. It is not related to a 3D position which is the role of the \hyperlink{class_opencv_sf_m_1_1_point_of_view}{PointOfView} class. The role of the class is to store only intra parameters (without radial distortion)  
+
+
+
+
+{\ttfamily \#include $<$CameraPinhole.h$>$}
+
+Inheritance diagram for OpencvSfM::CameraPinhole:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{class_opencv_sf_m_1_1_camera_pinhole}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_opencv_sf_m_1_1_camera_pinhole_a7951c403bff3a75b6a2decdfa8b685bc}{CameraPinhole} (cv::Mat intra\_\-params=cv::Mat::eye(3, 3, CV\_\-64F), unsigned char wantedEstimation=FOCAL\_\-PARAM$|$SKEW\_\-PARAM$|$PRINCIPAL\_\-POINT\_\-PARAM)
+\item 
+\hyperlink{class_opencv_sf_m_1_1_camera_pinhole_a942058d75d7c48a65df9a3386f5a6586}{CameraPinhole} (const std::vector$<$ std::vector$<$ cv::Point3f $>$ $>$ \&objectPoints, const std::vector$<$ std::vector$<$ cv::Point2f $>$ $>$ \&imagePoints, cv::Size imageSize, double aspectRatio=1., unsigned char wantedEstimation=FOCAL\_\-PARAM$|$SKEW\_\-PARAM$|$PRINCIPAL\_\-POINT\_\-PARAM)
+\item 
+void \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_aeecb985ac673ca4d8658ebdbca291dd0}{updateIntrinsicMatrix} (cv::Mat newParams, unsigned char intraValues=FOCAL\_\-PARAM$|$SKEW\_\-PARAM$|$PRINCIPAL\_\-POINT\_\-PARAM)
+\item 
+virtual std::vector$<$ cv::Vec4d $>$ \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_a694530f3c345a961bad11c28a68703ee}{convertFromImageTo3Dray} (std::vector$<$ cv::Vec3d $>$ points)
+\item 
+virtual std::vector$<$ cv::Vec2d $>$ \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_ac289202ffff97def7c6287cfb3e3040d}{pixelToNormImageCoordinates} (std::vector$<$ cv::Vec2d $>$ points)
+\item 
+virtual std::vector$<$ cv::Vec2d $>$ \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_aa844cae56eaa43784b3420bcddaacdd6}{normImageToPixelCoordinates} (std::vector$<$ cv::Vec2d $>$ points)
+\item 
+virtual cv::Mat \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_ad42158ee2722c73c6935a4744c152026}{computeProjectionMatrix} (const cv::Mat \&rotation, const cv::Vec3d \&translation)
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_opencv_sf_m_1_1_camera_pinhole_ac60a2fb4ca15534d0b361628837f9286}{
+cv::Mat \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_ac60a2fb4ca15534d0b361628837f9286}{intra\_\-params\_\-}}
+\label{class_opencv_sf_m_1_1_camera_pinhole_ac60a2fb4ca15534d0b361628837f9286}
+
+\begin{DoxyCompactList}\small\item\em store intra parameters(3$\ast$3 matrix). This matrix contains focal informations, principal point coordinates and skew of axis \end{DoxyCompactList}\item 
+\hypertarget{class_opencv_sf_m_1_1_camera_pinhole_ad6bf92278db0c35e220accd087a05701}{
+cv::Mat \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_ad6bf92278db0c35e220accd087a05701}{inv\_\-intra\_\-params\_\-}}
+\label{class_opencv_sf_m_1_1_camera_pinhole_ad6bf92278db0c35e220accd087a05701}
+
+\begin{DoxyCompactList}\small\item\em This is the inverse transformation of intra\_\-params\_\-. Used to speed up calculus... \end{DoxyCompactList}\item 
+unsigned char \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_a024b01688fee19c5c2d592f4060d6063}{estimation\_\-needed\_\-}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This class represent the physical device which take the pictures. It is not related to a 3D position which is the role of the \hyperlink{class_opencv_sf_m_1_1_point_of_view}{PointOfView} class. The role of the class is to store only intra parameters (without radial distortion) 
+
+So this class is devoted to the conversion between 3D points (using camera coordinate) and 2D points (using image coordinate) using the methods convertFromImageTo3Dray or convertFrom3DToImage 
+
+Definition at line 23 of file CameraPinhole.h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_opencv_sf_m_1_1_camera_pinhole_a7951c403bff3a75b6a2decdfa8b685bc}{
+\index{OpencvSfM::CameraPinhole@{OpencvSfM::CameraPinhole}!CameraPinhole@{CameraPinhole}}
+\index{CameraPinhole@{CameraPinhole}!OpencvSfM::CameraPinhole@{OpencvSfM::CameraPinhole}}
+\subsubsection[{CameraPinhole}]{\setlength{\rightskip}{0pt plus 5cm}OpencvSfM::CameraPinhole::CameraPinhole (
+\begin{DoxyParamCaption}
+\item[{cv::Mat}]{intra\_\-params = {\ttfamily cv::Mat::eye(3,~3,~CV\_\-64F)}, }
+\item[{unsigned char}]{wantedEstimation = {\ttfamily FOCAL\_\-PARAM$|$SKEW\_\-PARAM$|$PRINCIPAL\_\-POINT\_\-PARAM}}
+\end{DoxyParamCaption}
+)}}
+\label{class_opencv_sf_m_1_1_camera_pinhole_a7951c403bff3a75b6a2decdfa8b685bc}
+Constructor with (or not) intra parameters. 
+\begin{DoxyParams}{Parameters}
+{\em intra\_\-params} & matrix of intra parameters (3$\ast$3) \\
+\hline
+{\em wantedEstimation} & values which need an estimation \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_opencv_sf_m_1_1_camera_pinhole_a942058d75d7c48a65df9a3386f5a6586}{
+\index{OpencvSfM::CameraPinhole@{OpencvSfM::CameraPinhole}!CameraPinhole@{CameraPinhole}}
+\index{CameraPinhole@{CameraPinhole}!OpencvSfM::CameraPinhole@{OpencvSfM::CameraPinhole}}
+\subsubsection[{CameraPinhole}]{\setlength{\rightskip}{0pt plus 5cm}OpencvSfM::CameraPinhole::CameraPinhole (
+\begin{DoxyParamCaption}
+\item[{const std::vector$<$ std::vector$<$ cv::Point3f $>$ $>$ \&}]{objectPoints, }
+\item[{const std::vector$<$ std::vector$<$ cv::Point2f $>$ $>$ \&}]{imagePoints, }
+\item[{cv::Size}]{imageSize, }
+\item[{double}]{aspectRatio = {\ttfamily 1.}, }
+\item[{unsigned char}]{wantedEstimation = {\ttfamily FOCAL\_\-PARAM$|$SKEW\_\-PARAM$|$PRINCIPAL\_\-POINT\_\-PARAM}}
+\end{DoxyParamCaption}
+)}}
+\label{class_opencv_sf_m_1_1_camera_pinhole_a942058d75d7c48a65df9a3386f5a6586}
+Constructor where initial camera matrix is computed from the 3D-\/2D point correspondences. Currently, the function only supports planar calibration patterns, i.e. patterns where each object point has z-\/coordinate =0. 
+\begin{DoxyParams}{Parameters}
+{\em objectPoints} & The vector of vectors of the object points. See \href{http://opencv.willowgarage.com/documentation/cpp/calib3d_camera_calibration_and_3d_reconstruction.html#cv-calibratecamera}{\tt http://opencv.willowgarage.com/documentation/cpp/calib3d\_\-camera\_\-calibration\_\-and\_\-3d\_\-reconstruction.html\#cv-\/calibratecamera} \\
+\hline
+{\em imagePoints} & The vector of vectors of the corresponding image points. See \href{http://opencv.willowgarage.com/documentation/cpp/calib3d_camera_calibration_and_3d_reconstruction.html#cv-calibratecamera}{\tt http://opencv.willowgarage.com/documentation/cpp/calib3d\_\-camera\_\-calibration\_\-and\_\-3d\_\-reconstruction.html\#cv-\/calibratecamera} \\
+\hline
+{\em imageSize} & The image size in pixels; used to initialize the principal point \\
+\hline
+{\em aspectRatio} & If it is zero or negative, both $f_x$ and $f_y$ are estimated independently. Otherwise $f_x=f_y * aspectRatio$ \\
+\hline
+{\em wantedEstimation} & values which need an estimation \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_opencv_sf_m_1_1_camera_pinhole_ad42158ee2722c73c6935a4744c152026}{
+\index{OpencvSfM::CameraPinhole@{OpencvSfM::CameraPinhole}!computeProjectionMatrix@{computeProjectionMatrix}}
+\index{computeProjectionMatrix@{computeProjectionMatrix}!OpencvSfM::CameraPinhole@{OpencvSfM::CameraPinhole}}
+\subsubsection[{computeProjectionMatrix}]{\setlength{\rightskip}{0pt plus 5cm}Mat OpencvSfM::CameraPinhole::computeProjectionMatrix (
+\begin{DoxyParamCaption}
+\item[{const cv::Mat \&}]{rotation, }
+\item[{const cv::Vec3d \&}]{translation}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{class_opencv_sf_m_1_1_camera_pinhole_ad42158ee2722c73c6935a4744c152026}
+This method can create a projection matrix using intra parameters and given rotation and translation 
+\begin{DoxyParams}{Parameters}
+{\em rotation} & rotation matrix \\
+\hline
+{\em translation} & translation vector \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Projection matrix (4$\ast$3) 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{class_opencv_sf_m_1_1_camera_af5fa11b3438e4f70a339c101cebbc16d}{OpencvSfM::Camera}.
+
+
+
+Definition at line 19 of file Camera.cpp.
+
+\hypertarget{class_opencv_sf_m_1_1_camera_pinhole_a694530f3c345a961bad11c28a68703ee}{
+\index{OpencvSfM::CameraPinhole@{OpencvSfM::CameraPinhole}!convertFromImageTo3Dray@{convertFromImageTo3Dray}}
+\index{convertFromImageTo3Dray@{convertFromImageTo3Dray}!OpencvSfM::CameraPinhole@{OpencvSfM::CameraPinhole}}
+\subsubsection[{convertFromImageTo3Dray}]{\setlength{\rightskip}{0pt plus 5cm}virtual std::vector$<$cv::Vec4d$>$ OpencvSfM::CameraPinhole::convertFromImageTo3Dray (
+\begin{DoxyParamCaption}
+\item[{std::vector$<$ cv::Vec3d $>$}]{points}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{class_opencv_sf_m_1_1_camera_pinhole_a694530f3c345a961bad11c28a68703ee}
+This method can transform points from image to 3D rays 
+
+Implements \hyperlink{class_opencv_sf_m_1_1_camera_aa1b338f09e0139185d71bf82e1807cb7}{OpencvSfM::Camera}.
+
+
+
+Reimplemented in \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_distor_a0fba2c497b42a751e77070885e964e7c}{OpencvSfM::CameraPinholeDistor}.
+
+\hypertarget{class_opencv_sf_m_1_1_camera_pinhole_aa844cae56eaa43784b3420bcddaacdd6}{
+\index{OpencvSfM::CameraPinhole@{OpencvSfM::CameraPinhole}!normImageToPixelCoordinates@{normImageToPixelCoordinates}}
+\index{normImageToPixelCoordinates@{normImageToPixelCoordinates}!OpencvSfM::CameraPinhole@{OpencvSfM::CameraPinhole}}
+\subsubsection[{normImageToPixelCoordinates}]{\setlength{\rightskip}{0pt plus 5cm}vector$<$ Vec2d $>$ OpencvSfM::CameraPinhole::normImageToPixelCoordinates (
+\begin{DoxyParamCaption}
+\item[{std::vector$<$ cv::Vec2d $>$}]{points}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{class_opencv_sf_m_1_1_camera_pinhole_aa844cae56eaa43784b3420bcddaacdd6}
+This method can convert 2D points from normalized image coordinates to 2D points in pixel image coordinates 
+\begin{DoxyParams}{Parameters}
+{\em points} & 2D points in normalized image homogeneous coordinates. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+2D points in pixel image homogeneous coordinates. 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{class_opencv_sf_m_1_1_camera_aaea15041e74b4a4246b533aa67d86e4b}{OpencvSfM::Camera}.
+
+
+
+Reimplemented in \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_distor_a9d93e59eeff696c413493377cc42bb3d}{OpencvSfM::CameraPinholeDistor}.
+
+
+
+Definition at line 100 of file CameraPinhole.cpp.
+
+\hypertarget{class_opencv_sf_m_1_1_camera_pinhole_ac289202ffff97def7c6287cfb3e3040d}{
+\index{OpencvSfM::CameraPinhole@{OpencvSfM::CameraPinhole}!pixelToNormImageCoordinates@{pixelToNormImageCoordinates}}
+\index{pixelToNormImageCoordinates@{pixelToNormImageCoordinates}!OpencvSfM::CameraPinhole@{OpencvSfM::CameraPinhole}}
+\subsubsection[{pixelToNormImageCoordinates}]{\setlength{\rightskip}{0pt plus 5cm}virtual std::vector$<$cv::Vec2d$>$ OpencvSfM::CameraPinhole::pixelToNormImageCoordinates (
+\begin{DoxyParamCaption}
+\item[{std::vector$<$ cv::Vec2d $>$}]{points}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{class_opencv_sf_m_1_1_camera_pinhole_ac289202ffff97def7c6287cfb3e3040d}
+This method can convert 2D points from pixel image coordinates to 2D points in normalized image coordinates 
+\begin{DoxyParams}{Parameters}
+{\em points} & 2D points in pixel image homogeneous coordinates. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+2D points in normalized image homogeneous coordinates. 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{class_opencv_sf_m_1_1_camera_a9dde477a85f86e076c79d3ce01b5f974}{OpencvSfM::Camera}.
+
+
+
+Reimplemented in \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_distor_a506e945a43e874cc6235625c2a9cc064}{OpencvSfM::CameraPinholeDistor}.
+
+\hypertarget{class_opencv_sf_m_1_1_camera_pinhole_aeecb985ac673ca4d8658ebdbca291dd0}{
+\index{OpencvSfM::CameraPinhole@{OpencvSfM::CameraPinhole}!updateIntrinsicMatrix@{updateIntrinsicMatrix}}
+\index{updateIntrinsicMatrix@{updateIntrinsicMatrix}!OpencvSfM::CameraPinhole@{OpencvSfM::CameraPinhole}}
+\subsubsection[{updateIntrinsicMatrix}]{\setlength{\rightskip}{0pt plus 5cm}void OpencvSfM::CameraPinhole::updateIntrinsicMatrix (
+\begin{DoxyParamCaption}
+\item[{cv::Mat}]{newParams, }
+\item[{unsigned char}]{intraValues = {\ttfamily FOCAL\_\-PARAM$|$SKEW\_\-PARAM$|$PRINCIPAL\_\-POINT\_\-PARAM}}
+\end{DoxyParamCaption}
+)}}
+\label{class_opencv_sf_m_1_1_camera_pinhole_aeecb985ac673ca4d8658ebdbca291dd0}
+this method can be used to update the intra parameters. 
+\begin{DoxyParams}{Parameters}
+{\em newParams} & matrix of new parameters (3$\ast$3) \\
+\hline
+{\em intraValues} & values which are useful in matrix \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 34 of file CameraPinhole.cpp.
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{class_opencv_sf_m_1_1_camera_pinhole_a024b01688fee19c5c2d592f4060d6063}{
+\index{OpencvSfM::CameraPinhole@{OpencvSfM::CameraPinhole}!estimation\_\-needed\_\-@{estimation\_\-needed\_\-}}
+\index{estimation\_\-needed\_\-@{estimation\_\-needed\_\-}!OpencvSfM::CameraPinhole@{OpencvSfM::CameraPinhole}}
+\subsubsection[{estimation\_\-needed\_\-}]{\setlength{\rightskip}{0pt plus 5cm}unsigned char {\bf OpencvSfM::CameraPinhole::estimation\_\-needed\_\-}\hspace{0.3cm}{\ttfamily  \mbox{[}protected\mbox{]}}}}
+\label{class_opencv_sf_m_1_1_camera_pinhole_a024b01688fee19c5c2d592f4060d6063}
+This attribut is used to know what we should estimate... Example: if equal to 0, nothing should be estimated... If equal to 3, focal and skew should be estimated ( FOCAL\_\-PARAM + SKEW\_\-PARAM) 
+
+Definition at line 33 of file CameraPinhole.h.
+
+
+
+Referenced by OpencvSfM::CameraPinholeDistor::updateDistortionParameters().
+
+
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+D:/Travail/These/Determination caracteristiques camera/GSoC/SfM/src/CameraPinhole.h\item 
+D:/Travail/These/Determination caracteristiques camera/GSoC/SfM/src/Camera.cpp\item 
+D:/Travail/These/Determination caracteristiques camera/GSoC/SfM/src/CameraPinhole.cpp\end{DoxyCompactItemize}
