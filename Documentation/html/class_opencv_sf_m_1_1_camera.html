@@ -68,47 +68,50 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-attribs">Protected Attributes</a>  </div>
+<a href="#pro-attribs">Protected Attributes</a> &#124;
+<a href="#friends">Friends</a>  </div>
   <div class="headertitle">
 <div class="title">OpencvSfM::Camera Class Reference</div>  </div>
 </div>
 <div class="contents">
 <!-- doxytag: class="OpencvSfM::Camera" -->
-<p>This class represent the physical device which take the pictures. It is not related to a 3D position which is the role of the class <a class="el" href="class_opencv_sf_m_1_1_field_of_view.html" title="This class represent the 3D position of the device which take the pictures. The role of the class is ...">FieldOfView</a>. The role of the class is to store only device related informations like intra parameters, radial and tangential distotion.  
+<p>We will need this class, but <a class="el" href="class_opencv_sf_m_1_1_point_of_view.html" title="This class represent the 3D position of the device which take the pictures. The role of the class is ...">PointOfView</a> need our class too...  
  <a href="class_opencv_sf_m_1_1_camera.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_camera_8h_source.html">Camera.h</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for OpencvSfM::Camera:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="class_opencv_sf_m_1_1_camera.png" usemap="#OpencvSfM::Camera_map" alt=""/>
+  <map id="OpencvSfM::Camera_map" name="OpencvSfM::Camera_map">
+<area href="class_opencv_sf_m_1_1_camera_pinhole.html" title="This class represent the physical device which take the pictures. It is not related to a 3D position ..." alt="OpencvSfM::CameraPinhole" shape="rect" coords="0,56,205,80"/>
+<area href="class_opencv_sf_m_1_1_camera_pinhole_distor.html" title="This class represent the physical device which take the pictures. It is not related to a 3D position ..." alt="OpencvSfM::CameraPinholeDistor" shape="rect" coords="0,112,205,136"/>
+</map>
+ </div></div>
 
 <p><a href="class_opencv_sf_m_1_1_camera-members.html">List of all members.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5c689d729d8a8bee7b3f57d5dd764cd7"></a><!-- doxytag: member="OpencvSfM::Camera::Camera" ref="a5c689d729d8a8bee7b3f57d5dd764cd7" args="(cv::Mat intra_params=cv::Mat::eye(3, 3, CV_64F), cv::Vec&lt; double, 6 &gt; radial_dist=cv::Vec&lt; double, 6 &gt;(0.0, 0.0, 0.0, 0.0, 0.0, 0.0), cv::Vec&lt; double, 2 &gt; tangential_dist=cv::Vec&lt; double, 2 &gt;(0.0, 0.0))" -->
-&#160;</td><td class="memItemRight" valign="bottom"><b>Camera</b> (cv::Mat intra_params=cv::Mat::eye(3, 3, CV_64F), cv::Vec&lt; double, 6 &gt; radial_dist=cv::Vec&lt; double, 6 &gt;(0.0, 0.0, 0.0, 0.0, 0.0, 0.0), cv::Vec&lt; double, 2 &gt; tangential_dist=cv::Vec&lt; double, 2 &gt;(0.0, 0.0))</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; cv::Vec4d &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_camera.html#aa1b338f09e0139185d71bf82e1807cb7">convertFromImageTo3Dray</a> (std::vector&lt; cv::Vec3d &gt; points)=0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; cv::Vec2d &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_camera.html#a9dde477a85f86e076c79d3ce01b5f974">pixelToNormImageCoordinates</a> (std::vector&lt; cv::Vec2d &gt; points)=0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; cv::Vec2d &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_camera.html#aaea15041e74b4a4246b533aa67d86e4b">normImageToPixelCoordinates</a> (std::vector&lt; cv::Vec2d &gt; points)=0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_camera.html#af5fa11b3438e4f70a339c101cebbc16d">computeProjectionMatrix</a> (const cv::Mat &amp;rotation, const cv::Vec3d &amp;translation)</td></tr>
 <tr><td colspan="2"><h2><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab8ba859298ee9c13374477a99dd4241e"></a><!-- doxytag: member="OpencvSfM::Camera::intra_params_" ref="ab8ba859298ee9c13374477a99dd4241e" args="" -->
-cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_camera.html#ab8ba859298ee9c13374477a99dd4241e">intra_params_</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">store intra parameters(3*3 matrix). This matrix contains focal informations, principal point coordinates and skew of axis <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a78c5473c4630de99d70d2d26d8321117"></a><!-- doxytag: member="OpencvSfM::Camera::inv_intra_params_" ref="a78c5473c4630de99d70d2d26d8321117" args="" -->
-cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_camera.html#a78c5473c4630de99d70d2d26d8321117">inv_intra_params_</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">This is the inverse transformation of intra_params_. Used to speed up calculus... <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa944a739f433b8fa984a963478f6d1f8"></a><!-- doxytag: member="OpencvSfM::Camera::radial_dist_" ref="aa944a739f433b8fa984a963478f6d1f8" args="" -->
-cv::Vec&lt; double, 6 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_camera.html#aa944a739f433b8fa984a963478f6d1f8">radial_dist_</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">used to store radial dist parameters (/f$k_1/f$ to /f$k_6/f$) <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aca7121c3867cfd9af58c888b206581b9"></a><!-- doxytag: member="OpencvSfM::Camera::tangential_dist_" ref="aca7121c3867cfd9af58c888b206581b9" args="" -->
-cv::Vec&lt; double, 2 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_camera.html#aca7121c3867cfd9af58c888b206581b9">tangential_dist_</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">used to store tangential dist parameters (/f$p_1/f$ and /f$p_2/f$) <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8d0f1e2b2467b256b34fee4a5df31e4d"></a><!-- doxytag: member="OpencvSfM::Camera::config_" ref="a8d0f1e2b2467b256b34fee4a5df31e4d" args="" -->
-unsigned char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_camera.html#a8d0f1e2b2467b256b34fee4a5df31e4d">config_</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">This attribut is used to know what we should estimate... If equal to 0, everything should be estimated... <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa12601d4d667646d9be47e5355eebe04"></a><!-- doxytag: member="OpencvSfM::Camera::pointsOfView_" ref="aa12601d4d667646d9be47e5355eebe04" args="" -->
-std::vector&lt; <a class="el" href="class_opencv_sf_m_1_1_field_of_view.html">FieldOfView</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_camera.html#aa12601d4d667646d9be47e5355eebe04">pointsOfView_</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">vector of the differents positions of the camera. This will store images too. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a51667a509ef8baa90262e5552017b131"></a><!-- doxytag: member="OpencvSfM::Camera::pointsOfView_" ref="a51667a509ef8baa90262e5552017b131" args="" -->
+std::vector&lt; <a class="el" href="class_opencv_sf_m_1_1_point_of_view.html">PointOfView</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_camera.html#a51667a509ef8baa90262e5552017b131">pointsOfView_</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">vector of the differents positions of the camera. <br/></td></tr>
+<tr><td colspan="2"><h2><a name="friends"></a>
+Friends</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afe272cb7738811e04232a2a03c9c0224"></a><!-- doxytag: member="OpencvSfM::Camera::PointOfView" ref="afe272cb7738811e04232a2a03c9c0224" args="" -->
+class&#160;</td><td class="memItemRight" valign="bottom"><b>PointOfView</b></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
-<div class="textblock"><p>This class represent the physical device which take the pictures. It is not related to a 3D position which is the role of the class <a class="el" href="class_opencv_sf_m_1_1_field_of_view.html" title="This class represent the 3D position of the device which take the pictures. The role of the class is ...">FieldOfView</a>. The role of the class is to store only device related informations like intra parameters, radial and tangential distotion. </p>
-<p>This class can be used to store device related informations like intra parameters, radial and tangential distortion. We use the so-called pinhole camera model. That is, a scene view is formed by projecting 3D points into the image plane using a perspective transformation. Usual notation says that a point [u,v] from an image is related to the point [X,Y,Z] using the following notation : </p>
+<div class="textblock"><p>We will need this class, but <a class="el" href="class_opencv_sf_m_1_1_point_of_view.html" title="This class represent the 3D position of the device which take the pictures. The role of the class is ...">PointOfView</a> need our class too... </p>
+<p>This class represent the physical device which take the pictures. It is not related to a 3D position which is the role of the <a class="el" href="class_opencv_sf_m_1_1_point_of_view.html" title="This class represent the 3D position of the device which take the pictures. The role of the class is ...">PointOfView</a> class. The role of the class is to store only device related informations like intra parameters, radial and tangential distotion. This abstract class is not related to a type of camera (fish eyes...)</p>
+<p>This class can be used to store device related informations like intra parameters, radial and tangential distortion. If we use the so-called pinhole camera model, a scene view is formed by projecting 3D points into the image plane using a perspective transformation. Usual notation says that a point [u,v] from an image is related to the point [X,Y,Z] using the following notation : </p>
 <p class="formulaDsp">
 <img class="formulaDsp" alt="\[ s \begin{bmatrix} u \\ v \\ 1 \end{bmatrix} = \begin{bmatrix}f_x &amp; 0 &amp; c_x \\ 0 &amp; f_y &amp; c_y \\ 0 &amp; 0 &amp; 1 \end{bmatrix} \begin{bmatrix} r_{11} &amp; r_{12} &amp; r_{13} &amp; t_1 \\ r_{21} &amp; r_{22} &amp; r_{23} &amp; t_2 \\ r_{31} &amp; r_{32} &amp; r_{33} &amp; t_3 \end{bmatrix} \begin{bmatrix} X \\ Y \\ Z \\ 1 \end{bmatrix} \]" src="form_0.png"/>
 </p>
@@ -120,10 +123,124 @@ std::vector&lt; <a class="el" href="class_opencv_sf_m_1_1_field_of_view.html">Fi
 <p class="formulaDsp">
 <img class="formulaDsp" alt="\[ \begin{array}{l} \vspace{10pt} x'' = x' \dfrac{1 + k_1 r^2 + k_2 r^4 + k_3 r^6}{1 + k_4 r^2 + k_5 r^4 + k_6 r^6} + 2 p_1 x' y' + p_2(r^2 + 2 x'^2) \\ \vspace{10pt} y'' = y' \dfrac{1 + k_1 r^2 + k_2 r^4 + k_3 r^6}{1 + k_4 r^2 + k_5 r^4 + k_6 r^6} + p_1 (r^2 + 2 y'^2) + 2 p_2 x' y' \\ \text{where} \quad r^2 = x'^2 + y'^2 \\ u = f_x*x'' + c_x \\ v = f_y*y'' + c_y \end{array} \]" src="form_2.png"/>
 </p>
-<p> radial_dist_ can be used to store /f$k_1/f$ to /f$k_6/f$ tangential_dist_ can be used to store /f$p_1/f$ and /f$p_2/f$ </p>
+<p> radial_dist_ can be used to store <img class="formulaInl" alt="$k_1$" src="form_3.png"/> to <img class="formulaInl" alt="$k_6$" src="form_4.png"/> tangential_dist_ can be used to store <img class="formulaInl" alt="$p_1$" src="form_5.png"/> and <img class="formulaInl" alt="$p_2$" src="form_6.png"/></p>
+<p>So this class is devoted to the conversion between 2D points from pixel image coordinates and 2D points in normalized image coordinates, or ray projection using intra parameters. </p>
 
-<p>Definition at line <a class="el" href="_camera_8h_source.html#l00048">48</a> of file <a class="el" href="_camera_8h_source.html">Camera.h</a>.</p>
-</div><hr/>The documentation for this class was generated from the following files:<ul>
+<p>Definition at line <a class="el" href="_camera_8h_source.html#l00047">47</a> of file <a class="el" href="_camera_8h_source.html">Camera.h</a>.</p>
+</div><hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="af5fa11b3438e4f70a339c101cebbc16d"></a><!-- doxytag: member="OpencvSfM::Camera::computeProjectionMatrix" ref="af5fa11b3438e4f70a339c101cebbc16d" args="(const cv::Mat &amp;rotation, const cv::Vec3d &amp;translation)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual cv::Mat OpencvSfM::Camera::computeProjectionMatrix </td>
+          <td>(</td>
+          <td class="paramtype">const cv::Mat &amp;&#160;</td>
+          <td class="paramname"><em>rotation</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const cv::Vec3d &amp;&#160;</td>
+          <td class="paramname"><em>translation</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This method can create a projection matrix using intra parameters and given rotation and translation As we don't have intra parameters, this method only compute matrix [R|t] </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">rotation</td><td>rotation matrix </td></tr>
+    <tr><td class="paramname">translation</td><td>translation vector </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>Projection matrix (4*3) </dd></dl>
+
+<p>Reimplemented in <a class="el" href="class_opencv_sf_m_1_1_camera_pinhole.html#ad42158ee2722c73c6935a4744c152026">OpencvSfM::CameraPinhole</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa1b338f09e0139185d71bf82e1807cb7"></a><!-- doxytag: member="OpencvSfM::Camera::convertFromImageTo3Dray" ref="aa1b338f09e0139185d71bf82e1807cb7" args="(std::vector&lt; cv::Vec3d &gt; points)=0" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::vector&lt;cv::Vec4d&gt; OpencvSfM::Camera::convertFromImageTo3Dray </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; cv::Vec3d &gt;&#160;</td>
+          <td class="paramname"><em>points</em></td><td>)</td>
+          <td><code> [pure virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This method can transform points from image to 3D rays (homogeneous coordinates) </p>
+
+<p>Implemented in <a class="el" href="class_opencv_sf_m_1_1_camera_pinhole.html#a694530f3c345a961bad11c28a68703ee">OpencvSfM::CameraPinhole</a>, and <a class="el" href="class_opencv_sf_m_1_1_camera_pinhole_distor.html#a0fba2c497b42a751e77070885e964e7c">OpencvSfM::CameraPinholeDistor</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aaea15041e74b4a4246b533aa67d86e4b"></a><!-- doxytag: member="OpencvSfM::Camera::normImageToPixelCoordinates" ref="aaea15041e74b4a4246b533aa67d86e4b" args="(std::vector&lt; cv::Vec2d &gt; points)=0" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::vector&lt;cv::Vec2d&gt; OpencvSfM::Camera::normImageToPixelCoordinates </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; cv::Vec2d &gt;&#160;</td>
+          <td class="paramname"><em>points</em></td><td>)</td>
+          <td><code> [pure virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This method can convert 2D points from normalized image coordinates to 2D points in pixel image coordinates </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">points</td><td>2D points in normalized image homogeneous coordinates. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>2D points in pixel image homogeneous coordinates. </dd></dl>
+
+<p>Implemented in <a class="el" href="class_opencv_sf_m_1_1_camera_pinhole.html#aa844cae56eaa43784b3420bcddaacdd6">OpencvSfM::CameraPinhole</a>, and <a class="el" href="class_opencv_sf_m_1_1_camera_pinhole_distor.html#a9d93e59eeff696c413493377cc42bb3d">OpencvSfM::CameraPinholeDistor</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a9dde477a85f86e076c79d3ce01b5f974"></a><!-- doxytag: member="OpencvSfM::Camera::pixelToNormImageCoordinates" ref="a9dde477a85f86e076c79d3ce01b5f974" args="(std::vector&lt; cv::Vec2d &gt; points)=0" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::vector&lt;cv::Vec2d&gt; OpencvSfM::Camera::pixelToNormImageCoordinates </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; cv::Vec2d &gt;&#160;</td>
+          <td class="paramname"><em>points</em></td><td>)</td>
+          <td><code> [pure virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This method can convert 2D points from pixel image coordinates to 2D points in normalized image coordinates </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">points</td><td>2D points in pixel image homogeneous coordinates. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>2D points in normalized image homogeneous coordinates. </dd></dl>
+
+<p>Implemented in <a class="el" href="class_opencv_sf_m_1_1_camera_pinhole.html#ac289202ffff97def7c6287cfb3e3040d">OpencvSfM::CameraPinhole</a>, and <a class="el" href="class_opencv_sf_m_1_1_camera_pinhole_distor.html#a506e945a43e874cc6235625c2a9cc064">OpencvSfM::CameraPinholeDistor</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following files:<ul>
 <li>D:/Travail/These/Determination caracteristiques camera/GSoC/SfM/src/<a class="el" href="_camera_8h_source.html">Camera.h</a></li>
 <li>D:/Travail/These/Determination caracteristiques camera/GSoC/SfM/src/<a class="el" href="_camera_8cpp_source.html">Camera.cpp</a></li>
 </ul>
@@ -142,7 +259,7 @@ std::vector&lt; <a class="el" href="class_opencv_sf_m_1_1_field_of_view.html">Fi
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Sat May 28 2011 17:45:45 for GSoC2011SfM by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Mon May 30 2011 17:50:29 for GSoC2011SfM by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

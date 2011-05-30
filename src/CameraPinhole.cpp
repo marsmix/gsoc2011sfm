@@ -5,12 +5,15 @@ using cv::Mat;
 using cv::Vec2d;
 using cv::Vec3d;
 using cv::Vec4d;
+using cv::Range;
 
 namespace OpencvSfM{
 
   CameraPinhole::CameraPinhole(Mat intra_params/*=Mat::eye(3, 3, CV_64F)*/,unsigned char wantedEstimation/*=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM*/)
   {
-    this->intra_params_ = intra_params;
+    CV_Assert( intra_params.rows==3 && intra_params.cols==3 );
+
+    intra_params.convertTo(this->intra_params_,CV_64F);
     this->inv_intra_params_ = intra_params.inv();
     this->estimation_needed_ = wantedEstimation;
   }
@@ -65,17 +68,31 @@ namespace OpencvSfM{
     return vector<Vec4d>();
   }
 
-  vector<Vec2d> CameraPinhole::imageToNormImageCoordinates(vector<Vec2d> points)
+  vector<Vec2d> CameraPinhole::pixelToNormImageCoordinates(vector<Vec2d> points)
   {
     vector<Vec2d> newCoordinates;
+    double* ptrIntraParam=(double*)inv_intra_params_.data;
     //for each 2D point, use inv_intra to compute 2D point:
     vector<Vec2d>::iterator point=points.begin();
     while(point!=points.end())
     {
+      ///////////////////////////////////////////////////////////////////
+      //Can be done using matrix multiplication like this:
+      ///////////////////////////////////////////////////////////////////
+      /*
       Vec3d pointNorm((*point)[0],(*point)[1],1);
-      Vec3d pointNormImageCoordinate=inv_intra_params_.cross(pointNorm);
-      Vec2d point2D(pointNormImageCoordinate[0]/pointNormImageCoordinate[2],pointNormImageCoordinate[1]/pointNormImageCoordinate[2]);
+      Mat pointNormImageCoordinate=inv_intra_params_ * Mat(pointNorm);
+      double * dataPointImageCoordinate = (double *) pointNormImageCoordinate.data;
+      Vec2d point2D(dataPointImageCoordinate[0]/dataPointImageCoordinate[2],dataPointImageCoordinate[1]/dataPointImageCoordinate[2]);
       newCoordinates.push_back(point2D);
+      */
+
+      ///////////////////////////////////////////////////////////////////
+      //But this is faster (as intra matrix has only 5 values) :
+      newCoordinates.push_back(Vec2d(ptrIntraParam[0] * (*point)[0] + ptrIntraParam[1] * (*point)[1] + ptrIntraParam[2],
+        ptrIntraParam[4] * (*point)[1] + ptrIntraParam[5]));
+
+      point++;
     }
     return newCoordinates;
   }
@@ -84,15 +101,28 @@ namespace OpencvSfM{
   {
     vector<Vec2d> newCoordinates;
     //for each 2D point, use intra params to compute 2D point:
+    double* ptrIntraParam=(double*)intra_params_.data;
 
     vector<Vec2d>::iterator point=points.begin();
     while(point!=points.end())
     {
-      Vec3d pointNorm((*point)[0],(*point)[1],1);
-      Vec3d pointNormImageCoordinate=intra_params_.cross(pointNorm);
-      Vec2d point2D(pointNormImageCoordinate[0]/pointNormImageCoordinate[2],pointNormImageCoordinate[1]/pointNormImageCoordinate[2]);
-      newCoordinates.push_back(point2D);
+      ///////////////////////////////////////////////////////////////////
+      //Same as pixelToNormImageCoordinates, faster than using matrix multiplication:
+      newCoordinates.push_back(Vec2d(ptrIntraParam[0] * (*point)[0] + ptrIntraParam[1] * (*point)[1] + ptrIntraParam[2],
+        ptrIntraParam[4] * (*point)[1] + ptrIntraParam[5]));
+
+      point++;
     }
     return newCoordinates;
+  }
+
+  Mat CameraPinhole::computeProjectionMatrix(const Mat &rotation,const Vec3d &translation)
+  {
+    //P = K [R|t]
+    //Get [R|t]:
+    Mat Rt=Camera::computeProjectionMatrix(rotation,translation);
+
+    //compute K * Rt
+    return this->intra_params_ * Rt;
   }
 }

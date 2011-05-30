@@ -1,3 +1,10 @@
 \form#0:\[ s \begin{bmatrix} u \\ v \\ 1 \end{bmatrix} = \begin{bmatrix}f_x & 0 & c_x \\ 0 & f_y & c_y \\ 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} r_{11} & r_{12} & r_{13} & t_1 \\ r_{21} & r_{22} & r_{23} & t_2 \\ r_{31} & r_{32} & r_{33} & t_3 \end{bmatrix} \begin{bmatrix} X \\ Y \\ Z \\ 1 \end{bmatrix} \]
 \form#1:\[ \begin{array}{l} \vspace{10pt} \begin{bmatrix} x \\ y \\ z \end{bmatrix} = R \begin{bmatrix} X \\ Y \\ Z \end{bmatrix} + t \\ x' = x/z \\ y' = y/z \vspace{10pt} \end{array} \]
 \form#2:\[ \begin{array}{l} \vspace{10pt} x'' = x' \dfrac{1 + k_1 r^2 + k_2 r^4 + k_3 r^6}{1 + k_4 r^2 + k_5 r^4 + k_6 r^6} + 2 p_1 x' y' + p_2(r^2 + 2 x'^2) \\ \vspace{10pt} y'' = y' \dfrac{1 + k_1 r^2 + k_2 r^4 + k_3 r^6}{1 + k_4 r^2 + k_5 r^4 + k_6 r^6} + p_1 (r^2 + 2 y'^2) + 2 p_2 x' y' \\ \text{where} \quad r^2 = x'^2 + y'^2 \\ u = f_x*x'' + c_x \\ v = f_y*y'' + c_y \end{array} \]
+\form#3:$k_1$
+\form#4:$k_6$
+\form#5:$p_1$
+\form#6:$p_2$
+\form#7:$f_x$
+\form#8:$f_y$
+\form#9:$f_x=f_y * aspectRatio$

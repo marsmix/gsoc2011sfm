@@ -14,7 +14,7 @@ namespace OpencvSfM{
   };
 
   /*! \brief This class represent the physical device which take the pictures. 
-  *      It is not related to a 3D position which is the role of the FieldOfView class.
+  *      It is not related to a 3D position which is the role of the PointOfView class.
   *      The role of the class is to store only intra parameters (without radial distortion)
   *
   *
@@ -44,7 +44,7 @@ namespace OpencvSfM{
     * @param objectPoints The vector of vectors of the object points. See http://opencv.willowgarage.com/documentation/cpp/calib3d_camera_calibration_and_3d_reconstruction.html#cv-calibratecamera
     * @param imagePoints The vector of vectors of the corresponding image points. See http://opencv.willowgarage.com/documentation/cpp/calib3d_camera_calibration_and_3d_reconstruction.html#cv-calibratecamera
     * @param imageSize The image size in pixels; used to initialize the principal point
-    * @param aspectRatio If it is zero or negative, both \f $f_x$\f  and \f $f_y$\f  are estimated independently. Otherwise \f $f_x=f_y * aspectRatio$\f 
+    * @param aspectRatio If it is zero or negative, both \f$f_x\f$  and \f$f_y\f$  are estimated independently. Otherwise \f$f_x=f_y * aspectRatio\f$ 
     * @param wantedEstimation values which need an estimation
     */
     CameraPinhole(const std::vector<std::vector<cv::Point3f> >& objectPoints, const std::vector<std::vector<cv::Point2f> >& imagePoints, cv::Size imageSize, double aspectRatio=1.,unsigned char wantedEstimation=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM);
@@ -67,13 +67,20 @@ namespace OpencvSfM{
     * @param points 2D points in pixel image homogeneous coordinates.
     * @return 2D points in normalized image homogeneous coordinates.
     */
-    virtual std::vector<cv::Vec2d> imageToNormImageCoordinates(std::vector<cv::Vec2d> points);
+    virtual std::vector<cv::Vec2d> pixelToNormImageCoordinates(std::vector<cv::Vec2d> points);
     /**
     * This method can convert 2D points from normalized image coordinates to 2D points in pixel image coordinates
     * @param points 2D points in normalized image homogeneous coordinates.
     * @return 2D points in pixel image homogeneous coordinates.
     */
     virtual std::vector<cv::Vec2d> normImageToPixelCoordinates(std::vector<cv::Vec2d> points);
+    /**
+    * This method can create a projection matrix using intra parameters and given rotation and translation
+    * @param rotation rotation matrix
+    * @param translation translation vector
+    * @return Projection matrix (4*3)
+    */
+    virtual cv::Mat computeProjectionMatrix(const cv::Mat &rotation,const cv::Vec3d &translation);
   };
 
 };
