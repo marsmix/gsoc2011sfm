@@ -1,0 +1,249 @@
+\hypertarget{class_opencv_sf_m_1_1_camera_pinhole_distor}{
+\section{OpencvSfM::CameraPinholeDistor Class Reference}
+\label{class_opencv_sf_m_1_1_camera_pinhole_distor}\index{OpencvSfM::CameraPinholeDistor@{OpencvSfM::CameraPinholeDistor}}
+}
+
+
+This class represent the physical device which take the pictures. It is not related to a 3D position which is the role of the \hyperlink{class_opencv_sf_m_1_1_point_of_view}{PointOfView} class. The role of the class is to store intra parameters and radial distortion.  
+
+
+
+
+{\ttfamily \#include $<$CameraPinholeDistor.h$>$}
+
+Inheritance diagram for OpencvSfM::CameraPinholeDistor:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{class_opencv_sf_m_1_1_camera_pinhole_distor}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_opencv_sf_m_1_1_camera_pinhole_distor_ad58c8fb16fdbb0eba4345cd3abe47a92}{CameraPinholeDistor} (cv::Mat intra\_\-params=cv::Mat::eye(3, 3, CV\_\-64F), cv::Vec6d radial\_\-dist=cv::Vec6d(0.0, 0.0, 0.0, 0.0, 0.0, 0.0), unsigned char nbRadialParam=6, cv::Vec2d tangential\_\-dist=cv::Vec2d(0.0, 0.0), unsigned char wantedEstimation=FOCAL\_\-PARAM$|$SKEW\_\-PARAM$|$PRINCIPAL\_\-POINT\_\-PARAM$|$RADIAL\_\-PARAM$|$TANGEANT\_\-PARAM)
+\item 
+\hyperlink{class_opencv_sf_m_1_1_camera_pinhole_distor_ab3f32742332ecaab124721e9b259f932}{CameraPinholeDistor} (const std::vector$<$ std::vector$<$ cv::Point3f $>$ $>$ \&objectPoints, const std::vector$<$ std::vector$<$ cv::Point2f $>$ $>$ \&imagePoints, cv::Size imageSize, double aspectRatio=1., cv::Vec6d radial\_\-dist=cv::Vec6d(0.0, 0.0, 0.0, 0.0, 0.0, 0.0), unsigned char nbRadialParam=6, cv::Vec2d tangential\_\-dist=cv::Vec2d(0.0, 0.0), unsigned char wantedEstimation=FOCAL\_\-PARAM$|$SKEW\_\-PARAM$|$PRINCIPAL\_\-POINT\_\-PARAM$|$RADIAL\_\-PARAM$|$TANGEANT\_\-PARAM)
+\item 
+void \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_distor_aab95df60504b6bda45c11b53f939ad21}{updateDistortionParameters} (const cv::Vec6d \&radial\_\-dist, unsigned char nbRadialParam, const cv::Vec2d \&tangential\_\-dist, unsigned char wantedEstimation=RADIAL\_\-PARAM$|$TANGEANT\_\-PARAM)
+\item 
+virtual std::vector$<$ cv::Vec4d $>$ \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_distor_a0fba2c497b42a751e77070885e964e7c}{convertFromImageTo3Dray} (std::vector$<$ cv::Vec3d $>$ points)
+\item 
+virtual std::vector$<$ cv::Vec2d $>$ \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_distor_a506e945a43e874cc6235625c2a9cc064}{pixelToNormImageCoordinates} (std::vector$<$ cv::Vec2d $>$ points)
+\item 
+virtual std::vector$<$ cv::Vec2d $>$ \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_distor_a9d93e59eeff696c413493377cc42bb3d}{normImageToPixelCoordinates} (std::vector$<$ cv::Vec2d $>$ points)
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_opencv_sf_m_1_1_camera_pinhole_distor_ad3b352db4b127864bcd901e11d7e50dc}{
+cv::Vec$<$ double, 6 $>$ \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_distor_ad3b352db4b127864bcd901e11d7e50dc}{radial\_\-dist\_\-}}
+\label{class_opencv_sf_m_1_1_camera_pinhole_distor_ad3b352db4b127864bcd901e11d7e50dc}
+
+\begin{DoxyCompactList}\small\item\em used to store radial dist parameters (/f\$k\_\-1/f\$ to /f\$k\_\-6/f\$) \end{DoxyCompactList}\item 
+\hypertarget{class_opencv_sf_m_1_1_camera_pinhole_distor_a99247804700d8c8bfaf50a4e84cfb080}{
+unsigned char \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_distor_a99247804700d8c8bfaf50a4e84cfb080}{nb\_\-radial\_\-params\_\-}}
+\label{class_opencv_sf_m_1_1_camera_pinhole_distor_a99247804700d8c8bfaf50a4e84cfb080}
+
+\begin{DoxyCompactList}\small\item\em number of radial dist parameters (0, 2, 3 or 6) \end{DoxyCompactList}\item 
+\hypertarget{class_opencv_sf_m_1_1_camera_pinhole_distor_ae09ea3c12a8e19788d084b357f11a902}{
+cv::Vec$<$ double, 2 $>$ \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_distor_ae09ea3c12a8e19788d084b357f11a902}{tangential\_\-dist\_\-}}
+\label{class_opencv_sf_m_1_1_camera_pinhole_distor_ae09ea3c12a8e19788d084b357f11a902}
+
+\begin{DoxyCompactList}\small\item\em used to store tangential dist parameters (/f\$p\_\-1/f\$ and /f\$p\_\-2/f\$) \end{DoxyCompactList}\item 
+\hypertarget{class_opencv_sf_m_1_1_camera_pinhole_distor_a80906d90106b91c391449d4cb9fd32e7}{
+unsigned char {\bfseries nb\_\-tangent\_\-params\_\-}}
+\label{class_opencv_sf_m_1_1_camera_pinhole_distor_a80906d90106b91c391449d4cb9fd32e7}
+
+\item 
+\hypertarget{class_opencv_sf_m_1_1_camera_pinhole_distor_af9ce33321472dbbb71668b266225060b}{
+cv::Mat \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_distor_af9ce33321472dbbb71668b266225060b}{distortionVector}}
+\label{class_opencv_sf_m_1_1_camera_pinhole_distor_af9ce33321472dbbb71668b266225060b}
+
+\begin{DoxyCompactList}\small\item\em vector of distortion coefficients (k\_\-1, k\_\-2, p\_\-1, p\_\-2\mbox{[}, k\_\-3\mbox{[}, k\_\-4, k\_\-5, k\_\-6\mbox{]}\mbox{]}) of 4, 5 or 8 elements \end{DoxyCompactList}\item 
+\hypertarget{class_opencv_sf_m_1_1_camera_pinhole_distor_acd36b9080acefe62757f4181d0bf4d70}{
+cv::Mat \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_distor_acd36b9080acefe62757f4181d0bf4d70}{undistMapX}}
+\label{class_opencv_sf_m_1_1_camera_pinhole_distor_acd36b9080acefe62757f4181d0bf4d70}
+
+\begin{DoxyCompactList}\small\item\em Undistortion and rectification transformation map. \end{DoxyCompactList}\item 
+\hypertarget{class_opencv_sf_m_1_1_camera_pinhole_distor_ad222bd2f13252a82410216bbfc79a158}{
+cv::Mat \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_distor_ad222bd2f13252a82410216bbfc79a158}{undistMapY}}
+\label{class_opencv_sf_m_1_1_camera_pinhole_distor_ad222bd2f13252a82410216bbfc79a158}
+
+\begin{DoxyCompactList}\small\item\em Undistortion and rectification transformation map. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This class represent the physical device which take the pictures. It is not related to a 3D position which is the role of the \hyperlink{class_opencv_sf_m_1_1_point_of_view}{PointOfView} class. The role of the class is to store intra parameters and radial distortion. 
+
+So this class is devoted to the conversion between 3D points (using camera coordinate) and 2D points (using image coordinate) using the methods convertFromImageTo3Dray or convertFrom3DToImage 
+
+Definition at line 23 of file CameraPinholeDistor.h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_opencv_sf_m_1_1_camera_pinhole_distor_ad58c8fb16fdbb0eba4345cd3abe47a92}{
+\index{OpencvSfM::CameraPinholeDistor@{OpencvSfM::CameraPinholeDistor}!CameraPinholeDistor@{CameraPinholeDistor}}
+\index{CameraPinholeDistor@{CameraPinholeDistor}!OpencvSfM::CameraPinholeDistor@{OpencvSfM::CameraPinholeDistor}}
+\subsubsection[{CameraPinholeDistor}]{\setlength{\rightskip}{0pt plus 5cm}OpencvSfM::CameraPinholeDistor::CameraPinholeDistor (
+\begin{DoxyParamCaption}
+\item[{cv::Mat}]{intra\_\-params = {\ttfamily cv::Mat::eye(3,~3,~CV\_\-64F)}, }
+\item[{cv::Vec6d}]{radial\_\-dist = {\ttfamily cv::Vec6d(0.0,~0.0,~0.0,~0.0,~0.0,~0.0)}, }
+\item[{unsigned char}]{nbRadialParam = {\ttfamily 6}, }
+\item[{cv::Vec2d}]{tangential\_\-dist = {\ttfamily cv::Vec2d(0.0,~0.0)}, }
+\item[{unsigned char}]{wantedEstimation = {\ttfamily FOCAL\_\-PARAM$|$SKEW\_\-PARAM$|$PRINCIPAL\_\-POINT\_\-PARAM$|$RADIAL\_\-PARAM$|$TANGEANT\_\-PARAM}}
+\end{DoxyParamCaption}
+)}}
+\label{class_opencv_sf_m_1_1_camera_pinhole_distor_ad58c8fb16fdbb0eba4345cd3abe47a92}
+Constructor with (or not) intra parameters. 
+\begin{DoxyParams}{Parameters}
+{\em intra\_\-params} & matrix of intra parameters (3$\ast$3) \\
+\hline
+{\em radial\_\-dist} & radial dist parameters (/f\$k\_\-1/f\$ to /f\$k\_\-6/f\$) \\
+\hline
+{\em nbRadialParam} & number of radial dist parameters (0, 2, 3 or 6) \\
+\hline
+{\em tangential\_\-dist} & tangential dist parameters (/f\$p\_\-1/f\$ and /f\$p\_\-2/f\$) \\
+\hline
+{\em wantedEstimation} & values which need an estimation \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_opencv_sf_m_1_1_camera_pinhole_distor_ab3f32742332ecaab124721e9b259f932}{
+\index{OpencvSfM::CameraPinholeDistor@{OpencvSfM::CameraPinholeDistor}!CameraPinholeDistor@{CameraPinholeDistor}}
+\index{CameraPinholeDistor@{CameraPinholeDistor}!OpencvSfM::CameraPinholeDistor@{OpencvSfM::CameraPinholeDistor}}
+\subsubsection[{CameraPinholeDistor}]{\setlength{\rightskip}{0pt plus 5cm}OpencvSfM::CameraPinholeDistor::CameraPinholeDistor (
+\begin{DoxyParamCaption}
+\item[{const std::vector$<$ std::vector$<$ cv::Point3f $>$ $>$ \&}]{objectPoints, }
+\item[{const std::vector$<$ std::vector$<$ cv::Point2f $>$ $>$ \&}]{imagePoints, }
+\item[{cv::Size}]{imageSize, }
+\item[{double}]{aspectRatio = {\ttfamily 1.}, }
+\item[{cv::Vec6d}]{radial\_\-dist = {\ttfamily cv::Vec6d(0.0,~0.0,~0.0,~0.0,~0.0,~0.0)}, }
+\item[{unsigned char}]{nbRadialParam = {\ttfamily 6}, }
+\item[{cv::Vec2d}]{tangential\_\-dist = {\ttfamily cv::Vec2d(0.0,~0.0)}, }
+\item[{unsigned char}]{wantedEstimation = {\ttfamily FOCAL\_\-PARAM$|$SKEW\_\-PARAM$|$PRINCIPAL\_\-POINT\_\-PARAM$|$RADIAL\_\-PARAM$|$TANGEANT\_\-PARAM}}
+\end{DoxyParamCaption}
+)}}
+\label{class_opencv_sf_m_1_1_camera_pinhole_distor_ab3f32742332ecaab124721e9b259f932}
+Constructor where initial camera matrix is computed from the 3D-\/2D point correspondences. Currently, the function only supports planar calibration patterns, i.e. patterns where each object point has z-\/coordinate =0. 
+\begin{DoxyParams}{Parameters}
+{\em objectPoints} & The vector of vectors of the object points. See \href{http://opencv.willowgarage.com/documentation/cpp/calib3d_camera_calibration_and_3d_reconstruction.html#cv-calibratecamera}{\tt http://opencv.willowgarage.com/documentation/cpp/calib3d\_\-camera\_\-calibration\_\-and\_\-3d\_\-reconstruction.html\#cv-\/calibratecamera} \\
+\hline
+{\em imagePoints} & The vector of vectors of the corresponding image points. See \href{http://opencv.willowgarage.com/documentation/cpp/calib3d_camera_calibration_and_3d_reconstruction.html#cv-calibratecamera}{\tt http://opencv.willowgarage.com/documentation/cpp/calib3d\_\-camera\_\-calibration\_\-and\_\-3d\_\-reconstruction.html\#cv-\/calibratecamera} \\
+\hline
+{\em imageSize} & The image size in pixels; used to initialize the principal point \\
+\hline
+{\em aspectRatio} & If it is zero or negative, both $f_x$ and $f_y$ are estimated independently. Otherwise $f_x=f_y * aspectRatio$ \\
+\hline
+{\em radial\_\-dist} & radial dist parameters (/f\$k\_\-1/f\$ to /f\$k\_\-6/f\$) \\
+\hline
+{\em nbRadialParam} & number of radial dist parameters (0, 2, 3 or 6) \\
+\hline
+{\em tangential\_\-dist} & tangential dist parameters (/f\$p\_\-1/f\$ and /f\$p\_\-2/f\$) \\
+\hline
+{\em wantedEstimation} & values which need an estimation \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_opencv_sf_m_1_1_camera_pinhole_distor_a0fba2c497b42a751e77070885e964e7c}{
+\index{OpencvSfM::CameraPinholeDistor@{OpencvSfM::CameraPinholeDistor}!convertFromImageTo3Dray@{convertFromImageTo3Dray}}
+\index{convertFromImageTo3Dray@{convertFromImageTo3Dray}!OpencvSfM::CameraPinholeDistor@{OpencvSfM::CameraPinholeDistor}}
+\subsubsection[{convertFromImageTo3Dray}]{\setlength{\rightskip}{0pt plus 5cm}vector$<$ Vec4d $>$ OpencvSfM::CameraPinholeDistor::convertFromImageTo3Dray (
+\begin{DoxyParamCaption}
+\item[{std::vector$<$ cv::Vec3d $>$}]{points}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{class_opencv_sf_m_1_1_camera_pinhole_distor_a0fba2c497b42a751e77070885e964e7c}
+This method can transform points from image to 3D rays 
+
+Reimplemented from \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_a694530f3c345a961bad11c28a68703ee}{OpencvSfM::CameraPinhole}.
+
+
+
+Definition at line 65 of file CameraPinhole.cpp.
+
+\hypertarget{class_opencv_sf_m_1_1_camera_pinhole_distor_a9d93e59eeff696c413493377cc42bb3d}{
+\index{OpencvSfM::CameraPinholeDistor@{OpencvSfM::CameraPinholeDistor}!normImageToPixelCoordinates@{normImageToPixelCoordinates}}
+\index{normImageToPixelCoordinates@{normImageToPixelCoordinates}!OpencvSfM::CameraPinholeDistor@{OpencvSfM::CameraPinholeDistor}}
+\subsubsection[{normImageToPixelCoordinates}]{\setlength{\rightskip}{0pt plus 5cm}vector$<$ Vec2d $>$ OpencvSfM::CameraPinholeDistor::normImageToPixelCoordinates (
+\begin{DoxyParamCaption}
+\item[{std::vector$<$ cv::Vec2d $>$}]{points}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{class_opencv_sf_m_1_1_camera_pinhole_distor_a9d93e59eeff696c413493377cc42bb3d}
+This method can convert 2D points from normalized image coordinates to 2D points in pixel image coordinates 
+\begin{DoxyParams}{Parameters}
+{\em points} & 2D points in normalized image homogeneous coordinates. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+2D points in pixel image homogeneous coordinates. 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_aa844cae56eaa43784b3420bcddaacdd6}{OpencvSfM::CameraPinhole}.
+
+
+
+Definition at line 74 of file CameraPinholeDistor.cpp.
+
+\hypertarget{class_opencv_sf_m_1_1_camera_pinhole_distor_a506e945a43e874cc6235625c2a9cc064}{
+\index{OpencvSfM::CameraPinholeDistor@{OpencvSfM::CameraPinholeDistor}!pixelToNormImageCoordinates@{pixelToNormImageCoordinates}}
+\index{pixelToNormImageCoordinates@{pixelToNormImageCoordinates}!OpencvSfM::CameraPinholeDistor@{OpencvSfM::CameraPinholeDistor}}
+\subsubsection[{pixelToNormImageCoordinates}]{\setlength{\rightskip}{0pt plus 5cm}vector$<$ Vec2d $>$ OpencvSfM::CameraPinholeDistor::pixelToNormImageCoordinates (
+\begin{DoxyParamCaption}
+\item[{std::vector$<$ cv::Vec2d $>$}]{points}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{class_opencv_sf_m_1_1_camera_pinhole_distor_a506e945a43e874cc6235625c2a9cc064}
+This method can convert 2D points from pixel image coordinates to 2D points in normalized image coordinates 
+\begin{DoxyParams}{Parameters}
+{\em points} & 2D points in pixel image homogeneous coordinates. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+2D points in normalized image homogeneous coordinates. 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{class_opencv_sf_m_1_1_camera_pinhole_ac289202ffff97def7c6287cfb3e3040d}{OpencvSfM::CameraPinhole}.
+
+
+
+Definition at line 71 of file CameraPinhole.cpp.
+
+\hypertarget{class_opencv_sf_m_1_1_camera_pinhole_distor_aab95df60504b6bda45c11b53f939ad21}{
+\index{OpencvSfM::CameraPinholeDistor@{OpencvSfM::CameraPinholeDistor}!updateDistortionParameters@{updateDistortionParameters}}
+\index{updateDistortionParameters@{updateDistortionParameters}!OpencvSfM::CameraPinholeDistor@{OpencvSfM::CameraPinholeDistor}}
+\subsubsection[{updateDistortionParameters}]{\setlength{\rightskip}{0pt plus 5cm}void OpencvSfM::CameraPinholeDistor::updateDistortionParameters (
+\begin{DoxyParamCaption}
+\item[{const cv::Vec6d \&}]{radial\_\-dist, }
+\item[{unsigned char}]{nbRadialParam, }
+\item[{const cv::Vec2d \&}]{tangential\_\-dist, }
+\item[{unsigned char}]{wantedEstimation = {\ttfamily RADIAL\_\-PARAM$|$TANGEANT\_\-PARAM}}
+\end{DoxyParamCaption}
+)}}
+\label{class_opencv_sf_m_1_1_camera_pinhole_distor_aab95df60504b6bda45c11b53f939ad21}
+this method can be used to update the intra parameters. 
+\begin{DoxyParams}{Parameters}
+{\em radial\_\-dist} & values of the new radial distortions parameters \\
+\hline
+{\em nbRadialParam} & number of radial dist parameters (0, 2, 3 or 6) \\
+\hline
+{\em tangential\_\-dist} & values of the new tangential distortions parameters \\
+\hline
+{\em wantedEstimation} & values which need an estimation \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 29 of file CameraPinholeDistor.cpp.
+
+
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+D:/Travail/These/Determination caracteristiques camera/GSoC/SfM/src/CameraPinholeDistor.h\item 
+D:/Travail/These/Determination caracteristiques camera/GSoC/SfM/src/CameraPinhole.cpp\item 
+D:/Travail/These/Determination caracteristiques camera/GSoC/SfM/src/CameraPinholeDistor.cpp\end{DoxyCompactItemize}

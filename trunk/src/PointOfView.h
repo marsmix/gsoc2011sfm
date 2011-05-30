@@ -69,6 +69,19 @@ namespace OpencvSfM{
     * @return camera matrix
     */
     cv::Ptr<Camera> getIntraParameters() const{return cv::Ptr<Camera>(device_);};
+    
+    /**
+    * This method can convert 3D points from world coordinates to 2D points in pixel image coordinates
+    * @param points 3D points in world coordinates.
+    * @return 2D points in pixel image coordinates.
+    */
+    virtual std::vector<cv::Vec2d> project3DPointsIntoImage(std::vector<cv::Vec3d> points);
+    /**
+    * This method test is 3D point is in front of Camera (can be view with the camera)
+    * @param point 3D point in world coordinates (homogeneous, that is 4 values).
+    * @return true if point can be seen with this point of view
+    */
+    virtual bool pointInFrontOfCamera(cv::Vec4d point);
   };
 
 }
