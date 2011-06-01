@@ -1,6 +1,6 @@
 //Set to 1 if you want to test the cameras
 //But be aware to set other tests to 0...
-#if 1
+#if 0
 
 #include "CameraPinhole.h"
 #include "PointOfView.h"
@@ -28,9 +28,9 @@ void main()
   //Now create a real camera (ie with a position) using the same file:
   Mat rotation(3,3,CV_64F);
   data = (double*)rotation.data;
-  data[0] = 0.015513720929994632;data[1] = 0.99884343581246959;data[2] = -0.045509506668906109;
-  data[3] = 0.99922238739871228;data[4] = -0.017137499028595668;data[5] = -0.035509528978323907;
-  data[6] = -0.036248379055121745;data[7] = -0.044923232980116717;data[8] = -0.99833258894743582;
+  data[0] = 0.015513720929994632;  data[1] = 0.99884343581246959;   data[2] = -0.045509506668906109;
+  data[3] = 0.99922238739871228;   data[4] = -0.017137499028595668; data[5] = -0.035509528978323907;
+  data[6] = -0.036248379055121745; data[7] = -0.044923232980116717; data[8] = -0.99833258894743582;
   Vec3d translation;
   translation[0]=-0.059985479001418429;translation[1]=0.0040078802950409987;translation[2]=0.57088647431543438;
 
@@ -48,19 +48,9 @@ void main()
 
   vector<Vec2d> pixelProjection=firstPoV.project3DPointsIntoImage(points3D);
 
-  for(int i=0;i<pixelProjection.size();i++){
+  for(unsigned int i=0;i<pixelProjection.size();i++){
     cout<<"Point "<<i<<" projected in ("<<pixelProjection[i][0]<<", "<<pixelProjection[i][1]<<")"<<endl;
     Vec4d point3DHomog(points3D[i][0],points3D[i][1],points3D[i][2],1);
-
-    //Won't work because 3D point is not in camera reference:
-    if(firstPoV.pointInFrontOfCamera(point3DHomog))
-    {
-      cout<<"Point in front of camera ! (Won't work because 3D point is not in camera reference)"<<endl;
-    }
-    else
-    {
-      cout<<"Point NOT in front of camera ! (Won't work because 3D point is not in camera reference)"<<endl;
-    }
   }
 }
 #endif

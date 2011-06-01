@@ -42,8 +42,8 @@ namespace OpencvSfM{
   class PointOfView
   {
   protected:
-    cv::Mat rotation_;///<Rotation matrix R
-    cv::Vec3d translation_;///<Translation vector t
+    cv::Mat rotation_;///<Rotation matrix R (data is stored into projection_matrix_)
+    cv::Mat translation_;///<Translation vector t (Matrix instead of vector because data is stored into projection_matrix_)
     cv::Mat projection_matrix_;///<redundancy but speed improvement
     cv::Ptr<Camera> device_;///<intra parameters and distortion coefs
 

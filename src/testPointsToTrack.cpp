@@ -1,6 +1,6 @@
 //Set to 1 if you want to test the points detection and matching
 //But be aware to set other tests to 0...
-#if 0
+#if 1
 
 #include "PointsToTrackWithImage.h"
 #include "MotionProcessor.h"
@@ -37,10 +37,11 @@ void main(){
   //universal method to get the current image:
   Mat firstImage=mp.getFrame();
   Mat secondImage=mp.getFrame();
+  Mat thirdImage=mp.getFrame();
 
-  if(firstImage.empty()||secondImage.empty())
+  if(firstImage.empty()||secondImage.empty()||thirdImage.empty())
   {
-    cout<<"test can not be run... can't find two different images..."<<endl;
+    cout<<"test can not be run... can't find different images..."<<endl;
   }
   else
   {
@@ -48,15 +49,17 @@ void main(){
     
     cout<<"creation of two detection algorithm..."<<endl;
     Ptr<FeatureDetector> fastDetect;
-    fastDetect=Ptr<FeatureDetector>(new SiftFeatureDetector());
-    Ptr<DescriptorExtractor> SIFTDetect;
-    SIFTDetect=Ptr<DescriptorExtractor>(new SiftDescriptorExtractor());
+    fastDetect=Ptr<FeatureDetector>(new SurfFeatureDetector());
+    Ptr<DescriptorExtractor> SurfDetect;
+    SurfDetect=Ptr<DescriptorExtractor>(new SurfDescriptorExtractor());
 
     cout<<"now create the two set of points with features..."<<endl;
     Ptr<PointsToTrack> ptt1;
-    ptt1=Ptr<PointsToTrack>(new PointsToTrackWithImage (firstImage,Mat(),fastDetect,SIFTDetect));
+    ptt1=Ptr<PointsToTrack>(new PointsToTrackWithImage (firstImage,Mat(),fastDetect,SurfDetect));
     Ptr<PointsToTrack> ptt2;
-    ptt2=Ptr<PointsToTrack>(new PointsToTrackWithImage (secondImage,Mat(),fastDetect,SIFTDetect));
+    ptt2=Ptr<PointsToTrack>(new PointsToTrackWithImage (secondImage,Mat(),fastDetect,SurfDetect));
+    Ptr<PointsToTrack> ptt3;
+    ptt3=Ptr<PointsToTrack>(new PointsToTrackWithImage (thirdImage,Mat(),fastDetect,SurfDetect));
 
     cout<<"now try to find matches, so we create a matcher (classic bruteForce)"<<endl<<endl;
     Ptr<DescriptorMatcher> matcher;
@@ -71,14 +74,58 @@ void main(){
     //So we set ptt2 as training data:
     cout<<"Add points of image 2 as references points"<<endl;
     matches.add(ptt2);
+    matches.add(ptt3);
 
     cout<<"and try using knn to find best points matches in img1"<<endl<<endl;
     matches.knnMatch(ptt1,matchesVectorKNN,1,vector<Mat>(),false);
 
-    cout<<"Displaying the "<<matchesVectorKNN.size()<<"points..."<<endl;
+    vector<DMatch> matchesOK;
+    //first remove keypoints not in ptt2:
+    unsigned int nbPoints=matchesVectorKNN.size();
+    for(unsigned int i=0; i<nbPoints; i++)
+    {
+      if( ! matchesVectorKNN[i].empty())
+      {
+        unsigned int nbMatches=matchesVectorKNN[i].size();
+        for(unsigned int j=0; j<nbMatches; j++)
+        {
+          if(matchesVectorKNN[i][j].imgIdx==0)
+          {
+            //add this match:
+            matchesOK.push_back(matchesVectorKNN[i][j]);
+          }
+        }
+      }
+    }
+    cout<<"Displaying the "<<matchesOK.size()<<"points..."<<endl;
     Mat outImg;
-    drawMatches(firstImage, ptt1->getKeypoints(), secondImage, ptt2->getKeypoints(), matchesVectorKNN, outImg);
+    drawMatches(firstImage, ptt1->getKeypoints(), secondImage, ptt2->getKeypoints(), matchesOK, outImg);
     imshow("PointsMatcher key points (knnMatch)",outImg);
+    cv::waitKey(40);
+
+    //cross check matches:
+    matches.crossCheck(ptt1,matchesVectorKNN);
+    //first remove keypoints not in ptt2:
+    matchesOK.clear();
+    nbPoints=matchesVectorKNN.size();
+    for(unsigned int i=0; i<nbPoints; i++)
+    {
+      if( ! matchesVectorKNN[i].empty())
+      {
+        unsigned int nbMatches=matchesVectorKNN[i].size();
+        for(unsigned int j=0; j<nbMatches; j++)
+        {
+          if(matchesVectorKNN[i][j].imgIdx==0)
+          {
+            //add this match:
+            matchesOK.push_back(matchesVectorKNN[i][j]);
+          }
+        }
+      }
+    }
+    cout<<"Displaying the "<<matchesOK.size()<<"points..."<<endl;
+    drawMatches(firstImage, ptt1->getKeypoints(), secondImage, ptt2->getKeypoints(), matchesOK, outImg);
+    imshow("PointsMatcher key points (verified)",outImg);
     cv::waitKey(0);
   }
 }
@@ -118,10 +165,10 @@ void main(){
     //create the two detection algorithm:
     Ptr<FeatureDetector> fastDetect;
     fastDetect=Ptr<FeatureDetector>(new FastFeatureDetector(threshold));
-    Ptr<DescriptorExtractor> SIFTDetect;
-    SIFTDetect=Ptr<DescriptorExtractor>(new SiftDescriptorExtractor());
+    Ptr<DescriptorExtractor> SurfDetect;
+    SurfDetect=Ptr<DescriptorExtractor>(new SiftDescriptorExtractor());
 
-    PointsToTrackWithImage ptt(imgT0001,Mat(),fastDetect,SIFTDetect);
+    PointsToTrackWithImage ptt(imgT0001,Mat(),fastDetect,SurfDetect);
     int nbPoints;
     for(int i=0;i<10;i++){
       nbPoints=ptt.computeKeypointsAndDesc();

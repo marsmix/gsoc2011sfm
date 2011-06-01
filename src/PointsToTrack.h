@@ -57,7 +57,7 @@ namespace OpencvSfM{
     * this method return the points coordinates and sometimes orientation and size
     * @return points coordinates and sometimes orientation and size
     */
-    std::vector<cv::KeyPoint> getKeypoints() const {return keypoints_;};
+    std::vector<cv::KeyPoint>& getKeypoints() {return keypoints_;};
     /**
     * this method return the descritors for each points in a matrix with size (n*m), where n is the number of points and m is the desciptor size.
     * @return descritors for each points in a matrix with size (n*m), where n is the number of points and m is the desciptor size.

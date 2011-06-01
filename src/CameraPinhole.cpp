@@ -115,14 +115,4 @@ namespace OpencvSfM{
     }
     return newCoordinates;
   }
-
-  Mat CameraPinhole::computeProjectionMatrix(const Mat &rotation,const Vec3d &translation)
-  {
-    //P = K [R|t]
-    //Get [R|t]:
-    Mat Rt=Camera::computeProjectionMatrix(rotation,translation);
-
-    //compute K * Rt
-    return this->intra_params_ * Rt;
-  }
 }
