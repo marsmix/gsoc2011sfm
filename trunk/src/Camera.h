@@ -71,14 +71,6 @@ namespace OpencvSfM{
     * @return 2D points in pixel image coordinates.
     */
     virtual std::vector<cv::Vec2d> normImageToPixelCoordinates(std::vector<cv::Vec2d> points) =0;//we don't know how this transformation can be done, so pure virtual
-    /**
-    * This method can create a projection matrix using intra parameters and given rotation and translation
-    * As we don't have intra parameters, this method only compute matrix [R|t]
-    * @param rotation rotation matrix
-    * @param translation translation vector
-    * @return Projection matrix (4*3)
-    */
-    virtual cv::Mat computeProjectionMatrix(const cv::Mat &rotation,const cv::Vec3d &translation);
   };
 
 }
