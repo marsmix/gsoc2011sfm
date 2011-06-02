@@ -4,10 +4,11 @@
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
-#include "dirent.h"
+#include "boost/filesystem.hpp"   // includes all needed Boost.Filesystem declarations
+
+#include <vector>
 #include <string>
 #include <sstream>
-#include <vector>
 
 
 namespace OpencvSfM{
@@ -32,7 +33,7 @@ class MotionProcessor
 protected:
   TypeOfMotionProcessor type_of_input_;///<This attribut is used to know which type is the input (webcam, video file, list of file or just one image)
   cv::VideoCapture capture_;///<When the camera is attached to an avi file or webcam, this will be usefull to get frame...
-  std::vector<std::string> nameOfFiles_;///<If the motion processor use directory as input, we store here the names of files.
+  std::vector<boost::filesystem::path> nameOfFiles_;///<If the motion processor use directory as input, we store here the names of files.
   /**
   * When the camera is attached to a list of file, sourceName_ will be used to store name of the prefix.
   * For example, if the files are img1.jpg, img2.jpg, ... img125.jpg, sourceName_ will be equal to img
