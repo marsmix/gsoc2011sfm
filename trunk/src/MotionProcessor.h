@@ -1,10 +1,10 @@
 #ifndef _GSOC_SFM_MOTION_PROCESSOR_H
 #define _GSOC_SFM_MOTION_PROCESSOR_H 1
 
-#include "opencv2/core/core.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-#include "boost/filesystem.hpp"   // includes all needed Boost.Filesystem declarations
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <boost/filesystem.hpp>   // includes all needed Boost.Filesystem declarations
 
 #include <vector>
 #include <string>
