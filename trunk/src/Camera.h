@@ -2,6 +2,7 @@
 #define _GSOC_SFM_CAMERA_H 1
 
 #include "opencv2/core/core.hpp"
+#include "../otherProjects/libmv/estimator/fundamental_estimator.h"
 #include "PointOfView.h"
 #include <vector>
 
