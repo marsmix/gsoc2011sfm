@@ -89,8 +89,8 @@ void main(){
     vector<Vec2d> pixelProjected=itPoV->project3DPointsIntoImage(points3D);
     //convert Vec2d into KeyPoint:
     vector<KeyPoint> points2D;
-    for(int j=0;j<pixelProjected.size();j++)
-      points2D.push_back(KeyPoint(pixelProjected[j][0],pixelProjected[j][1],10.0));
+    for(unsigned int j=0;j<pixelProjected.size();j++)
+      points2D.push_back(KeyPoint((float)pixelProjected[j][0],(float)pixelProjected[j][1],10.0));
 
     drawKeypoints(imgTmp,points2D,imgTmp,Scalar(255,255,255));
     imshow("Points projected...",imgTmp);

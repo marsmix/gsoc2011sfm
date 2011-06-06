@@ -121,9 +121,10 @@ namespace libmv {
   }
 
   inline void _LIBMV_DLL_ Project(const Mat34 &P, const Vec3 &X, Vec2 *x) {
-    Vec3 hx;
-    Project(P, X, x);
-    *x = hx.head<2>() / hx(2);
+    Vec4 HX;
+    HX << X, 1.0;
+    Project(P, HX, x);
+    *x = HX.head<2>() / HX(2);
   }
 
   inline void _LIBMV_DLL_ Project(const Mat34 &P, const Mat4X &X, Mat2X *x) {

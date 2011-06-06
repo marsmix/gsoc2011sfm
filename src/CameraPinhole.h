@@ -1,7 +1,7 @@
 #ifndef _GSOC_SFM_CAMERA_PINHOLE_H
 #define _GSOC_SFM_CAMERA_PINHOLE_H 1
 
-//A lot of methods are inspired of LIBMV project (http://code.google.com/p/libmv/)
+//A lot of methods are inspired of LIBMV project (http://code.google.com/p/libmv_core/)
 
 #include "opencv2/calib3d/calib3d.hpp"
 #include "Camera.h"

@@ -29,7 +29,7 @@ namespace libmv {
 
 TwoViewDataSet TwoRealisticCameras(bool same_K) {
   TwoViewDataSet d;
-
+  
   d.K1 << 320,   0, 160,
             0, 320, 120,
             0,   0,   1;
@@ -48,13 +48,13 @@ TwoViewDataSet TwoRealisticCameras(bool same_K) {
   P_From_KRt(d.K2, d.R2, d.t2, &d.P2);
 
   fundamental_matrix::FundamentalFromProjections(d.P1, d.P2, &d.F);
-
+  
   d.X.resize(3, 30);
   d.X.setRandom();
 
   Project(d.P1, d.X, &d.x1);
   Project(d.P2, d.X, &d.x2);
-
+  
   return d;
 }
 
@@ -87,10 +87,10 @@ NViewDataSet NRealisticCamerasFull(int nviews, int npoints,
   d.X *= 0.6;
   
   Vecu all_point_ids(npoints);
-  for (size_t j = 0; j < npoints; ++j)
+  for (int j = 0; j < npoints; ++j)
     all_point_ids[j] = j;
 
-  for (size_t i = 0; i < nviews; ++i) {
+  for (int i = 0; i < nviews; ++i) {
     Vec3 camera_center, t, jitter, lookdir;
 
     double theta = i * 2 * M_PI / nviews;

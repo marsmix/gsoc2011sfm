@@ -27,6 +27,7 @@
 namespace libmv {
 
 struct TwoViewDataSet {
+public:
   Mat3 K1, K2;  // Internal parameters.
   Mat3 R1, R2;  // Rotation.
   Vec3 t1, t2;  // Translation.
