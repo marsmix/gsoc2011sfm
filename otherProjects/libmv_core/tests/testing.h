@@ -22,7 +22,7 @@
 #define TESTING_TESTING_H_
 
 #include "../numeric/libmv_types.h"
-#include "gtest/include/gtest.h"
+#include "gtest/gtest.h"
 #include "gflags/gflags.h"
 
 DECLARE_string(test_tmpdir);
