@@ -27,8 +27,9 @@
 #endif
 const int INFO = 0, WARNING = 1, ERROR = 2, FATAL = 3, NUM_SEVERITIES = 4;
 
-#define LOG(x) std::cout << x
-#define VLOG(x) std::cout << x
+#define LOG(x) std::clog << x
+#define VLOG(x) std::clog << x
+
 #define CHECK(x) assert(x)
 
 //////////////////////////////////////////////////////////////////////////

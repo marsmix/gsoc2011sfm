@@ -72,7 +72,6 @@ namespace OpencvSfM{
         return false;
       }
 
-      struct dirent *entry;
       boost::filesystem::directory_iterator iter= boost::filesystem::directory_iterator(dirTmp);
       while(iter != boost::filesystem::directory_iterator())
       {
