@@ -25,13 +25,13 @@
 #include <fstream>
 
 // The following lines pull in the real gtest *.cc files.
-#include "../../gtest/src/gtest.cc"
-#include "../../gtest/src/gtest-death-test.cc"
-#include "../../gtest/src/gtest-filepath.cc"
-#include "../../gtest/src/gtest-port.cc"
-#include "../../gtest/src/gtest-printers.cc"
-#include "../../gtest/src/gtest-test-part.cc"
-#include "../../gtest/src/gtest-typed-test.cc"
+#include "gtest/src/gtest.cc"
+#include "gtest/src/gtest-death-test.cc"
+#include "gtest/src/gtest-filepath.cc"
+#include "gtest/src/gtest-port.cc"
+#include "gtest/src/gtest-printers.cc"
+#include "gtest/src/gtest-test-part.cc"
+#include "gtest/src/gtest-typed-test.cc"
 
 DEFINE_string(test_tmpdir, "/tmp", "Dir to use for temp files");
 
