@@ -71,7 +71,7 @@ TEST(FocalFromFundamental, EpipolesFromFundamental) {
 }
 
 /*
-the following test are not in the libmv_core interface but are used by core function...
+the following test are not in the libmv_core interface (exported) but are used by core function...
 I don't know what to do with such test, so I let them but hidden in com...
 TEST(FocalFromFundamental, RotationToEliminateY) {
   Vec3 a, b;
@@ -207,8 +207,11 @@ TEST(FocalFromFundamental, TwoViewReconstruction) {
   K2_estimated << f2_estimated,            0, p2(0),
                              0, f2_estimated, p2(1),
                              0,            0,     1;
-  EXPECT_NEAR(0, FrobeniusDistance(d.K1, K1_estimated), 1e-8);
-  EXPECT_NEAR(0, FrobeniusDistance(d.K2, K2_estimated), 1e-8);
+
+  double dist1=FrobeniusDistance(d.K1, K1_estimated);
+  double dist2=FrobeniusDistance(d.K2, K2_estimated);
+  EXPECT_NEAR(0, dist1, 1e-7);
+  EXPECT_NEAR(0, dist2, 1e-7);
 
   // Compute essential matrix
   Mat3 E_estimated;
@@ -229,8 +232,10 @@ TEST(FocalFromFundamental, TwoViewReconstruction) {
   RelativeCameraMotion(d.R1, d.t1, d.R2, d.t2, &R, &t);
   NormalizeL2(&t);
 
-  EXPECT_LE(FrobeniusDistance(R, R_estimated), 1e-8);
-  EXPECT_LE(DistanceL2(t, t_estimated), 1e-8);
+  dist1=FrobeniusDistance(R, R_estimated);
+  dist2=DistanceL2(t, t_estimated);
+  EXPECT_LE(dist1, 1e-8);
+  EXPECT_LE(dist2, 1e-8);
 }
 
 TEST(FocalFromFundamentalExhaustive, TwoViewReconstruction) {
