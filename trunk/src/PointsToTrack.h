@@ -78,11 +78,22 @@ namespace OpencvSfM{
     //
     void printPointsOnImage(const cv::Mat &image, cv::Mat& outImg, const cv::Scalar& color=cv::Scalar::all(-1), int flags=cv::DrawMatchesFlags::DEFAULT) const;
 
-    void read( const cv::FileNode& fn );
+    static void read( const cv::FileNode& node, PointsToTrack& points );
 
-    void write (cv::FileStorage& fs) const;
+    static void write ( cv::FileStorage& fs, const PointsToTrack& points );
   };
+}
 
+//! writes vector of keypoints to the file storage
+void cv::write( cv::FileStorage& fs, const std::string& name,
+  const OpencvSfM::PointsToTrack& points )
+{
+  OpencvSfM::PointsToTrack::write( fs,points );
+};
+//! reads vector of keypoints from the specified file storage node
+void cv::read(const cv::FileNode& node, OpencvSfM::PointsToTrack& points )
+{
+  OpencvSfM::PointsToTrack::read( node,points );
 }
 
 #endif

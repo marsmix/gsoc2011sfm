@@ -100,6 +100,36 @@ namespace OpencvSfM{
     virtual void crossMatch( cv::Ptr<PointsMatcher> otherMatcher,
       std::vector<cv::DMatch>& matches,
       const std::vector<cv::Mat>& masks = std::vector<cv::Mat>() );
+    /**
+    * This function draw keypoints and matches.
+    * Contrary to cv::drawMatches, only the first image is used
+    * to draw matches...
+    * @param img1 First source image.
+    * @param keypoints1 Keypoints from first source image.
+    * @param keypoints2 Keypoints from second source image.
+    * @param matches Matches from first image to second one,
+    * i.e. keypoints1[i] has corresponding point keypoints2[matches[i]] .
+    * @param outImg Output image. Its content depends on flags value
+    * what is drawn in output image. See below possible flags bit values.
+    * @param matchColor – Color of matches (lines and connected keypoints).
+    * If matchColor==Scalar::all(-1) color will be generated randomly.
+    * @param singlePointColor – Color of single keypoints (circles),
+    * i.e. keypoints not having the matches. If singlePointColor==Scalar::all(-1)
+    * color will be generated randomly.
+    * @param matchesMask – Mask determining which matches will be drawn.
+    * If mask is empty all matches will be drawn.
+    * @param flags – Each bit of flags sets some feature of drawing.
+    * Possible flags bit values is defined by DrawMatchesFlags , see http://opencv.willowgarage.com/documentation/cpp/features2d_drawing_function_of_keypoints_and_matches.html#cv-drawmatches.
+    */
+    static void drawMatches( const cv::Mat& img1,
+      const std::vector<cv::KeyPoint>& keypoints1,
+      const std::vector<cv::KeyPoint>& keypoints2,
+      const std::vector<cv::DMatch>& matches1to2, cv::Mat& outImg,
+      const cv::Scalar& matchColor=cv::Scalar::all(-1),
+      const cv::Scalar& singlePointColor=cv::Scalar::all(-1),
+      const std::vector<char>& matchesMask=std::vector<char>(),
+      int flags=cv::DrawMatchesFlags::DEFAULT
+      );
 
   protected:
 
