@@ -1,12 +1,15 @@
 #include "PointsMatcher.h"
-
-using cv::Mat;
-using cv::Ptr;
-using std::vector;
-using cv::KeyPoint;
-using cv::DMatch;
+#include <opencv2/imgproc/imgproc.hpp>
 
 namespace OpencvSfM{
+  using cv::Mat;
+  using cv::Ptr;
+  using std::vector;
+  using cv::KeyPoint;
+  using cv::DMatch;
+  using cv::Size;
+  using cv::Rect;
+
   PointsMatcher::PointsMatcher( const Ptr<cv::DescriptorMatcher>& matcher )
     :matcher_( matcher )
   {
@@ -148,5 +151,61 @@ namespace OpencvSfM{
       }
     }
     matchesOtherWay.clear();
+  }
+  void PointsMatcher::drawMatches( const Mat& img1,
+    const vector<cv::KeyPoint>& keypoints1,
+    const vector<cv::KeyPoint>& keypoints2,
+    const vector<cv::DMatch>& matches1to2, Mat& outImg,
+    const cv::Scalar& matchColor, const cv::Scalar& singlePointColor,
+    const std::vector<char>& matchesMask, int flags )
+  {
+    Size size( img1.cols, img1.rows );
+    if( flags & cv::DrawMatchesFlags::DRAW_OVER_OUTIMG )
+    {
+      if( size.width > outImg.cols || size.height > outImg.rows )
+        CV_Error( CV_StsBadSize, "outImg has size less than needed to draw img1" );
+    }
+    else
+    {
+      outImg.create( size, CV_MAKETYPE(img1.depth(), 3) );
+
+      if( img1.type() == CV_8U )
+        cv::cvtColor( img1, outImg, CV_GRAY2BGR );
+      else
+        img1.copyTo( outImg );
+    }
+
+    // draw keypoints
+    if( !(flags & cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS) )
+    {
+      drawKeypoints( outImg, keypoints1, outImg, singlePointColor,
+        flags + cv::DrawMatchesFlags::DRAW_OVER_OUTIMG );
+    }
+
+    cv::RNG& rng = cv::theRNG();
+    bool isRandMatchColor = matchColor == cv::Scalar::all(-1);
+    vector<DMatch>::size_type total_size=matches1to2.size();
+    // draw matches
+    for( vector<DMatch>::size_type m = 0; m < total_size; m++ )
+    {
+      int i1 = matches1to2[m].queryIdx;
+      int i2 = matches1to2[m].trainIdx;
+      if( matchesMask.empty() || matchesMask[m] )
+      {
+        const KeyPoint &kp1 = keypoints1[i1], &kp2 = keypoints2[i2];
+
+        cv::Scalar color = isRandMatchColor ?
+          cv::Scalar( rng(256), rng(256), rng(256) ) : matchColor;
+
+        cv::Point center1( cvRound(kp1.pt.x), cvRound(kp1.pt.y) );
+        cv::Point center2( cvRound(kp2.pt.x), cvRound(kp2.pt.y) );
+        int radius = 3;
+        cv::circle( outImg, center1, radius, color, 1, CV_AA );
+        cv::circle( outImg, center2, radius, color, 1, CV_AA );
+        cv::line( outImg, center1, center2, color, 1, CV_AA );
+
+      }
+    }
+
   }
 }

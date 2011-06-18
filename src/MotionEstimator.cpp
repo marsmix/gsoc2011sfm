@@ -247,9 +247,12 @@ namespace OpencvSfM{
       Mat secondImg=images[ it + 1 ];
       Mat outImg;
 
-      cv::drawMatches(firstImg, points_to_track_[it]->getKeypoints(),
-        secondImg, points_to_track_[ it + 1 ]->getKeypoints(),
-        matches_to_print, outImg);
+      PointsMatcher::drawMatches(firstImg, points_to_track_[it]->getKeypoints(),
+        points_to_track_[ it + 1 ]->getKeypoints(),
+        matches_to_print, outImg,
+        cv::Scalar::all(-1), cv::Scalar::all(-1), vector<char>(),
+        cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
+
       imshow("showTracks",outImg);
       cv::waitKey(timeBetweenImg);
 
