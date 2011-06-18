@@ -8,12 +8,15 @@
 
 namespace OpencvSfM{
 
-/*! \brief This class can be used to store informations about points and features. 
-  *      This is an abstract class: you can't use it directly. Use for instance PointsToTrackWithImage.
+/*! \brief This class can be used to store informations about point
+  * and features. This is an abstract class: you can't use it directly.
+  * Use for instance PointsToTrackWithImage.
   *
-  * To create a structure from motion, most methods use points to compute the structure.
-  * This class focus on the first task in SfM: find points in image which are easy to track...
-  * When available, a feature vector for each points is very helpful: the matching will be easier.
+  * To create a structure from motion, most methods use points to compute
+  * the structure. This class focus on the first task in SfM: find points
+  * in image which are easy to track...
+  * When available, a feature vector for each points is very helpful:
+  * the matching will be easier.
   */
   class PointsToTrack
   {
@@ -34,9 +37,11 @@ namespace OpencvSfM{
     
     /**
     * This method is used to compute both Keypoints and descriptors...
+    * @param forcing_recalculation if true previous keypoints are removed...
+    * If false and if keypoints and descriptor exists, nothing is done.
     * @return the number of points
     */
-    virtual int computeKeypointsAndDesc();
+    virtual int computeKeypointsAndDesc(bool forcing_recalculation=false);
     /**
     * This method is used to compute only Keypoints...
     * @return the number of points
