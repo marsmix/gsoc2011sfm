@@ -63,7 +63,7 @@ void main(){
 
   //As the (tight) bounding box for the temple model is (-0.054568 0.001728 -0.042945) - (0.047855 0.161892 0.032236)
   //I will create some 3D points and see if they are correcly reprojected:
-  
+
   vector<Vec3d> points3D;
   points3D.push_back(Vec3d( -0.054568, 0.001728, -0.042945 ));
   points3D.push_back(Vec3d( -0.054568, 0.001728, 0.032236 ));
@@ -78,7 +78,7 @@ void main(){
   MotionProcessor mp;
   //Here we will a folder with a lot of images, but we can do the same thing with any other type of input
   mp.setInputSource("../Medias/temple/",IS_DIRECTORY);
-  
+
   vector<PointOfView>::iterator itPoV=myCameras.begin();
   while (itPoV!=myCameras.end())
   {

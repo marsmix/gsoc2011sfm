@@ -51,34 +51,55 @@ namespace OpencvSfM{
     * @param emptyTrainData – If emptyTrainData is false the method create deep copy of the object, i.e. copies both parameters and train data. If emptyTrainData is true the method create object copy with current parameters but with empty train data..
     * @return An other PointsMatcher instance
     */
-    virtual cv::Ptr<PointsMatcher> clone( bool emptyTrainData=false ) const;
+    virtual cv::Ptr<PointsMatcher> clone( bool emptyTrainData=true ) const;
+    /**
+    * Find the k best matches for each descriptor from a query set with train descriptors.
+    * @param queryPoints  Query set of points and descriptors.
+    * @param matches Mathes. If some query descriptor (keypoint) masked out in mask no match will
+    * be added for this descriptor. So matches size may be less than query keypoints count.
+    * @param masks The set of masks. Each masks[i] specifies permissible matches between input
+    * query keypoints and stored train keypointss from i-th image.
+    */
+    virtual void match( cv::Ptr<PointsToTrack> queryPoints,
+      std::vector<cv::DMatch>& matches,
+      const std::vector<cv::Mat>& masks = std::vector<cv::Mat>() );
     /**
     * Find the k best matches for each descriptor from a query set with train descriptors.
     * @param queryPoints  Query set of points and descriptors.
     * @param matches Mathes. Each matches[i] is k or less matches for the same query descriptor.
     * @param k Count of best matches will be found per each query descriptor (or less if it’s not possible).
     * @param masks specifying permissible matches between input query and train matrices of descriptors.
-    * @param compactResult – It’s used when mask (or masks) is not empty. If compactResult is false matches vector will have the same size as queryDescriptors rows. If compactResult is true matches vector will not contain matches for fully masked out query descriptors.
+    * @param compactResult – It’s used when mask (or masks) is not empty. If compactResult is false
+    * matches vector will have the same size as queryDescriptors rows.
+    * If compactResult is true matches vector will not contain matches
+    * for fully masked out query descriptors.
     */
-    virtual void knnMatch( cv::Ptr<PointsToTrack> queryPoints,std::vector<std::vector<cv::DMatch> >& matches, int k,
-      const std::vector<cv::Mat>& masks, bool compactResult );
+    virtual void knnMatch( cv::Ptr<PointsToTrack> queryPoints,
+      std::vector<std::vector<cv::DMatch> >& matches, int k,
+      const std::vector<cv::Mat>& masks = std::vector<cv::Mat>(), bool compactResult = true );
     /**
     * Find the best matches for each query descriptor which have distance less than given threshold.
     * @param queryPoints  Query set of points and descriptors.
     * @param matches Each matches[i] is k or less matches for the same query descriptor.
     * @param maxDistance The threshold to found match distances.
     * @param masks specifying permissible matches between input query and train matrices of descriptors.
-    * @param compactResult – It’s used when mask (or masks) is not empty. If compactResult is false matches vector will have the same size as queryDescriptors rows. If compactResult is true matches vector will not contain matches for fully masked out query descriptors.
+    * @param compactResult – It’s used when mask (or masks) is not empty. If compactResult is false matches
+    * vector will have the same size as queryDescriptors rows. If compactResult is true matches vector will
+    * not contain matches for fully masked out query descriptors.
     */
     virtual void radiusMatch( cv::Ptr<PointsToTrack> queryPoints,std::vector<std::vector<cv::DMatch> >& matches, float maxDistance,
-      const std::vector<cv::Mat>& masks, bool compactResult );
+      const std::vector<cv::Mat>& masks = std::vector<cv::Mat>(), bool compactResult = true );
     /**
-    * Using matches given in parameters, recompute a matching in inverse order and keep only matches which are two-ways.
-    * @param queryPoints Query set of points and descriptors.
-    * @param matches First guess of matches... Will be updated to contain only two-way matches.
-    * @param compactResult if true and a point have no match, the point is removed from matches results; else the vector for this point is left empty
+    * Using an other matchers given in parameters, recompute a matching in inverse order
+    * and keep only matches which are two-ways.
+    * @param otherMatcher Query set of points and descriptors.
+    * @param matches First guess of matches... Will be updated to contain only
+    * two-way matches (can be empty).
+    * @param masks specifying permissible matches between input query and train matrices of descriptors.
     */
-    virtual void crossCheck( cv::Ptr<PointsToTrack> queryPoints,std::vector<std::vector<cv::DMatch>>& matches, bool compactResult=true );
+    virtual void crossMatch( cv::Ptr<PointsMatcher> otherMatcher,
+      std::vector<cv::DMatch>& matches,
+      const std::vector<cv::Mat>& masks = std::vector<cv::Mat>() );
 
   protected:
 

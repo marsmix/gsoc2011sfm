@@ -20,10 +20,25 @@ namespace OpencvSfM{
     descriptors_.release();
   }
   
-  int PointsToTrack::computeKeypointsAndDesc()
+  int PointsToTrack::computeKeypointsAndDesc(bool forcing_recalculation)
   {
-    int nbPoints=computeKeypoints();
-    computeDescriptors();
+    int nbPoints;
+    if( !forcing_recalculation )
+    {
+      if( keypoints_.empty() )
+        nbPoints=computeKeypoints();
+      else
+        nbPoints=keypoints_.size();
+
+      if( descriptors_.empty() )
+        computeDescriptors();
+    }
+    else
+    {
+      nbPoints=computeKeypoints();
+      computeDescriptors();
+    }
+
     return nbPoints;
   }
 
@@ -44,15 +59,22 @@ namespace OpencvSfM{
     this->keypoints_.insert( this->keypoints_.end(),keypoints.begin(),keypoints.end());
 
 
-    cv::KeyPointsFilter::runByKeypointSize( keypoints_, std::numeric_limits<float>::epsilon() );
+    cv::KeyPointsFilter::runByKeypointSize( keypoints_,
+      std::numeric_limits<float>::epsilon() );
 
     if(!computeMissingDescriptor)
     {
       if(!descriptors_.empty())
       {
-        Mat newDescriptors( this->keypoints_.size(), this->descriptors_.cols, this->descriptors_.type());
-        newDescriptors( cv::Rect(0, 0, this->descriptors_.cols,this->descriptors_.rows) ) = this->descriptors_;
-        newDescriptors( cv::Rect(0, this->descriptors_.rows, this->descriptors_.cols,descriptors.rows) ) = descriptors;
+        Mat newDescriptors( this->keypoints_.size(), this->descriptors_.cols,
+          this->descriptors_.type());
+        newDescriptors( 
+          cv::Rect(0, 0, this->descriptors_.cols,this->descriptors_.rows) ) = 
+          this->descriptors_;
+
+        newDescriptors( cv::Rect(0, this->descriptors_.rows,
+          this->descriptors_.cols,descriptors.rows) ) = descriptors;
+
         this->descriptors_=newDescriptors;
       }
     }

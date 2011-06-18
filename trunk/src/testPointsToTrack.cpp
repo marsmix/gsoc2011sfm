@@ -4,6 +4,7 @@
 
 #include "PointsToTrackWithImage.h"
 #include "MotionProcessor.h"
+#include "MotionEstimator.h"
 #include "PointsMatcher.h"
 #include <opencv2/calib3d/calib3d.hpp>
 
@@ -24,6 +25,7 @@ using namespace OpencvSfM;
 
 void main(){
   MotionProcessor mp;
+  vector<Mat> masks;
 
   //first load images:
   //Here we will a folder with a lot of images, but we can do the same thing with any other type of input
@@ -65,20 +67,21 @@ void main(){
     Ptr<DescriptorMatcher> matcher;
     matcher=Ptr<DescriptorMatcher>(new BruteForceMatcher<L2<float>>());
 
-    //The point matcher will now be created like this:
-    PointsMatcher matches(matcher);
     //The matches vector is:
     vector<vector<DMatch> > matchesVectorKNN;
+    
+    //The point matcher will now be created like this:
+    PointsMatcher matches(matcher);
 
     //We want to find points in img1 which are also in img2.
     //So we set ptt2 as training data:
     cout<<"Add points of image 2 as references points"<<endl;
     matches.add(ptt2);
-    matches.add(ptt3);
+    //matches.add(ptt3);
 
     cout<<"and try using knn to find best points matches in img1"<<endl<<endl;
-    matches.knnMatch(ptt1,matchesVectorKNN,1,vector<Mat>(),false);
-
+    matches.knnMatch(ptt1,matchesVectorKNN,1,masks,false);
+    
     vector<DMatch> matchesOK;
     //first remove keypoints not in ptt2:
     unsigned int nbPoints=matchesVectorKNN.size();
@@ -99,32 +102,19 @@ void main(){
     }
     cout<<"Displaying the "<<matchesOK.size()<<"points..."<<endl;
     Mat outImg;
-    drawMatches(firstImage, ptt1->getKeypoints(), secondImage, ptt2->getKeypoints(), matchesOK, outImg);
+    drawMatches(firstImage, ptt1->getKeypoints(), secondImage,
+      ptt2->getKeypoints(), matchesOK, outImg);
     imshow("PointsMatcher key points (knnMatch)",outImg);
     cv::waitKey(40);
-
+    
+    Ptr<PointsMatcher> matches2= matches.clone();
+    matches2->add(ptt1);
     //cross check matches:
-    matches.crossCheck(ptt1,matchesVectorKNN);
-    //first remove keypoints not in ptt2:
-    matchesOK.clear();
-    nbPoints=matchesVectorKNN.size();
-    for(unsigned int i=0; i<nbPoints; i++)
-    {
-      if( ! matchesVectorKNN[i].empty())
-      {
-        unsigned int nbMatches=matchesVectorKNN[i].size();
-        for(unsigned int j=0; j<nbMatches; j++)
-        {
-          if(matchesVectorKNN[i][j].imgIdx==0)
-          {
-            //add this match:
-            matchesOK.push_back(matchesVectorKNN[i][j]);
-          }
-        }
-      }
-    }
+    matches.crossMatch(matches2,matchesOK);
+
     cout<<"Displaying the "<<matchesOK.size()<<"points..."<<endl;
-    drawMatches(firstImage, ptt1->getKeypoints(), secondImage, ptt2->getKeypoints(), matchesOK, outImg);
+    drawMatches(firstImage, ptt1->getKeypoints(), secondImage,
+      ptt2->getKeypoints(), matchesOK, outImg);
     imshow("PointsMatcher key points (verified)",outImg);
     cv::waitKey(0);
   }
