@@ -91,6 +91,10 @@ namespace OpencvSfM{
   }
   void PointsToTrack::read( const cv::FileNode& node, PointsToTrack& points )
   {
+    std::string myName=node.name();
+    if( myName != "PointsToTrack")
+      return;//this node is not for us...
+
     cv::FileNode& node_keypoints = node["keypoints"];
     if( node_keypoints.empty() )
       CV_Error( CV_StsError, "PointsToTrack FileNode is not correct!" );
@@ -101,6 +105,7 @@ namespace OpencvSfM{
       KeyPoint kpt;
       it >> kpt.pt.x >> kpt.pt.y >> kpt.size >> kpt.angle >> kpt.response >> kpt.octave >> kpt.class_id;
       points.keypoints_.push_back(kpt);
+      //it++ is not needed as the >> operator increment automatically it!
     }
 
     cv::FileNode node_descriptors = node["descriptors"];
@@ -111,8 +116,6 @@ namespace OpencvSfM{
   };
   void PointsToTrack::write(cv::FileStorage& fs, const PointsToTrack& keypoints)
   {
-    vector<KeyPoint>::size_type key_size = keypoints.keypoints_.size();
-
     fs << "PointsToTrack" << "{";
     cv::write( fs, "keypoints", keypoints.keypoints_ );
 

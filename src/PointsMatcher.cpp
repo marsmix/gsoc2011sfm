@@ -11,9 +11,15 @@ namespace OpencvSfM{
   using cv::Rect;
 
   PointsMatcher::PointsMatcher( const Ptr<cv::DescriptorMatcher>& matcher )
-    :matcher_( matcher )
   {
     CV_Assert( !matcher.empty() );
+    matcher_ = matcher;
+  }
+
+  PointsMatcher::PointsMatcher(const PointsMatcher& copy)
+  {
+    pointCollection_=copy.pointCollection_;
+    matcher_ = copy.matcher_->clone(true);
   }
 
   PointsMatcher::~PointsMatcher(void)
@@ -23,21 +29,6 @@ namespace OpencvSfM{
 
   void PointsMatcher::add( Ptr<PointsToTrack> pointCollection )
   {
-    pointCollection->computeKeypointsAndDesc(false);
-
-    Mat descMat=pointCollection->getDescriptors();
-    if(descMat.empty())
-    {
-      vector<KeyPoint> keyPoints=pointCollection->getKeypoints();
-      CV_Assert( !keyPoints.empty() );
-
-      pointCollection->computeDescriptors();
-      descMat = pointCollection->getDescriptors();
-    }
-
-    vector<Mat> pointsDesc;
-    pointsDesc.push_back( descMat );
-    matcher_->add( pointsDesc );
     pointCollection_.push_back(pointCollection);
 
   }
@@ -50,6 +41,26 @@ namespace OpencvSfM{
 
   void PointsMatcher::train()
   {
+    matcher_->clear();
+
+    vector<Mat> pointsDesc;
+    Ptr<PointsToTrack> pointCollection;
+    vector<Ptr<PointsToTrack>>::iterator it = pointCollection_.begin(),
+      it_end = pointCollection_.end();
+    while( it != it_end )
+    {
+      pointCollection = *it;
+      pointCollection->computeKeypointsAndDesc(false);
+
+      Mat descMat=pointCollection->getDescriptors();
+
+      pointsDesc.push_back( descMat );
+
+      it++;
+    }
+    
+
+    matcher_->add( pointsDesc );
     matcher_->train();
   }
 
@@ -62,6 +73,8 @@ namespace OpencvSfM{
     std::vector<cv::DMatch>& matches,
     const std::vector<cv::Mat>& masks )
   {
+    train();
+
     queryPoints->computeKeypointsAndDesc(false);
 
     vector<KeyPoint> keyPoints=queryPoints->getKeypoints();
@@ -77,6 +90,8 @@ namespace OpencvSfM{
     vector<vector<DMatch> >& matches, int knn,
     const vector<Mat>& masks, bool compactResult)
   {
+    train();
+
     queryPoints->computeKeypointsAndDesc(false);
 
     vector<KeyPoint> keyPoints=queryPoints->getKeypoints();
@@ -92,6 +107,8 @@ namespace OpencvSfM{
     vector<vector<DMatch> >& matches, float maxDistance,
     const vector<Mat>& masks, bool compactResult )
   {
+    train();
+
     queryPoints->computeKeypointsAndDesc(false);
 
     vector<KeyPoint> keyPoints=queryPoints->getKeypoints();
@@ -121,6 +138,8 @@ namespace OpencvSfM{
     vector<DMatch>& matches,
     const std::vector<cv::Mat>& masks )
   {
+    train();
+
     //TODO: for now this function only work with matcher having only one picture
     CV_Assert( this->pointCollection_.size()==1 );
     CV_Assert( otherMatcher->pointCollection_.size()==1 );
@@ -207,5 +226,45 @@ namespace OpencvSfM{
       }
     }
 
+  }
+
+
+  void PointsMatcher::read( const cv::FileNode& node,
+    PointsMatcher& points )
+  {
+    std::string myName=node.name();
+    if( myName != "PointsMatcher")
+      return;//this node is not for us...
+
+    //This matcher need only point coordinates as the matcher is already loaded:
+
+    if( node.empty() || !node.isSeq() )
+      CV_Error( CV_StsError, "PointsMatcher FileNode is not correct!" );
+
+    cv::FileNodeIterator it = node.begin(), it_end = node.end();
+    while( it != it_end )
+    {
+      Ptr<PointsToTrack> ptt = Ptr<PointsToTrack>(new PointsToTrack());
+      cv::FileNode& node_tmp = (*it)["PointsToTrack"];
+      PointsToTrack::read( node_tmp, *ptt );
+      points.pointCollection_.push_back(ptt);
+      it++;
+    }
+  }
+
+  void PointsMatcher::write ( cv::FileStorage& fs,
+    const PointsMatcher& points )
+  {
+    vector<PointsToTrack>::size_type key_size = points.pointCollection_.size();
+
+    fs << "PointsMatcher" << "[";
+
+    for (vector<PointsToTrack>::size_type i=0; i < key_size; i++)
+    {
+      fs  << "{";
+      PointsToTrack::write( fs, *points.pointCollection_[i] );
+      fs  << "}";
+    }
+    fs << "]";
   }
 }

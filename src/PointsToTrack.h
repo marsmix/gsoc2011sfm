@@ -57,12 +57,19 @@ namespace OpencvSfM{
     * @param descriptors of points, if any
     * @param computeMissingDescriptor if true, the missing descriptors are computed.
     */
-    virtual void addKeypoints(std::vector<cv::KeyPoint> keypoints,cv::Mat descriptors=cv::Mat(),bool computeMissingDescriptor=false);
+    void addKeypoints(std::vector<cv::KeyPoint> keypoints,cv::Mat descriptors=cv::Mat(),bool computeMissingDescriptor=false);
+    /**
+    * This method is used to add a keypoint at the end of the points vector...
+    * @param keypoints Keypoints to add
+    * @return index of the keypoint.
+    */
+    inline unsigned int addKeypoint(cv::KeyPoint point)
+    {keypoints_.push_back(point); return keypoints_.size()-1;};
     /**
     * this method return the points coordinates and sometimes orientation and size
-    * @return points coordinates and sometimes orientation and size
+    * @return points coordinates and when available orientation and size
     */
-    std::vector<cv::KeyPoint>& getKeypoints() {return keypoints_;};
+    inline const std::vector<cv::KeyPoint>& getKeypoints() const {return keypoints_;};
     /**
     * this method return the descritors for each points in a matrix with size (n*m), where n is the number of points and m is the desciptor size.
     * @return descritors for each points in a matrix with size (n*m), where n is the number of points and m is the desciptor size.
@@ -80,7 +87,7 @@ namespace OpencvSfM{
 
     static void read( const cv::FileNode& node, PointsToTrack& points );
 
-    static void write ( cv::FileStorage& fs, const PointsToTrack& points );
+    static void write( cv::FileStorage& fs, const PointsToTrack& points );
   };
 }
 /*

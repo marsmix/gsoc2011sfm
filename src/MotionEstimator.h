@@ -46,14 +46,23 @@ namespace OpencvSfM{
     * This function is used to get the numbers of image for this track
     * @return 0 if inconsistent, >= 2 else
     */
-    inline unsigned int getNbTrack()
+    inline unsigned int getNbTrack() const
     {return track_is_inconsistent?0:images_indexes_.size();};
     /**
     * use this function to create a DMatch value from this track
     * @param img1 train match image
     * @param img2 query match image
+    * @return DMatch value
     */
-    inline cv::DMatch toDMatch(int img1,int img2);
+    inline cv::DMatch toDMatch(int img1,int img2) const;
+    /**
+    * use this function to get the n^th match value from this track
+    * @param index which match
+    * @param idImage out value of the image index
+    * @param idPoint out value of the point index
+    */
+    inline void getMatch(unsigned int index,
+      int &idImage, int &idPoint) const;
   };
 
   /**
@@ -127,6 +136,10 @@ namespace OpencvSfM{
     * @param timeBetweenImg see cv::waitKey for the value
     */
     void showTracks(std::vector<cv::Mat>& images,int timeBetweenImg=25);
+
+    static void read( const cv::FileNode& node, MotionEstimator& points );
+
+    static void write( cv::FileStorage& fs, const MotionEstimator& points );
   protected:
     /**
     * This function add matches to tracks

@@ -19,6 +19,8 @@ namespace OpencvSfM{
     * @param matcher Ptr on a matcher. See for available matcher: http://opencv.willowgarage.com/documentation/cpp/features2d_common_interfaces_of_descriptor_matchers.html#descriptormatcher
     */
     PointsMatcher( const cv::Ptr<cv::DescriptorMatcher>& matcher );
+
+    PointsMatcher(const PointsMatcher& copy);
     /**
     * Destructor...
     */
@@ -130,6 +132,10 @@ namespace OpencvSfM{
       const std::vector<char>& matchesMask=std::vector<char>(),
       int flags=cv::DrawMatchesFlags::DEFAULT
       );
+
+    static void read( const cv::FileNode& node, PointsMatcher& points );
+
+    static void write( cv::FileStorage& fs, const PointsMatcher& points );
 
   protected:
 
