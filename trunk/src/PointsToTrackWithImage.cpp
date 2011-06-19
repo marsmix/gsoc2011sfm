@@ -1,14 +1,21 @@
 #include "PointsToTrackWithImage.h"
 
-using cv::FeatureDetector;
-using cv::DescriptorExtractor;
-using cv::Ptr;
-using cv::SIFT;
-using cv::Mat;
-using std::string;
 
 namespace OpencvSfM
 {
+  using cv::FeatureDetector;
+  using cv::DescriptorExtractor;
+  using cv::Ptr;
+  using cv::SIFT;
+  using cv::Mat;
+  using std::string;
+  using cv::Scalar;
+  using cv::KeyPoint;
+  using cv::Point;
+  using std::vector;
+  using cv::line;
+  using cv::circle;
+
   PointsToTrackWithImage::PointsToTrackWithImage(Mat imageToAnalyse,Mat maskOfAnalyse,Ptr<FeatureDetector> feature_detector,Ptr<DescriptorExtractor> descriptor_detector)
     :imageToAnalyse_(imageToAnalyse),maskOfAnalyse_(maskOfAnalyse),feature_detector_(feature_detector),descriptor_detector_(descriptor_detector)
   {
@@ -46,5 +53,4 @@ namespace OpencvSfM
   {
     descriptor_detector_->compute(imageToAnalyse_,this->keypoints_,this->descriptors_);
   }
-
 }

@@ -91,19 +91,21 @@ namespace OpencvSfM{
   }
   void PointsToTrack::read( const cv::FileNode& node, PointsToTrack& points )
   {
-    cv::FileNode& fn = node["!PointsToTrack!"];
-    if( fn.empty() || fn.size() != 2 )
+    cv::FileNode& node_keypoints = node["keypoints"];
+    if( node_keypoints.empty() )
       CV_Error( CV_StsError, "PointsToTrack FileNode is not correct!" );
 
-    cv::FileNode node_keypoints = fn[0];
     cv::FileNodeIterator it = node_keypoints.begin(), it_end = node_keypoints.end();
     while( it != it_end )
     {
       KeyPoint kpt;
-      it >> kpt;
+      it >> kpt.pt.x >> kpt.pt.y >> kpt.size >> kpt.angle >> kpt.response >> kpt.octave >> kpt.class_id;
       points.keypoints_.push_back(kpt);
     }
-    cv::FileNode node_descriptors = fn[1];
+
+    cv::FileNode node_descriptors = node["descriptors"];
+    if( node_descriptors.empty() )
+      CV_Error( CV_StsError, "PointsToTrack FileNode is not correct!" );
     node_descriptors >> points.descriptors_;
 
   };
@@ -111,14 +113,10 @@ namespace OpencvSfM{
   {
     vector<KeyPoint>::size_type key_size = keypoints.keypoints_.size();
 
-    fs << "!PointsToTrack!" << "[";
-    fs << "keypoints" << "[";
+    fs << "PointsToTrack" << "{";
+    cv::write( fs, "keypoints", keypoints.keypoints_ );
 
-    for(vector<KeyPoint>::size_type i = 0; i < key_size; i++ )
-      fs<<keypoints.keypoints_[i];
-
-    fs << "]";
     fs << "descriptors" << keypoints.descriptors_;
-    fs << "]";
+    fs << "}";
   }
 }
