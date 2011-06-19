@@ -1,7 +1,7 @@
 
 //Set to 1 if you want to test the points detection and matching
 //But be aware to set other tests to 0...
-#if 1
+#if 0
 
 #include "PointsToTrackWithImage.h"
 #include "MotionProcessor.h"
@@ -60,21 +60,27 @@ void main(){
       firstImage,Mat(),fastDetect,SurfDetect));
     ptt1->computeKeypointsAndDesc(true);
 
+    Ptr<DescriptorMatcher> matcher;
+    matcher=Ptr<DescriptorMatcher>(new FlannBasedMatcher());
+    Ptr<PointsMatcher> matches_algo ( new PointsMatcher(matcher) );
+
+    matches_algo->add(ptt1);
+
     //now save the points:
     FileStorage fsOut("test.yml", FileStorage::WRITE);
     //Can't find a way to enable the following notation:
     //fs << *ptt1;
-    PointsToTrack::write(fsOut,*ptt1);
+    PointsMatcher::write(fsOut,*matches_algo);
     fsOut.release();
 
     //and create a new PointsToTrack using this file:
-    PointsToTrack ptt_New;
+    Ptr<PointsMatcher> matches_new ( new PointsMatcher(matcher->clone(true)) );
     //ptt_New=Ptr<PointsToTrack>(new PointsToTrack ());
     FileStorage fsRead("test.yml", FileStorage::READ);
     FileNode myPtt = fsRead.getFirstTopLevelNode();
     //Can't find a way to enable the following notation:
     //myPtt >> ptt_New;
-    PointsToTrack::read(myPtt,ptt_New);
+    PointsMatcher::read(myPtt, *matches_new);
     fsRead.release();
   }
 

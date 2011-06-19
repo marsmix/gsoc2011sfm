@@ -49,13 +49,13 @@ namespace OpencvSfM{
     return false;
   }
 
-  DMatch TrackPoints::toDMatch(int img1,int img2)
+  DMatch TrackPoints::toDMatch(int img1,int img2) const
   {
     DMatch outMatch;
     char nbFound=0;
     //we don't use find here because we want the number instead of iterator...
-    vector<unsigned int>::iterator indexImg = images_indexes_.begin();
-    vector<unsigned int>::iterator end_iter = images_indexes_.end();
+    vector<unsigned int>::const_iterator indexImg = images_indexes_.begin();
+    vector<unsigned int>::const_iterator end_iter = images_indexes_.end();
     unsigned int index=0;
     while(indexImg != end_iter)
     {
@@ -77,6 +77,17 @@ namespace OpencvSfM{
       indexImg++;
     }
     return outMatch;
+  };
+
+  void TrackPoints::getMatch(unsigned int index,
+    int &idImage, int &idPoint) const
+  {
+    char nbFound=0;
+    if( index < images_indexes_.size() )
+    {
+      idImage = images_indexes_[index];
+      idPoint = point_indexes_[index];
+    }
   };
 
 
@@ -258,5 +269,112 @@ namespace OpencvSfM{
 
       it++;
     }
+  }
+
+  void MotionEstimator::read( const cv::FileNode& node, MotionEstimator& me )
+  {
+    std::string myName=node.name();
+    if( myName != "MotionEstimator")
+      return;//this node is not for us...
+
+    if( node.empty() || !node.isMap() )
+      CV_Error( CV_StsError, "MotionEstimator FileNode is not correct!" );
+
+    int nb_pictures = (int) node["nbPictures"];
+    //initialisation of various vector (empty)
+    for(int i=0; i<nb_pictures; i++)
+    {
+      Ptr<PointsToTrack> ptt = Ptr<PointsToTrack>(new PointsToTrack());
+      me.points_to_track_.push_back(ptt);
+
+      Ptr<PointsMatcher> p_m = Ptr<PointsMatcher>(new PointsMatcher(
+        *me.match_algorithm_ ));
+      p_m->add(ptt);
+
+      me.matches_.push_back(p_m);
+    }
+
+    cv::FileNode& node_TrackPoints = node["TrackPoints"];
+
+    //tracks are stored in the following form:
+    //list of track where a track is stored like this:
+    // nbPoints idImage1 point1  idImage2 point2 ...
+    if( node_TrackPoints.empty() || !node_TrackPoints.isSeq() )
+      CV_Error( CV_StsError, "MotionEstimator FileNode is not correct!" );
+    cv::FileNodeIterator it = node_TrackPoints.begin(),
+      it_end = node_TrackPoints.end();
+    while( it != it_end )
+    {
+      cv::FileNode it_track = (*it)[0];
+      int nbPoints;
+      it_track["nbPoints"] >> nbPoints;
+      TrackPoints track;
+      cv::FileNodeIterator itPoints = it_track["track"].begin(),
+        itPoints_end = it_track["track"].end();
+      while( itPoints != itPoints_end )
+      {
+        int idImage;
+        cv::KeyPoint kpt;
+        idImage = (*itPoints)[0];
+        itPoints++;
+        kpt.pt.x = (*itPoints)[0];
+        kpt.pt.y = (*itPoints)[1];
+        kpt.size = (*itPoints)[2];
+        kpt.angle = (*itPoints)[3];
+        kpt.response = (*itPoints)[4];
+        kpt.octave = (*itPoints)[5];
+        kpt.class_id = (*itPoints)[6];
+
+        unsigned int point_index = me.points_to_track_[idImage]->
+          addKeypoint( kpt );
+        track.addMatch(idImage,point_index);
+
+        itPoints++;
+      }
+      me.tracks_.push_back(track);
+      it++;
+    }
+  }
+
+  void MotionEstimator::write( cv::FileStorage& fs, const MotionEstimator& me )
+  {
+    vector<TrackPoints>::size_type key_size = me.tracks_.size();
+
+    fs << "MotionEstimator" << "{";
+    fs << "nbPictures" << (int)me.points_to_track_.size();
+    fs << "TrackPoints" << "[";
+    for (vector<TrackPoints>::size_type i=0; i < key_size; i++)
+    {
+      const TrackPoints &track = me.tracks_[i];
+      unsigned int nbPoints = track.getNbTrack();
+      if( nbPoints > 0)
+      {
+        fs << "{" << "nbPoints" << (int)nbPoints;
+        fs << "track" << "[:";
+        for (unsigned int j = 0; j < nbPoints ; j++)
+        {
+          int idImage=-1, idPoint=-1;
+          track.getMatch( j, idImage, idPoint );
+          if( idImage>=0 && idPoint>=0 )
+          {
+            fs << idImage;
+            fs  << "[:";
+
+            const cv::KeyPoint kpt = me.points_to_track_[idImage]->
+              getKeypoints()[idPoint];
+            cv::write(fs, kpt.pt.x);
+            cv::write(fs, kpt.pt.y);
+            cv::write(fs, kpt.size);
+            cv::write(fs, kpt.angle);
+            cv::write(fs, kpt.response);
+            cv::write(fs, kpt.octave);
+            cv::write(fs, kpt.class_id);
+            fs << "]" ;
+          }
+        }
+        fs << "]" << "}" ;
+      }
+    }
+    fs << "]" << "}";
   }
 }

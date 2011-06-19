@@ -1,6 +1,6 @@
 //Set to 1 if you want to test the points detection and matching
 //But be aware to set other tests to 0...
-#if 0
+#if 1
 
 #include "PointsToTrackWithImage.h"
 #include "MotionProcessor.h"
@@ -47,7 +47,7 @@ void main(){
   vector<Mat> images;
   Mat currentImage=mp.getFrame();
   int nbFrame=0;
-  while ( !currentImage.empty() && nbFrame<20 )
+  while ( !currentImage.empty() && nbFrame<50 )
   {
     //if the image is loaded, find the points:
     cout<<"Create a new PointsToTrack..."<<endl;
@@ -66,7 +66,7 @@ void main(){
   Ptr<DescriptorMatcher> matcher;
   matcher=Ptr<DescriptorMatcher>(new FlannBasedMatcher());
   Ptr<PointsMatcher> matches_algo ( new PointsMatcher(matcher) );
-
+  
   MotionEstimator motion_estim(vec_points_to_track,matches_algo);
 
   motion_estim.computeMatches();
@@ -80,7 +80,30 @@ void main(){
   cout<<"numbers of correct tracks:"<<tracks.size()<<endl;
 
   //now for fun show the sequence on images:
-  motion_estim.showTracks(images,0);
+  motion_estim.showTracks(images,1000);
+
+  //now save the tracks:
+  FileStorage fsOut("motion_tracks.yml", FileStorage::WRITE);
+  //Can't find a way to enable the following notation:
+  //fs << *ptt1;
+  MotionEstimator::write(fsOut,motion_estim);
+  fsOut.release();
+  
+  /*
+  //and create a new PointsToTrack using this file:
+  vector<Ptr<PointsToTrack>> points_empty;
+  MotionEstimator motion_estim_loaded( points_empty, matches_algo->clone(true) );
+  //ptt_New=Ptr<PointsToTrack>(new PointsToTrack ());
+  FileStorage fsRead("motion_tracks.yml", FileStorage::READ);
+  FileNode myPtt = fsRead.getFirstTopLevelNode();
+  //Can't find a way to enable the following notation:
+  //myPtt >> ptt_New;
+  MotionEstimator::read(myPtt, motion_estim_loaded);
+  fsRead.release();
+
+  vector<TrackPoints> &tracks=motion_estim_loaded.getTracks();
+  cout<<"numbers of correct tracks:"<<tracks.size()<<endl;
+  motion_estim_loaded.showTracks(images,0);*/
 }
 
 
