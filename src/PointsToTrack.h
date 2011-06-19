@@ -83,17 +83,18 @@ namespace OpencvSfM{
     static void write ( cv::FileStorage& fs, const PointsToTrack& points );
   };
 }
-
+/*
 //! writes vector of keypoints to the file storage
-void cv::write( cv::FileStorage& fs, const std::string& name,
+static inline void cv::write( cv::FileStorage& fs, const std::string& name,
   const OpencvSfM::PointsToTrack& points )
 {
   OpencvSfM::PointsToTrack::write( fs,points );
 };
 //! reads vector of keypoints from the specified file storage node
-void cv::read(const cv::FileNode& node, OpencvSfM::PointsToTrack& points )
+static inline void cv::read(const cv::FileNode& node, OpencvSfM::PointsToTrack& points, 
+  OpencvSfM::PointsToTrack defaultValue = OpencvSfM::PointsToTrack())
 {
   OpencvSfM::PointsToTrack::read( node,points );
 }
-
+*/
 #endif

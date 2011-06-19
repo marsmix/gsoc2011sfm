@@ -25,6 +25,7 @@ using namespace OpencvSfM;
 //////////////////////////////////////////////////////////////////////////
 
 void main(){
+
   MotionProcessor mp;
   vector<Mat> masks;
 
@@ -57,18 +58,23 @@ void main(){
     Ptr<PointsToTrack> ptt1;
     ptt1=Ptr<PointsToTrack>(new PointsToTrackWithImage (
       firstImage,Mat(),fastDetect,SurfDetect));
+    ptt1->computeKeypointsAndDesc(true);
 
     //now save the points:
-    FileStorage fs("test.yml", FileStorage::WRITE);
-    fs << ptt1;
-    fs.release();
+    FileStorage fsOut("test.yml", FileStorage::WRITE);
+    //Can't find a way to enable the following notation:
+    //fs << *ptt1;
+    PointsToTrack::write(fsOut,*ptt1);
+    fsOut.release();
 
     //and create a new PointsToTrack using this file:
     PointsToTrack ptt_New;
     //ptt_New=Ptr<PointsToTrack>(new PointsToTrack ());
     FileStorage fsRead("test.yml", FileStorage::READ);
     FileNode myPtt = fsRead.getFirstTopLevelNode();
-    myPtt >> ptt_New;
+    //Can't find a way to enable the following notation:
+    //myPtt >> ptt_New;
+    PointsToTrack::read(myPtt,ptt_New);
     fsRead.release();
   }
 

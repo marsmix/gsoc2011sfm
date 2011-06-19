@@ -59,7 +59,6 @@ namespace OpencvSfM{
     void computeDescriptors();
 
     inline cv::Mat getImage(){return imageToAnalyse_;};
-
   };
 
 }
