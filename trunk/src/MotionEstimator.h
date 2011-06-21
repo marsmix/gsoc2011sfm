@@ -4,9 +4,11 @@
 #include "PointsToTrack.h"
 #include "MotionProcessor.h"
 #include "PointsMatcher.h"
+#include "opencv2/calib3d/calib3d.hpp"
 
 namespace OpencvSfM{
 
+  class MotionEstimator;
   /**
   * \brief This class store the track of keypoints.
   * A track is a connected set of matching keypoints across multiple images
@@ -14,12 +16,18 @@ namespace OpencvSfM{
   */
   class TrackPoints
   {
+    friend class MotionEstimator;
+
   protected:
     std::vector<unsigned int> images_indexes_;
     std::vector<unsigned int> point_indexes_;
-    bool track_is_inconsistent;
+    /**
+    * if <0 the track is inconsistent
+    * if >0 represent the degree of consistence (higher is better)
+    */
+    int track_consistance;
   public:
-    TrackPoints():track_is_inconsistent(false){};
+    TrackPoints():track_consistance(0){};
     /**
     * This function add matches to track
     * @param image_src index of source matches image
@@ -47,7 +55,7 @@ namespace OpencvSfM{
     * @return 0 if inconsistent, >= 2 else
     */
     inline unsigned int getNbTrack() const
-    {return track_is_inconsistent?0:images_indexes_.size();};
+    {return track_consistance<0?0:images_indexes_.size();};
     /**
     * use this function to create a DMatch value from this track
     * @param img1 train match image

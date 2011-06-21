@@ -137,6 +137,12 @@ namespace OpencvSfM{
 
     static void write( cv::FileStorage& fs, const PointsMatcher& points );
 
+    inline const cv::KeyPoint &getKeypoint(int numKey) const
+    {
+      CV_Assert( pointCollection_.size()>0 );
+      return pointCollection_[0]->getKeypoint(numKey);
+    }
+
   protected:
 
     cv::Ptr<cv::DescriptorMatcher> matcher_;///<Algorithm used to find matches...
@@ -144,4 +150,5 @@ namespace OpencvSfM{
   };
 
 }
+
 #endif
