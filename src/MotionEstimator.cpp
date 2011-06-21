@@ -12,14 +12,35 @@ namespace OpencvSfM{
 
   bool TrackPoints::addMatch(int image_src, int point_idx1)
   {
-    //If a track contains more than one keypoint in the same image,
-    //it is deemed inconsistent.
-    if(containImage(image_src))
-      track_is_inconsistent = true;
+    if( track_consistance<0 )
+      return false;
+
+    //If a track contains more than one keypoint in the same image but
+    //a different keypoint, it is deemed inconsistent.
+    vector<unsigned int>::iterator indexImg = images_indexes_.begin();
+    vector<unsigned int>::iterator end_iter = images_indexes_.end();
+    unsigned int index=0;
+    while(indexImg != end_iter)
+    {
+      if ( *indexImg == image_src )
+      {
+        if( point_indexes_[index] == point_idx1 )
+        {
+          if( track_consistance>=0 )
+            track_consistance++;
+        }
+        else
+          track_consistance=-1;
+
+        return track_consistance>=0;
+      }
+      index++;
+      indexImg++;
+    }
 
     images_indexes_.push_back(image_src);
     point_indexes_.push_back(point_idx1);
-    return !track_is_inconsistent;
+    return track_consistance>=0;
   }
 
   bool TrackPoints::containImage(int image_wanted)
@@ -156,7 +177,44 @@ namespace OpencvSfM{
         vector<DMatch> matches_i_j;
 
         point_matcher->crossMatch(point_matcher1,matches_i_j,masks);
-        
+//////////////////////////////////////////////////////////////////////////
+//For now we use fundamental function from OpenCV but soon use libmv !
+
+
+        //First compute points matches:
+        int size_match=matches_i_j.size();
+        Mat srcP(1,size_match,CV_32FC2);
+        Mat destP(1,size_match,CV_32FC2);
+        vector<uchar> status;
+
+        //vector<KeyPoint> points1 = point_matcher->;
+        for( int i = 0; i < size_match; i ++ ){
+          const KeyPoint &key1 = point_matcher1->getKeypoint(
+            matches_i_j[i].queryIdx);
+          const KeyPoint &key2 = point_matcher->getKeypoint(
+            matches_i_j[i].trainIdx);
+          srcP.at<float[2]>(0,i)[0] = key1.pt.x;
+          srcP.at<float[2]>(0,i)[1] = key1.pt.y;
+          destP.at<float[2]>(0,i)[0] = key2.pt.x;
+          destP.at<float[2]>(0,i)[1] = key2.pt.y;
+          status.push_back(1);
+        }
+
+        Mat fundam = cv::findFundamentalMat(srcP, destP, status, cv::FM_RANSAC);
+
+        //refine the mathing :
+        for( int i = 0; i < size_match; ++i ){
+          if( status[i] == 0 )
+          {
+            status[i] = status[--size_match];
+            status.pop_back();
+            matches_i_j[i--] = matches_i_j[size_match];
+            matches_i_j.pop_back();
+          }
+        }
+
+
+//////////////////////////////////////////////////////////////////////////
         if(matches_i_j.size()>mininum_points_matches)
           addMatches(matches_i_j,i,j);
         
@@ -306,8 +364,9 @@ namespace OpencvSfM{
     while( it != it_end )
     {
       cv::FileNode it_track = (*it)[0];
-      int nbPoints;
+      int nbPoints,track_consistance;
       it_track["nbPoints"] >> nbPoints;
+      it_track["track_consistance"] >> track_consistance;
       TrackPoints track;
       cv::FileNodeIterator itPoints = it_track["track"].begin(),
         itPoints_end = it_track["track"].end();
@@ -331,6 +390,7 @@ namespace OpencvSfM{
 
         itPoints++;
       }
+      track.track_consistance = track_consistance;
       me.tracks_.push_back(track);
       it++;
     }
@@ -339,6 +399,7 @@ namespace OpencvSfM{
   void MotionEstimator::write( cv::FileStorage& fs, const MotionEstimator& me )
   {
     vector<TrackPoints>::size_type key_size = me.tracks_.size();
+    int idImage=-1, idPoint=-1;
 
     fs << "MotionEstimator" << "{";
     fs << "nbPictures" << (int)me.points_to_track_.size();
@@ -350,11 +411,12 @@ namespace OpencvSfM{
       if( nbPoints > 0)
       {
         fs << "{" << "nbPoints" << (int)nbPoints;
+        fs << "track_consistance" << track.track_consistance;
         fs << "track" << "[:";
         for (unsigned int j = 0; j < nbPoints ; j++)
         {
-          int idImage=-1, idPoint=-1;
-          track.getMatch( j, idImage, idPoint );
+          idImage = track.images_indexes_[j];
+          idPoint = track.point_indexes_[j];
           if( idImage>=0 && idPoint>=0 )
           {
             fs << idImage;

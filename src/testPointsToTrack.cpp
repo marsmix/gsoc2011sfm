@@ -65,10 +65,10 @@ void main(){
 
     cout<<"now try to find matches, so we create a matcher (classic bruteForce)"<<endl<<endl;
     Ptr<DescriptorMatcher> matcher;
-    matcher=Ptr<DescriptorMatcher>(new BruteForceMatcher<L2<float>>());
+    matcher=Ptr<DescriptorMatcher>(new FlannBasedMatcher());
 
     //The matches vector is:
-    vector<vector<DMatch> > matchesVectorKNN;
+    vector<DMatch> matchesVector;
     
     //The point matcher will now be created like this:
     PointsMatcher matches(matcher);
@@ -79,43 +79,58 @@ void main(){
     matches.add(ptt2);
     //matches.add(ptt3);
 
-    cout<<"and try using knn to find best points matches in img1"<<endl<<endl;
-    matches.knnMatch(ptt1,matchesVectorKNN,1,masks,false);
-    
-    vector<DMatch> matchesOK;
-    //first remove keypoints not in ptt2:
-    unsigned int nbPoints=matchesVectorKNN.size();
-    for(unsigned int i=0; i<nbPoints; i++)
-    {
-      if( ! matchesVectorKNN[i].empty())
-      {
-        unsigned int nbMatches=matchesVectorKNN[i].size();
-        for(unsigned int j=0; j<nbMatches; j++)
-        {
-          if(matchesVectorKNN[i][j].imgIdx==0)
-          {
-            //add this match:
-            matchesOK.push_back(matchesVectorKNN[i][j]);
-          }
-        }
-      }
-    }
-    cout<<"Displaying the "<<matchesOK.size()<<"points..."<<endl;
-    Mat outImg;
-    drawMatches(firstImage, ptt1->getKeypoints(), secondImage,
-      ptt2->getKeypoints(), matchesOK, outImg);
-    imshow("PointsMatcher key points (knnMatch)",outImg);
-    cv::waitKey(40);
-    
     Ptr<PointsMatcher> matches2= matches.clone();
     matches2->add(ptt1);
     //cross check matches:
-    matches.crossMatch(matches2,matchesOK);
+    matches.crossMatch(matches2,matchesVector);
 
-    cout<<"Displaying the "<<matchesOK.size()<<"points..."<<endl;
+    Mat outImg;
+    cout<<"Displaying the "<<matchesVector.size()<<"points..."<<endl;
     drawMatches(firstImage, ptt1->getKeypoints(), secondImage,
-      ptt2->getKeypoints(), matchesOK, outImg);
-    imshow("PointsMatcher key points (verified)",outImg);
+      ptt2->getKeypoints(), matchesVector, outImg);
+    imshow("PointsMatcher key points",outImg);
+    cv::waitKey(0);
+
+    //////////////////////////////////////////////////////////////////////////
+    //For now we use fundamental function from OpenCV but soon use libmv !
+
+    //First compute points matches:
+    int size_match=matchesVector.size();
+    Mat srcP(1,size_match,CV_32FC2);
+    Mat destP(1,size_match,CV_32FC2);
+    vector<uchar> status;
+
+    //vector<KeyPoint> points1 = point_matcher->;
+    for( int i = 0; i < size_match; i ++ ){
+      const KeyPoint &key1 = ptt1->getKeypoint(
+        matchesVector[i].queryIdx);
+      const KeyPoint &key2 = ptt2->getKeypoint(
+        matchesVector[i].trainIdx);
+      srcP.at<float[2]>(0,i)[0] = key1.pt.x;
+      srcP.at<float[2]>(0,i)[1] = key1.pt.y;
+      destP.at<float[2]>(0,i)[0] = key2.pt.x;
+      destP.at<float[2]>(0,i)[1] = key2.pt.y;
+      status.push_back(1);
+    }
+
+    Mat fundam = cv::findFundamentalMat(srcP, destP, status, cv::FM_RANSAC);
+
+    //refine the mathing :
+    for( int i = 0; i < size_match; ++i ){
+      if( status[i] == 0 )
+      {
+        status[i] = status[--size_match];
+        status.pop_back();
+        matchesVector[i--] = matchesVector[size_match];
+        matchesVector.pop_back();
+      }
+    }
+
+    Mat outImg1;
+    cout<<"Displaying the "<<matchesVector.size()<<"points..."<<endl;
+    drawMatches(firstImage, ptt1->getKeypoints(), secondImage,
+      ptt2->getKeypoints(), matchesVector, outImg1);
+    imshow("PointsMatcher key points1",outImg1);
     cv::waitKey(0);
   }
 }

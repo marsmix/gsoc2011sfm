@@ -23,7 +23,22 @@ using namespace OpencvSfM;
 //Only to see how we can use MotionEstimator
 //////////////////////////////////////////////////////////////////////////
 
-void main(){
+void main(){/*
+  //Want to create this file:
+  //
+  FileStorage fsOut("test.yml", FileStorage::WRITE);
+  fsOut << "test" << "[" << "{";
+  fsOut << "first_array"  << "[" << 1 << 2 << 3 << 4 << "]";
+  fsOut << "second_array" << "[" << 5 << 6 << 7 << 8 << "]";
+  fsOut << "last_array" << "[";
+  fsOut << "[" << 1 << 2 << "{" << "id1" << 3 << "}" << "]";
+  fsOut << "[" << 4 << 5 << "{" << "id1" << 6 << "}" << "]";
+  fsOut << "]" << "}" << "]";
+  fsOut.release();
+
+  FileStorage fsRead("test.yml", FileStorage::READ);
+  fsRead.release();
+  */
   MotionProcessor mp;
 
   //first load images:
@@ -42,37 +57,79 @@ void main(){
   vector<Ptr<PointsToTrack>> vec_points_to_track;
   Ptr<PointsToTrack> ptrPoints_tmp;
 
+  Ptr<DescriptorMatcher> matcher;
+  matcher=Ptr<DescriptorMatcher>(new FlannBasedMatcher());
+  Ptr<PointsMatcher> matches_algo ( new PointsMatcher(matcher) );
 
   //universal method to get the current image:
   vector<Mat> images;
   Mat currentImage=mp.getFrame();
-  int nbFrame=0;
-  while ( !currentImage.empty() && nbFrame<50 )
+
+  if( boost::filesystem::exists( boost::filesystem::status("motion_points.yml") ) )
   {
-    //if the image is loaded, find the points:
-    cout<<"Create a new PointsToTrack..."<<endl;
+    cout<<"Load points from \"motion_points.yml\""<<endl;
+    FileStorage fsRead("motion_points.yml", FileStorage::READ);
+    FileNodeIterator vecPtt = fsRead.getFirstTopLevelNode().begin();
+    FileNodeIterator vecPtt_end = fsRead.getFirstTopLevelNode().end();
 
-    ptrPoints_tmp = Ptr<PointsToTrack>( new PointsToTrackWithImage (currentImage,
-      Mat(), fastDetect, SurfDetect));
-    ptrPoints_tmp->computeKeypointsAndDesc();
+    while( vecPtt != vecPtt_end && !currentImage.empty() )
+    {
+      Ptr<PointsToTrack> ptt = Ptr<PointsToTrack>(new PointsToTrack());
+      PointsToTrack::read( (*vecPtt)[0]["PointsToTrack"],*ptt);
+      vec_points_to_track.push_back(ptt);
+      images.push_back(currentImage);
+      currentImage=mp.getFrame();
+      vecPtt++;
+      cout<<"|";
+    }
+    cout<<endl;
 
-    vec_points_to_track.push_back( ptrPoints_tmp );
-    images.push_back(currentImage);
-    nbFrame++;
-    currentImage=mp.getFrame();
+    fsRead.release();
   }
-  cout<<"Create the motion estimator:"<<endl;
+  else
+  {
+    int nbFrame=0;
+    while ( !currentImage.empty() && nbFrame<30 )
+    {
+      //if the image is loaded, find the points:
+      cout<<"Create a new PointsToTrack..."<<endl;
 
-  Ptr<DescriptorMatcher> matcher;
-  matcher=Ptr<DescriptorMatcher>(new FlannBasedMatcher());
-  Ptr<PointsMatcher> matches_algo ( new PointsMatcher(matcher) );
-  
+      ptrPoints_tmp = Ptr<PointsToTrack>( new PointsToTrackWithImage (
+        currentImage, Mat(), fastDetect, SurfDetect));
+      ptrPoints_tmp->computeKeypointsAndDesc();
+
+      vec_points_to_track.push_back( ptrPoints_tmp );
+      images.push_back(currentImage);
+      nbFrame++;
+      currentImage=mp.getFrame();
+    }
+    cout<<"Create the motion estimator:"<<endl;
+
+    //now save the tracks:
+    FileStorage fsOut("motion_points.yml", FileStorage::WRITE);
+    fsOut << "Vector_of_motionTrack" << "[";
+    for(int i=0;i<vec_points_to_track.size(); i++)
+    {
+      PointsToTrack::write(fsOut,*vec_points_to_track[i]);
+    }
+    fsOut << "]";
+    fsOut.release();
+
+  }
+
   MotionEstimator motion_estim(vec_points_to_track,matches_algo);
 
   motion_estim.computeMatches();
 
   vector<TrackPoints> &tracks=motion_estim.getTracks();
   cout<<"numbers of tracks:"<<tracks.size()<<endl;
+
+  //now save the tracks:
+  FileStorage fsOutMotion1("motion_tracks1.yml", FileStorage::WRITE);
+  //Can't find a way to enable the following notation:
+  //fs << *ptt1;
+  MotionEstimator::write(fsOutMotion1,motion_estim);
+  fsOutMotion1.release();
 
   motion_estim.keepOnlyCorrectMatches();
 
@@ -83,11 +140,11 @@ void main(){
   motion_estim.showTracks(images,1000);
 
   //now save the tracks:
-  FileStorage fsOut("motion_tracks.yml", FileStorage::WRITE);
+  FileStorage fsOutMotion("motion_tracks.yml", FileStorage::WRITE);
   //Can't find a way to enable the following notation:
   //fs << *ptt1;
-  MotionEstimator::write(fsOut,motion_estim);
-  fsOut.release();
+  MotionEstimator::write(fsOutMotion,motion_estim);
+  fsOutMotion.release();
   
   /*
   //and create a new PointsToTrack using this file:

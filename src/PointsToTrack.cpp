@@ -94,7 +94,6 @@ namespace OpencvSfM{
     std::string myName=node.name();
     if( myName != "PointsToTrack")
       return;//this node is not for us...
-
     cv::FileNode& node_keypoints = node["keypoints"];
     if( node_keypoints.empty() )
       CV_Error( CV_StsError, "PointsToTrack FileNode is not correct!" );
@@ -116,10 +115,10 @@ namespace OpencvSfM{
   };
   void PointsToTrack::write(cv::FileStorage& fs, const PointsToTrack& keypoints)
   {
-    fs << "PointsToTrack" << "{";
+    fs << "{" << "PointsToTrack" << "{";
     cv::write( fs, "keypoints", keypoints.keypoints_ );
 
     fs << "descriptors" << keypoints.descriptors_;
-    fs << "}";
+    fs << "}" << "}";
   }
 }

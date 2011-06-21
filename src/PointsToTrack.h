@@ -71,6 +71,13 @@ namespace OpencvSfM{
     */
     inline const std::vector<cv::KeyPoint>& getKeypoints() const {return keypoints_;};
     /**
+    * this method return the points coordinates of the i^th entry
+    * @param index number of keypoints wanted
+    * @return points coordinates and when available orientation and size
+    */
+    inline const cv::KeyPoint& getKeypoint(unsigned int index) const
+    {CV_Assert( index<keypoints_.size()); return keypoints_[index];};
+    /**
     * this method return the descritors for each points in a matrix with size (n*m), where n is the number of points and m is the desciptor size.
     * @return descritors for each points in a matrix with size (n*m), where n is the number of points and m is the desciptor size.
     */
