@@ -74,6 +74,12 @@ namespace OpencvSfM{
     * @return 2D points in pixel image coordinates.
     */
     virtual std::vector<cv::Vec2d> normImageToPixelCoordinates(std::vector<cv::Vec2d> points);
+    /**
+    * This method return the intra parameters of the camera
+    * @return Matrix K of intra parameters
+    */
+    virtual cv::Mat getIntraMatrix()
+    {return intra_params_;};
   };
 
 };

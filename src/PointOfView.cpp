@@ -53,6 +53,33 @@ namespace OpencvSfM{
     }
   }
 
+  Vec2d PointOfView::project3DPointIntoImage(Vec3d point)
+  {
+    //As we don't know what type of camera we use (with/without disportion, fisheyes...)
+    //we can't use classic projection matrix P = K . [R|t]
+    //Instead, we first compute points transformation into camera's system and then compute
+    //pixel coordinate using camera device function.
+
+    //As we need Mat object to compute projection, we create temporary objects:
+    Mat mat3DNorm(4,1,CV_64F);
+    double* point3DNorm=(double*)mat3DNorm.data;
+    Mat mat2DNorm(3,1,CV_64F);
+    double* point2DNorm=(double*)mat2DNorm.data;
+
+    vector<Vec2d> pointsOut;
+    point3DNorm[0] = point[0];
+    point3DNorm[1] = point[1];
+    point3DNorm[2] = point[2];
+    point3DNorm[3] = 1;
+
+    //transform points into camera's coordinates:
+    mat2DNorm = ( projection_matrix_ * mat3DNorm);
+    pointsOut.push_back(Vec2d(point2DNorm[0]/point2DNorm[2],point2DNorm[1]/point2DNorm[2]));
+
+    //transform points into pixel coordinates using camera intra parameters:
+    pointsOut = device_->normImageToPixelCoordinates(pointsOut);
+    return pointsOut[0];
+  }
   vector<Vec2d> PointOfView::project3DPointsIntoImage(vector<Vec3d> points)
   {
     //As we don't know what type of camera we use (with/without disportion, fisheyes...)
@@ -96,4 +123,8 @@ namespace OpencvSfM{
     else
       return false;
   }
+  Mat PointOfView::getProjectionMatrix()
+  {
+    return device_->getIntraMatrix() * projection_matrix_;
+  };
 }

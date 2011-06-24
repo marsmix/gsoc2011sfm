@@ -1,6 +1,6 @@
 //Set to 1 if you want to test the points detection and matching
 //But be aware to set other tests to 0...
-#if 1
+#if 0
 
 #include "PointsToTrackWithImage.h"
 #include "MotionProcessor.h"
@@ -23,22 +23,7 @@ using namespace OpencvSfM;
 //Only to see how we can use MotionEstimator
 //////////////////////////////////////////////////////////////////////////
 
-void main(){/*
-  //Want to create this file:
-  //
-  FileStorage fsOut("test.yml", FileStorage::WRITE);
-  fsOut << "test" << "[" << "{";
-  fsOut << "first_array"  << "[" << 1 << 2 << 3 << 4 << "]";
-  fsOut << "second_array" << "[" << 5 << 6 << 7 << 8 << "]";
-  fsOut << "last_array" << "[";
-  fsOut << "[" << 1 << 2 << "{" << "id1" << 3 << "}" << "]";
-  fsOut << "[" << 4 << 5 << "{" << "id1" << 6 << "}" << "]";
-  fsOut << "]" << "}" << "]";
-  fsOut.release();
-
-  FileStorage fsRead("test.yml", FileStorage::READ);
-  fsRead.release();
-  */
+void main(){
   MotionProcessor mp;
 
   //first load images:
@@ -46,9 +31,7 @@ void main(){/*
   mp.setInputSource("../Medias/temple/",IS_DIRECTORY);
 
   //Configure input (not needed, but show how we can do 
-  mp.setProperty(CV_CAP_PROP_CONVERT_RGB,0);//Only greyscale, due to SIFT
-  mp.setProperty(CV_CAP_PROP_FRAME_WIDTH,1024);//for test
-  mp.setProperty(CV_CAP_PROP_FRAME_HEIGHT,768);//idem...
+  //mp.setProperty(CV_CAP_PROP_CONVERT_RGB,0);//Only greyscale, due to SIFT
 
   Ptr<FeatureDetector> fastDetect;
   fastDetect=Ptr<FeatureDetector>(new SurfFeatureDetector());
@@ -89,7 +72,7 @@ void main(){/*
   else
   {
     int nbFrame=0;
-    while ( !currentImage.empty() && nbFrame<30 )
+    while ( !currentImage.empty() && nbFrame<50 )
     {
       //if the image is loaded, find the points:
       cout<<"Create a new PointsToTrack..."<<endl;

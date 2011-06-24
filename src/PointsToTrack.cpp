@@ -9,7 +9,7 @@ using cv::line;
 using cv::circle;
 
 namespace OpencvSfM{
-  PointsToTrack::PointsToTrack(std::vector<KeyPoint> keypoints/*=std::vector<cv::KeyPoint>(0)*/,Mat descriptors/*=cv::Mat()*/)
+  PointsToTrack::PointsToTrack(std::vector<KeyPoint> keypoints/*=std::vector<cv::KeyPoint>(0)*/,Mat descriptors/*=cv::Mat()*/):keypoints_(keypoints),descriptors_(descriptors)
   {
   }
 
