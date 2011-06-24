@@ -146,12 +146,12 @@ namespace OpencvSfM{
 
     if(matches.empty())
     {
-      //as we don't have matches guess, compute them:
+      //as we don't have matches for img1 -> img2, compute them:
       match( otherMatcher->pointCollection_[0], matches, masks);
     }
 
     
-    //now construct the vector of DMatch, but in the other way:
+    //now construct the vector of DMatch, but in the other way (2 -> 1):
     vector<DMatch> matchesOtherWay;
     otherMatcher->match( pointCollection_[0], matchesOtherWay, masks );
     //now check for reciprocity:

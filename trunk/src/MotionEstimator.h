@@ -4,6 +4,7 @@
 #include "PointsToTrack.h"
 #include "MotionProcessor.h"
 #include "PointsMatcher.h"
+#include "PointOfView.h"
 #include "opencv2/calib3d/calib3d.hpp"
 
 namespace OpencvSfM{
@@ -35,21 +36,21 @@ namespace OpencvSfM{
     * @return true if this match is correct, false if inconsistent with
     * Snavely's rules.
     */
-    inline bool addMatch(int image_src, int point_idx);
+    inline bool addMatch(const int image_src, const int point_idx);
     
     /**
     * This function is used to know if the track contains the image
     * @param image_wanted index of query image
     * @return true if this track contain points from the query image
     */
-    inline bool containImage(int image_wanted);
+    inline bool containImage(const int image_wanted);
     /**
     * This function is used to know if the track contains the query point
     * @param image_src index of query image
     * @param point_idx1 index of point in query image
     * @return true if this track contain the point from the query image
     */
-    inline bool containPoint(int image_src, int point_idx1);
+    inline bool containPoint(const int image_src, const int point_idx1);
     /**
     * This function is used to get the numbers of image for this track
     * @return 0 if inconsistent, >= 2 else
@@ -62,15 +63,21 @@ namespace OpencvSfM{
     * @param img2 query match image
     * @return DMatch value
     */
-    inline cv::DMatch toDMatch(int img1,int img2) const;
+    inline cv::DMatch toDMatch(const int img1,const int img2) const;
     /**
     * use this function to get the n^th match value from this track
     * @param index which match
     * @param idImage out value of the image index
     * @param idPoint out value of the point index
     */
-    inline void getMatch(unsigned int index,
+    inline void getMatch(const unsigned int index,
       int &idImage, int &idPoint) const;
+    /**
+    * use this function to get the index point of the wanted image
+    * @param image index of wanted image
+    * @return index of point
+    */
+    inline int getIndexPoint(const unsigned int image) const;
   };
 
   /**
@@ -121,7 +128,7 @@ namespace OpencvSfM{
     * computed, use computeMatches to compute them!
     * @param points extracted points with features vectors.
     */
-    void addNewPointsToTrack(cv::Ptr<PointsToTrack> points);
+    void addNewImagesOfPoints(cv::Ptr<PointsToTrack> points);
     
     /**
     * This method compute the matches between each points of each images.
@@ -145,19 +152,52 @@ namespace OpencvSfM{
     */
     void showTracks(std::vector<cv::Mat>& images,int timeBetweenImg=25);
 
+    /**
+    * Project previously 2D points matches using cameras parameters
+    * @param cameras Input of cameras matrix with extrinsic parameters
+    * @param points3D output of points in 3D
+    */
+    void triangulateNView(std::vector<PointOfView>& cameras,
+      std::vector<cv::Vec3d>& points3D);
+    void MotionEstimator::triangulateNViewDebug(std::vector<PointOfView>& cameras,
+      std::vector<cv::Mat>& images,
+      std::vector<cv::Vec3d>& points3D);
+
     static void read( const cv::FileNode& node, MotionEstimator& points );
 
     static void write( cv::FileStorage& fs, const MotionEstimator& points );
-  protected:
+    void filterPoints( std::vector<cv::Vec3d> triangulated, int index_image,
+      std::vector<cv::Vec3d>& outPoints,
+      std::vector<cv::KeyPoint>& points2DOrigine);
+
+    inline int getMaxView()
+    {
+      unsigned int maxImg=0;
+      std::vector<TrackPoints>::size_type key_size = tracks_.size(),
+        i=0;
+      for (i=0; i < key_size; i++)
+      {
+        const TrackPoints &track = tracks_[i];
+        int nviews = track.images_indexes_.size();
+        for(int j = 0;j<nviews;++j)
+          if(maxImg<track.images_indexes_[j])
+            maxImg=track.images_indexes_[j];
+      }
+      return maxImg;
+    }
     /**
     * This function add matches to tracks
     * @param newMatches new matches to add
     * @param img1 index of source matches image
     * @param img2 index of destination matches image
-    * @return 
     */
     inline void addMatches(std::vector<cv::DMatch> &newMatches,
       unsigned int img1, unsigned int img2);
+    /**
+    * This function add new Tracks
+    * @param newTracks new Tracks to add
+    */
+    void addTracks(std::vector<TrackPoints> &newTracks);
   };
 
 }

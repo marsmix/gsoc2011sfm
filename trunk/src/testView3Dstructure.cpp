@@ -2,6 +2,8 @@
 //But be aware to set other tests to 0...
 #if 0
 
+#include "MotionEstimator.h"
+#include "PointsMatcher.h"
 #include "PointsToTrackWithImage.h"
 #include "MotionProcessor.h"
 #include "PointOfView.h"
@@ -15,89 +17,92 @@ using namespace std;
 using namespace cv;
 using namespace OpencvSfM;
 
-//////////////////////////////////////////////////////////////////////////
-//This file will not be in the final version of API, consider it like a tuto/draft...
-//You will need files to test. Download the temple dataset here : http://vision.middlebury.edu/mview/data/
-//////////////////////////////////////////////////////////////////////////
+void main(){
 
-vector<PointOfView> loadCamerasFromFile(string fileName)
-{
-  vector<PointOfView> outVect;
-  ifstream pointsDef(fileName);
-  bool isOK=pointsDef.is_open();
-  //first get the numbers of cameras:
-  int nbCameras;
-  if(pointsDef>>nbCameras)
-  {
-    string name_of_picture;
-    Mat intra_params,rotation;
-    Vec3d translation;
-    intra_params.create(3, 3, CV_64F);
-    rotation.create(3, 3, CV_64F);
-    double* data_intra_param=(double*)intra_params.data;
-    double* data_rotation=(double*)rotation.data;
-    for (int i=0;i<nbCameras;i++)
-    {
-      //first the name of image:
-      if(pointsDef>>name_of_picture)
-      {
-        //the 9 values of K:
-        for(int j=0;j<9;j++)
-          pointsDef>>data_intra_param[j];
-        //the 9 values of rotation:
-        for(int j=0;j<9;j++)
-          pointsDef>>data_rotation[j];
-        //the 3 values of translation:
-        for(int j=0;j<3;j++)
-          pointsDef>>translation[j];
-        //now create a point of view:
-        outVect.push_back(PointOfView(new CameraPinhole(intra_params),rotation,translation));
-      }
+  int nviews = 5;
+  int npoints = 6;
+  std::ifstream inPoints("logPoints.txt");
+  string skeepWord;
+
+  // Collect P matrices together.
+  vector<PointOfView> cameras;
+  for (int j = 0; j < nviews; ++j) {
+    double R[9];
+    double T[3];
+    double K[9];
+    inPoints >> skeepWord;
+    while( skeepWord.find("ProjectionsMat")==std::string::npos && !inPoints.eof() )
+      inPoints >> skeepWord;
+    inPoints >> K[0] >> K[1] >> K[2];
+    inPoints >> K[3] >> K[4] >> K[5];
+    inPoints >> K[6] >> K[7] >> K[8];
+    Ptr<Camera> device=Ptr<Camera>(new CameraPinhole(Mat(3,3,CV_64F,K)) );
+    inPoints >> R[0] >> R[1] >> R[2];
+    inPoints >> R[3] >> R[4] >> R[5];
+    inPoints >> R[6] >> R[7] >> R[8];
+    inPoints >> T[0] >> T[1] >> T[2];
+    //create the PointOfView:
+    cameras.push_back( PointOfView(device, Mat(3,3,CV_64F,R), Vec3d(T) ) );
+  }
+
+  vector<cv::Vec3d> points3D;
+  vector<cv::Ptr<PointsToTrack>> points2D;
+  vector<vector<cv::KeyPoint>> tracks_keypoints(nviews);
+  for (int i = 0; i < npoints; ++i) {
+    inPoints >> skeepWord;
+    while( skeepWord != "2D" && !inPoints.eof() )
+      inPoints >> skeepWord;
+    inPoints >> skeepWord;//skip Point
+    double X[3];
+    inPoints >> X[0] >> X[1] >> X[2];
+    points3D.push_back( Vec3d( X[0], X[1], X[2] ) );
+
+    // Collect the image of point i in each frame.
+    // inPoints >> skeepWord;
+    for (int j = 0; j < nviews; ++j) {
+      cv::Vec2d point;
+      inPoints >> point[0] >> point[1];
+      tracks_keypoints[j].push_back( KeyPoint(cv::Point2f(point[0], point[1]),1) );
     }
   }
-  return outVect;
-}
-
-void main(){
-  vector<PointOfView> myCameras=loadCamerasFromFile("../Medias/temple/temple_par.txt");
-
-  //As the (tight) bounding box for the temple model is (-0.054568 0.001728 -0.042945) - (0.047855 0.161892 0.032236)
-  //I will create some 3D points and see if they are correcly reprojected:
-  
-  vector<Vec3d> points3D;
-  points3D.push_back(Vec3d( -0.054568, 0.001728, -0.042945 ));
-  points3D.push_back(Vec3d( -0.054568, 0.001728, 0.032236 ));
-  points3D.push_back(Vec3d( 0.047855, 0.001728, -0.042945 ));
-  points3D.push_back(Vec3d( -0.054568, 0.161892, -0.042945 ));
-  points3D.push_back(Vec3d( -0.054568, 0.161892, 0.032236 ));
-  points3D.push_back(Vec3d( 0.047855, 0.001728, 0.032236 ));
-  points3D.push_back(Vec3d( 0.047855, 0.161892, -0.042945 ));
-  points3D.push_back(Vec3d( 0.047855, 0.161892, 0.032236 ));
-
-  //now for each point of view, we draw the picture and these points projected:
-  MotionProcessor mp;
-  //Here we will a folder with a lot of images, but we can do the same thing with any other type of input
-  mp.setInputSource("../Medias/temple/",IS_DIRECTORY);
-  
-  vector<PointOfView>::iterator itPoV=myCameras.begin();
-  while (itPoV!=myCameras.end())
-  {
-    Mat imgTmp=mp.getFrame();//get the current image
-    if(imgTmp.empty())
-      break;//end of sequence: quit!
-
-    vector<Vec2d> pixelProjected=itPoV->project3DPointsIntoImage(points3D);
-    //convert Vec2d into KeyPoint:
-    vector<KeyPoint> points2D;
-    for(unsigned int j=0;j<pixelProjected.size();j++)
-      points2D.push_back(KeyPoint((float)pixelProjected[j][0],(float)pixelProjected[j][1],10.0));
-
-    drawKeypoints(imgTmp,points2D,imgTmp,Scalar(255,255,255));
-    imshow("Points projected...",imgTmp);
-    cv::waitKey(0);
-    cv::waitKey(40);
-    itPoV++;
+  for (int j = 0; j < nviews; ++j) {
+    points2D.push_back( cv::Ptr<PointsToTrack>(
+      new PointsToTrack( tracks_keypoints[j] )) );
   }
+  /*
+  vector<Mat> Ks(nviews);
+  vector<Mat> Ps(nviews);
+  vector<cv::Vec3d> points3D;
+  vector<vector<cv::Vec2d>> points2D;
+  */
+
+  Ptr<DescriptorMatcher> matcher;
+  matcher=Ptr<DescriptorMatcher>(new FlannBasedMatcher());
+  Ptr<PointsMatcher> matches_algo ( new PointsMatcher(matcher) );
+  MotionEstimator motion_estim(points2D,matches_algo);
+
+  //create tracks:
+  vector<TrackPoints> tracks;
+  for(int i=0; i<npoints; ++i)
+  {
+    TrackPoints tp;
+    for(int j=0;j<nviews;j++)
+    {
+      tp.addMatch(j,i);
+    }
+    tracks.push_back(tp);
+  }
+  motion_estim.addTracks(tracks);
+
+  //create an empty sequence of images:
+  vector<Mat> images;
+  for (int j = 0; j < nviews; ++j) {
+    Mat img=Mat::zeros(800,600,CV_8SC1);
+    images.push_back( img );
+  }
+
+  //now for fun show the sequence on images:
+  motion_estim.triangulateNViewDebug(cameras,images,points3D);
 }
 
 #endif
