@@ -34,9 +34,9 @@ void main(){
   //mp.setProperty(CV_CAP_PROP_CONVERT_RGB,0);//Only greyscale, due to SIFT
 
   Ptr<FeatureDetector> fastDetect;
-  fastDetect=Ptr<FeatureDetector>(new SurfFeatureDetector());
+  fastDetect=Ptr<FeatureDetector>(new SiftFeatureDetector());
   Ptr<DescriptorExtractor> SurfDetect;
-  SurfDetect=Ptr<DescriptorExtractor>(new SurfDescriptorExtractor());
+  SurfDetect=Ptr<DescriptorExtractor>(new SiftDescriptorExtractor());
   vector<Ptr<PointsToTrack>> vec_points_to_track;
   Ptr<PointsToTrack> ptrPoints_tmp;
 

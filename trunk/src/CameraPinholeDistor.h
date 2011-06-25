@@ -80,13 +80,13 @@ namespace OpencvSfM{
     * @param points 2D points in pixel image homogeneous coordinates.
     * @return 2D points in normalized image homogeneous coordinates.
     */
-    virtual std::vector<cv::Vec2d> pixelToNormImageCoordinates(std::vector<cv::Vec2d> points);
+    virtual std::vector<cv::Vec2d> pixelToNormImageCoordinates(std::vector<cv::Vec2d> points) const;
     /**
     * This method can convert 2D points from normalized image coordinates to 2D points in pixel image coordinates
     * @param points 2D points in normalized image homogeneous coordinates.
     * @return 2D points in pixel image coordinates.
     */
-    virtual std::vector<cv::Vec2d> normImageToPixelCoordinates(std::vector<cv::Vec2d> points);
+    virtual std::vector<cv::Vec2d> normImageToPixelCoordinates(std::vector<cv::Vec2d> points) const;
   };
 
 }

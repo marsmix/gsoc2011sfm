@@ -63,7 +63,7 @@ namespace OpencvSfM{
     return vector<Vec4d>();
   }
 
-  vector<Vec2d> CameraPinholeDistor::pixelToNormImageCoordinates(vector<Vec2d> points)
+  vector<Vec2d> CameraPinholeDistor::pixelToNormImageCoordinates(vector<Vec2d> points) const
   {
     vector<Vec2d> undistordedPoints;
     //rectify the distorion, but keep points in pixels coordinates:
@@ -71,7 +71,7 @@ namespace OpencvSfM{
     return undistordedPoints;
   }
 
-  vector<Vec2d> CameraPinholeDistor::normImageToPixelCoordinates(std::vector<cv::Vec2d> points)
+  vector<Vec2d> CameraPinholeDistor::normImageToPixelCoordinates(std::vector<cv::Vec2d> points) const
   {
     vector<Vec2d> pointsPixelCoord=CameraPinhole::normImageToPixelCoordinates(points);
     //TODO: remove the distortion!
