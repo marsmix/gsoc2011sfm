@@ -53,7 +53,7 @@ namespace OpencvSfM{
     }
   }
 
-  Vec2d PointOfView::project3DPointIntoImage(Vec3d point)
+  Vec2d PointOfView::project3DPointIntoImage(Vec3d point) const
   {
     //As we don't know what type of camera we use (with/without disportion, fisheyes...)
     //we can't use classic projection matrix P = K . [R|t]
@@ -80,7 +80,7 @@ namespace OpencvSfM{
     pointsOut = device_->normImageToPixelCoordinates(pointsOut);
     return pointsOut[0];
   }
-  vector<Vec2d> PointOfView::project3DPointsIntoImage(vector<Vec3d> points)
+  vector<Vec2d> PointOfView::project3DPointsIntoImage(vector<Vec3d> points) const
   {
     //As we don't know what type of camera we use (with/without disportion, fisheyes...)
     //we can't use classic projection matrix P = K . [R|t]
@@ -113,7 +113,7 @@ namespace OpencvSfM{
     return device_->normImageToPixelCoordinates(pointsOut);
   }
 
-  bool PointOfView::pointInFrontOfCamera(cv::Vec4d point)
+  bool PointOfView::pointInFrontOfCamera(cv::Vec4d point) const
   {
     Mat pointTranspose= (Mat) point;
     double condition_1 = this->projection_matrix_.row(2).dot(pointTranspose.t()) * point[3];
@@ -123,7 +123,7 @@ namespace OpencvSfM{
     else
       return false;
   }
-  Mat PointOfView::getProjectionMatrix()
+  Mat PointOfView::getProjectionMatrix() const
   {
     return device_->getIntraMatrix() * projection_matrix_;
   };

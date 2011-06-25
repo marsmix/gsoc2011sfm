@@ -68,7 +68,7 @@ namespace OpencvSfM{
     return vector<Vec4d>();
   }
 
-  vector<Vec2d> CameraPinhole::pixelToNormImageCoordinates(vector<Vec2d> points)
+  vector<Vec2d> CameraPinhole::pixelToNormImageCoordinates(vector<Vec2d> points) const
   {
     vector<Vec2d> newCoordinates;
     double* ptrIntraParam=(double*)inv_intra_params_.data;
@@ -97,7 +97,7 @@ namespace OpencvSfM{
     return newCoordinates;
   }
 
-  vector<Vec2d> CameraPinhole::normImageToPixelCoordinates(std::vector<cv::Vec2d> points)
+  vector<Vec2d> CameraPinhole::normImageToPixelCoordinates(std::vector<cv::Vec2d> points) const
   {
     vector<Vec2d> newCoordinates;
     //for each 2D point, use intra params to compute 2D point:

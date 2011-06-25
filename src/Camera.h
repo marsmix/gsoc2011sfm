@@ -65,18 +65,20 @@ namespace OpencvSfM{
     * @param points 2D points in pixel image homogeneous coordinates.
     * @return 2D points in normalized image homogeneous coordinates.
     */
-    virtual std::vector<cv::Vec2d> pixelToNormImageCoordinates(std::vector<cv::Vec2d> points) =0;//we don't know how this transformation can be done, so pure virtual
+    virtual std::vector<cv::Vec2d> pixelToNormImageCoordinates(
+      std::vector<cv::Vec2d> points) const=0;
     /**
     * This method can convert 2D points from normalized image coordinates to 2D points in pixel image coordinates
     * @param points 2D points in normalized image homogeneous coordinates.
     * @return 2D points in pixel image coordinates.
     */
-    virtual std::vector<cv::Vec2d> normImageToPixelCoordinates(std::vector<cv::Vec2d> points) =0;//we don't know how this transformation can be done, so pure virtual
+    virtual std::vector<cv::Vec2d> normImageToPixelCoordinates(
+      std::vector<cv::Vec2d> points) const=0;
     /**
     * This method return the intra parameters of the camera
     * @return Matrix K of intra parameters
     */
-    virtual cv::Mat getIntraMatrix()
+    virtual cv::Mat getIntraMatrix() const
     {return cv::Mat::eye(3,3,CV_64FC1);};
   };
 

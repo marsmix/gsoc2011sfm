@@ -78,6 +78,18 @@ namespace OpencvSfM{
     * @return index of point
     */
     inline int getIndexPoint(const unsigned int image) const;
+    inline double triangulateLinear(std::vector<PointOfView>& cameras,
+      const std::vector<cv::Ptr<PointsToTrack>> &points_to_track,
+      cv::Vec3d& points3D,
+      const std::vector<int> &masks = std::vector<int>()) const;
+    inline double triangulateRobust(std::vector<PointOfView>& cameras,
+      const std::vector<cv::Ptr<PointsToTrack>> &points_to_track,
+      cv::Vec3d& points3D,
+      double reproj_error = 4) const;
+  protected:
+    inline double errorEstimate(std::vector<PointOfView>& cameras,
+      const std::vector<cv::Ptr<PointsToTrack>> &points_to_track,
+      cv::Vec3d& points3D) const;
   };
 
   /**
@@ -159,16 +171,10 @@ namespace OpencvSfM{
     */
     void triangulateNView(std::vector<PointOfView>& cameras,
       std::vector<cv::Vec3d>& points3D);
-    void MotionEstimator::triangulateNViewDebug(std::vector<PointOfView>& cameras,
-      std::vector<cv::Mat>& images,
-      std::vector<cv::Vec3d>& points3D);
 
     static void read( const cv::FileNode& node, MotionEstimator& points );
 
     static void write( cv::FileStorage& fs, const MotionEstimator& points );
-    void filterPoints( std::vector<cv::Vec3d> triangulated, int index_image,
-      std::vector<cv::Vec3d>& outPoints,
-      std::vector<cv::KeyPoint>& points2DOrigine);
 
     inline int getMaxView()
     {
