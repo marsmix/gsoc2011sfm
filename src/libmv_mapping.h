@@ -57,6 +57,7 @@
 #include <Eigen/LU>
 #include <Eigen/QR>
 #include <Eigen/SVD>
+#include <opencv2/core/core.hpp>
 
 #if _WIN32 || __APPLE__
 void static sincos (double x, double *sinx, double *cosx) {
@@ -158,6 +159,176 @@ namespace libmv {
     Eigen::RowMajor> RMatf;
 
   typedef Eigen::NumTraits<double> EigenDouble;
+  using namespace Eigen;
+
+  template <typename EigenMat>
+  inline void convertCvMatToEigen(cv::Mat input, EigenMat& output)
+  {
+    typedef typename EigenMat::Scalar DataType;
+    CV_Assert( sizeof(DataType) == input.elemSize1() );
+
+    if( EigenMat::Options & 0x1 == Eigen::ColMajor )
+    {
+      input = input.t();
+      Eigen::Map<EigenMat> eigen_tmp( (DataType*)input.data,
+        input.cols, input.rows);
+      output = eigen_tmp;
+    }
+    else
+    {
+      Eigen::Map<EigenMat> eigen_tmp( (DataType*)input.data,
+        input.rows, input.cols);
+      output = eigen_tmp;
+    }
+  }
+
+  template <typename EigenMat>
+  inline void convertEigenToCvMat(typename EigenMat& input, int cvNameOfType,
+    cv::Mat& output)
+  {
+    typedef typename EigenMat::Scalar DataType;
+    CV_Assert( sizeof(DataType) == CV_ELEM_SIZE1(cvNameOfType) );
+
+    if( EigenMat::Options & 0x1 == Eigen::ColMajor )
+    {
+      cv::Mat tmp(input.cols(), input.rows(), cvNameOfType,
+        input.data());
+      output = tmp.t();
+    }
+    else
+    {
+      cv::Mat tmp( input.rows(), input.cols(), cvNameOfType,
+        input.data());
+      output = tmp.clone();
+    }
+  }
+  // A simple container class, which guarantees 16 byte alignment needed for most
+  // vectorization. Don't use this container for classes that cannot be copied
+  // via memcpy.
+  template <typename T,
+    typename Allocator = Eigen::aligned_allocator<T> >
+  class vector {
+  public:
+    ~vector()                        { clear();                 }
+
+    vector()                         { init();                  }
+    vector(int size)                 { init(); resize(size);    }
+    vector(int size, const T & val)  {
+      init();
+      resize(size);
+      std::fill(data_, data_+size_, val); }
+
+    // Copy constructor and assignment.
+    vector(const vector<T, Allocator> &rhs) {
+      init();
+      copy(rhs);
+    }
+    vector<T, Allocator> &operator=(const vector<T, Allocator> &rhs) {
+      if (&rhs != this) {
+        copy(rhs);
+      }
+      return *this;
+    }
+
+    /// Swaps the contents of two vectors in constant time.
+    void swap(vector<T, Allocator> &other) {
+      std::swap(allocator_, other.allocator_);
+      std::swap(size_, other.size_);
+      std::swap(capacity_, other.capacity_);
+      std::swap(data_, other.data_);
+    }
+
+    int      size()            const { return size_;            }
+    int      capacity()        const { return capacity_;        }
+    const T& back()            const { return data_[size_ - 1]; }
+    T& back()                  { return data_[size_ - 1]; }
+    const T& front()           const { return data_[0];         }
+    T& front()                 { return data_[0];         }
+    const T& operator[](int n) const { return data_[n];         }
+    T& operator[](int n)       { return data_[n];         }
+    const T * begin()          const { return data_;            }
+    const T * end()            const { return data_+size_;      }
+    T * begin()                { return data_;            }
+    T * end()                  { return data_+size_;      }
+
+    void resize(unsigned int size) {
+      reserve(size);
+      if (size > size_) {
+        construct(size_, size);
+      } else if (size < size_) {
+        destruct(size, size_);
+      }
+      size_ = size;
+    }
+
+
+
+    void push_back(const T &value) {
+      if (size_ == capacity_) {
+        reserve(size_ ? 2 * size_ : 1);
+      }
+      new (&data_[size_++]) T(value);
+    }
+
+    void pop_back() {
+      resize(size_ - 1);
+    }
+
+    void clear() {
+      destruct(0, size_);
+      deallocate();
+      init();
+    }
+
+    void reserve(unsigned int size) {
+      if (size > size_) {
+        T *data = static_cast<T *>(allocate(size));
+        memcpy(data, data_, sizeof(*data)*size_);
+        allocator_.deallocate(data_, capacity_);
+        data_ = data;
+        capacity_ = size;
+      }
+    }
+
+  private:
+    void construct(int start, int end) {
+      for (int i = start; i < end; ++i) {
+        new (&data_[i]) T;
+      }
+    }
+    void destruct(int start, int end) {
+      for (int i = start; i < end; ++i) {
+        data_[i].~T();
+      }
+    }
+    void init() {
+      size_ = 0;
+      data_ = 0;
+      capacity_ = 0;
+    }
+
+    void *allocate(int size) {
+      return size ? allocator_.allocate(size) : 0;
+    }
+
+    void deallocate() {
+      allocator_.deallocate(data_, size_);
+      data_ = 0;
+    }
+
+    void copy(const vector<T, Allocator> &rhs) {
+      resize(rhs.size());
+      for (int i = 0; i < rhs.size(); ++i) {
+        (*this)[i] = rhs[i];
+      }
+    }
+
+    Allocator allocator_;
+    unsigned int size_;
+    unsigned int capacity_;
+    T *data_;
+  };
+
   
   // Solve the linear system Ax = 0 via SVD. Store the solution in x, such that
   // ||x|| = 1.0. Return the singluar value corresponding to the solution.

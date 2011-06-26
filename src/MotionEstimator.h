@@ -14,12 +14,17 @@ namespace OpencvSfM{
   * \brief This class store the track of keypoints.
   * A track is a connected set of matching keypoints across multiple images
   * 
+  * This class can be used as a Vec3d because it's the projection of a 3D points
+  * Of course, use triangulate method before to create this 3D point!
+  * 
+  * Discussion: Store index of points or 2D position?
   */
   class TrackPoints
   {
     friend class MotionEstimator;
 
   protected:
+    cv::Ptr<cv::Vec3d> point3D;
     std::vector<unsigned int> images_indexes_;
     std::vector<unsigned int> point_indexes_;
     /**
@@ -28,6 +33,12 @@ namespace OpencvSfM{
     */
     int track_consistance;
   public:
+    /**
+    * cast operator to use this object as a 3D point!
+    */
+    operator cv::Ptr<cv::Vec3d>() {
+      return point3D;
+    }
     TrackPoints():track_consistance(0){};
     /**
     * This function add matches to track
@@ -81,11 +92,11 @@ namespace OpencvSfM{
     inline double triangulateLinear(std::vector<PointOfView>& cameras,
       const std::vector<cv::Ptr<PointsToTrack>> &points_to_track,
       cv::Vec3d& points3D,
-      const std::vector<int> &masks = std::vector<int>()) const;
+      const std::vector<int> &masks = std::vector<int>());
     inline double triangulateRobust(std::vector<PointOfView>& cameras,
       const std::vector<cv::Ptr<PointsToTrack>> &points_to_track,
       cv::Vec3d& points3D,
-      double reproj_error = 4) const;
+      double reproj_error = 4);
   protected:
     inline double errorEstimate(std::vector<PointOfView>& cameras,
       const std::vector<cv::Ptr<PointsToTrack>> &points_to_track,
@@ -175,8 +186,8 @@ namespace OpencvSfM{
     static void read( const cv::FileNode& node, MotionEstimator& points );
 
     static void write( cv::FileStorage& fs, const MotionEstimator& points );
-
-    inline int getMaxView()
+    
+    inline int getNumViews() const
     {
       unsigned int maxImg=0;
       std::vector<TrackPoints>::size_type key_size = tracks_.size(),
@@ -191,6 +202,7 @@ namespace OpencvSfM{
       }
       return maxImg;
     }
+
     /**
     * This function add matches to tracks
     * @param newMatches new matches to add

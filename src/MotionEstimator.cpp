@@ -140,11 +140,11 @@ namespace OpencvSfM{
       distance += ((p.pt.x-projP[0])*(p.pt.x-projP[0]) + 
         (p.pt.y-projP[1])*(p.pt.y-projP[1]) );
     }
-    return distance;
+    return distance/static_cast<double>(nviews);
   }
   double TrackPoints::triangulateLinear(vector<PointOfView>& cameras,
     const std::vector<cv::Ptr<PointsToTrack>> &points_to_track,
-    cv::Vec3d& points3D, const vector<int> &masks) const
+    cv::Vec3d& points3D, const vector<int> &masks)
   {
     unsigned int nviews = 0;
     bool hasMask=false;
@@ -163,7 +163,7 @@ namespace OpencvSfM{
     }
 
     Mat design = Mat::zeros(3*nviews, 4 + nviews,CV_64FC1);
-    int real_position=0;
+    unsigned  int real_position=0;
     i = 0;
     for (real_position = 0; real_position < images_indexes_.size();
       ++real_position ) {
@@ -190,18 +190,34 @@ namespace OpencvSfM{
     points3D[1]=X_and_alphas.at<double>(1,0)/scal_factor;
     points3D[2]=X_and_alphas.at<double>(2,0)/scal_factor;
 
+    //update the point 3D:
+    if(point3D.empty())
+      point3D = Ptr<cv::Vec3d>( new cv::Vec3d(points3D) );
+    else
+      *point3D = points3D;
+
     return errorEstimate(cameras, points_to_track, points3D);
   }
   
   double TrackPoints::triangulateRobust(std::vector<PointOfView>& cameras,
     const std::vector<cv::Ptr<PointsToTrack>> &points_to_track, cv::Vec3d& points3D,
-    double reproj_error) const
+    double reproj_error)
   {
     cv::RNG& rng = cv::theRNG();
     unsigned int nviews = images_indexes_.size();
     double distance=0, best_distance=1e20;
     vector<int> masks;
     cv::Vec3d bestPoints3D;
+
+    if( !point3D.empty() )
+    {
+      double error = errorEstimate(cameras, points_to_track, *point3D);
+      if( error<reproj_error )
+      {
+        points3D = *point3D;
+        return error;
+      }
+    }
 
     int num_iter=0, max_iter=10;
     for(num_iter=0; num_iter<max_iter; ++num_iter)
@@ -237,7 +253,12 @@ namespace OpencvSfM{
       }
     }
     points3D = bestPoints3D;
-    return distance/nviews;
+    //update the point 3D:
+    if(point3D.empty())
+      point3D = Ptr<cv::Vec3d>( new cv::Vec3d(points3D) );
+    else
+      *point3D = points3D;
+    return distance;
   }
   MotionEstimator::MotionEstimator(vector<Ptr<PointsToTrack>> &points_to_track,
     Ptr<PointsMatcher> match_algorithm)
@@ -586,19 +607,19 @@ namespace OpencvSfM{
     vector<TrackPoints>::size_type key_size = tracks_.size();
     vector<PointOfView>::size_type num_camera = cameras.size();
     int idImage=-1, idPoint=-1;
-
-    libmv::vector<libmv::Mat34> Ps(key_size);
     vector<TrackPoints>::size_type i;
+    /*
+    libmv::vector<libmv::Mat34> Ps(key_size);
     for (i=0; i < num_camera; i++)
     {
       Mat projTmp = cameras[i].getProjectionMatrix();
       Eigen::Map<libmv::Mat43> eigen_tmp((double*)projTmp.data);
       Ps[i] = eigen_tmp.transpose();
-    }
+    }*/
 
     for (i=0; i < key_size; i++)
     {
-      const TrackPoints &track = tracks_[i];
+      TrackPoints &track = tracks_[i];
       unsigned int nviews = track.images_indexes_.size();
       
       unsigned int maxImg=0;

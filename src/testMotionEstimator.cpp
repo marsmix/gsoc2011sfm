@@ -6,6 +6,7 @@
 #include "MotionProcessor.h"
 #include "MotionEstimator.h"
 #include "PointsMatcher.h"
+#include "libmv_mapping.h"
 #include <opencv2/calib3d/calib3d.hpp>
 
 #include <iostream>
@@ -33,10 +34,10 @@ void main(){
   //Configure input (not needed, but show how we can do 
   //mp.setProperty(CV_CAP_PROP_CONVERT_RGB,0);//Only greyscale, due to SIFT
 
-  Ptr<FeatureDetector> fastDetect;
-  fastDetect=Ptr<FeatureDetector>(new SiftFeatureDetector());
-  Ptr<DescriptorExtractor> SurfDetect;
-  SurfDetect=Ptr<DescriptorExtractor>(new SiftDescriptorExtractor());
+  Ptr<FeatureDetector> detector;
+  detector=Ptr<FeatureDetector>(new SiftFeatureDetector());
+  Ptr<DescriptorExtractor> desc_extractor;
+  desc_extractor=Ptr<DescriptorExtractor>(new SiftDescriptorExtractor());
   vector<Ptr<PointsToTrack>> vec_points_to_track;
   Ptr<PointsToTrack> ptrPoints_tmp;
 
@@ -72,15 +73,15 @@ void main(){
   else
   {
     int nbFrame=0;
-    while ( !currentImage.empty() && nbFrame<50 )
+    while ( !currentImage.empty() )// && nbFrame<50 )
     {
       //if the image is loaded, find the points:
       cout<<"Create a new PointsToTrack..."<<endl;
 
       ptrPoints_tmp = Ptr<PointsToTrack>( new PointsToTrackWithImage (
-        currentImage, Mat(), fastDetect, SurfDetect));
+        currentImage, Mat(), detector, desc_extractor));
       ptrPoints_tmp->computeKeypointsAndDesc();
-
+      
       vec_points_to_track.push_back( ptrPoints_tmp );
       images.push_back(currentImage);
       nbFrame++;

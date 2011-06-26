@@ -7,6 +7,7 @@
 #include "MotionEstimator.h"
 #include "PointOfView.h"
 #include "CameraPinhole.h"
+#include "libmv_mapping.h"
 #include <opencv2/calib3d/calib3d.hpp>
 
 #include <iostream>
@@ -64,7 +65,6 @@ vector<PointOfView> loadCamerasFromFile(string fileName)
 
 
 void main(){
-
   Ptr<DescriptorMatcher> matcher;
   matcher=Ptr<DescriptorMatcher>(new FlannBasedMatcher());
   Ptr<PointsMatcher> matches_algo ( new PointsMatcher(matcher) );
@@ -94,9 +94,9 @@ void main(){
   vector<Vec3d> triangulated;
   MotionProcessor mp;
   mp.setInputSource("../Medias/temple/",IS_DIRECTORY);
-
+  
   vector<PointOfView>::iterator itPoV=myCameras.begin();
-  int index_image=-1, maxImg=motion_estim_loaded.getMaxView();
+  int index_image=-1, maxImg=motion_estim_loaded.getNumViews();
   while (itPoV!=myCameras.end() && index_image<maxImg )
   {
     Mat imgTmp=mp.getFrame();//get the current image
