@@ -2,11 +2,13 @@
 #define _GSOC_SFM_POINTS_TO_TRACK_H 1
 
 #include "opencv2/features2d/features2d.hpp"
+#include "TracksOfPoints.h"
 
 #include <vector>
 
 
 namespace OpencvSfM{
+  class TrackPoints;
 
 /*! \brief This class can be used to store informations about point
   * and features. This is an abstract class: you can't use it directly.
@@ -23,13 +25,17 @@ namespace OpencvSfM{
   protected:
     std::vector<cv::KeyPoint> keypoints_;///<This attribute will store points coordinates and sometimes orientation and size
     cv::Mat descriptors_;///<this attribute will store descritors for each points in a matrix with size (n*m), where n is the number of points and m is the desciptor size.
+    int corresponding_image_;///<index of frame when available
+    static int glob_number_images_;///<total numbers of images!
   public:
     /**
     * this constructor create an object with available information...
+    * @param corresponding_image Global index of image
     * @param keypoints the points we will try to track...
     * @param descriptors the feature vector for each points...
     */
-    PointsToTrack(std::vector<cv::KeyPoint> keypoints=std::vector<cv::KeyPoint>(0),cv::Mat descriptors=cv::Mat());
+    PointsToTrack(int corresponding_image=-1, std::vector<cv::KeyPoint> keypoints=
+      std::vector<cv::KeyPoint>(0), cv::Mat descriptors=cv::Mat());
     /**
     * Destructor : delete points and features vectors
     */
@@ -70,6 +76,13 @@ namespace OpencvSfM{
     * @return points coordinates and when available orientation and size
     */
     inline const std::vector<cv::KeyPoint>& getKeypoints() const {return keypoints_;};
+    /**
+    * this method return the points coordinates corresponding to tracks
+    * @param matches list of tracks. Only points found in tracks are returned
+    * @param pointsVals [out] points found in tracks
+    */
+    void getKeyMatches(const std::vector<TrackPoints>& matches, int otherImage,
+      std::vector<cv::Point2f>& pointsVals) const;
     /**
     * this method return the points coordinates of the i^th entry
     * @param index number of keypoints wanted

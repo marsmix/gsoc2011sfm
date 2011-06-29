@@ -22,20 +22,26 @@ namespace OpencvSfM{
   public:
     /**
     * First constructor used to create a list of points to track using a feature and a descriptor algorithm.
+    * @param corresponding_image Global index of image
     * @param imageToAnalyse Image to use for keypoints and features search
     * @param maskOfAnalyse Mask used to hide part of image
     * @param feature_detector Algorithm to use for features detection (see http://opencv.willowgarage.com/documentation/cpp/common_interfaces_for_feature_detection_and_descriptor_extraction.html#featuredetector)
     * @param descriptor_detector Algorithm to use for descriptors detection (see http://opencv.willowgarage.com/documentation/cpp/common_interfaces_for_feature_detection_and_descriptor_extraction.html#descriptorextractor)
     */
-    PointsToTrackWithImage(cv::Mat imageToAnalyse,cv::Mat maskOfAnalyse,cv::Ptr<cv::FeatureDetector> feature_detector=0,cv::Ptr<cv::DescriptorExtractor> descriptor_detector=0);
+    PointsToTrackWithImage(int corresponding_image,cv::Mat imageToAnalyse,
+      cv::Mat maskOfAnalyse, cv::Ptr<cv::FeatureDetector> feature_detector=0,
+      cv::Ptr<cv::DescriptorExtractor> descriptor_detector=0);
     /**
     * Second constructor used to create a list of points to track using a feature and a descriptor algorithm.
+    * @param corresponding_image Global index of image
     * @param imageToAnalyse Image to use for keypoints and features search
     * @param maskOfAnalyse Mask used to hide part of image
     * @param feature_detector name of the algorithm to use for features detection (see http://opencv.willowgarage.com/documentation/cpp/common_interfaces_for_feature_detection_and_descriptor_extraction.html#featuredetector)
     * @param descriptor_detector name of the algorithm to use for descriptors detection (see http://opencv.willowgarage.com/documentation/cpp/common_interfaces_for_feature_detection_and_descriptor_extraction.html#descriptorextractor)
     */
-    PointsToTrackWithImage(cv::Mat imageToAnalyse,cv::Mat maskOfAnalyse,std::string feature_detector, std::string descriptor_detector="SIFT");
+    PointsToTrackWithImage(int corresponding_image, cv::Mat imageToAnalyse,
+      cv::Mat maskOfAnalyse, std::string feature_detector,
+      std::string descriptor_detector="SIFT");
     ~PointsToTrackWithImage(void);
     
     /**

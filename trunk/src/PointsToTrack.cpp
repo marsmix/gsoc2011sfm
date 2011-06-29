@@ -9,8 +9,18 @@ using cv::line;
 using cv::circle;
 
 namespace OpencvSfM{
-  PointsToTrack::PointsToTrack(std::vector<KeyPoint> keypoints/*=std::vector<cv::KeyPoint>(0)*/,Mat descriptors/*=cv::Mat()*/):keypoints_(keypoints),descriptors_(descriptors)
+  int PointsToTrack::glob_number_images_ = 0;
+
+  PointsToTrack::PointsToTrack(int corresponding_image,
+    std::vector<KeyPoint> keypoints, Mat descriptors)
+    :keypoints_(keypoints),descriptors_(descriptors)
   {
+    if ( corresponding_image>=0 )
+      corresponding_image_ = corresponding_image;
+    else
+      corresponding_image_ = PointsToTrack::glob_number_images_;
+
+    PointsToTrack::glob_number_images_++;
   }
 
 
@@ -18,6 +28,7 @@ namespace OpencvSfM{
   {
     keypoints_.clear();
     descriptors_.release();
+    PointsToTrack::glob_number_images_--;
   }
   
   int PointsToTrack::computeKeypointsAndDesc(bool forcing_recalculation)
@@ -120,5 +131,25 @@ namespace OpencvSfM{
 
     fs << "descriptors" << keypoints.descriptors_;
     fs << "}" << "}";
+  }
+
+  void PointsToTrack::getKeyMatches(const std::vector<TrackPoints>& matches,
+    int otherImage, std::vector<cv::Point2f>& pointsVals) const
+  {
+    //for each points:
+    vector<TrackPoints>::size_type key_size = matches.size();
+    vector<TrackPoints>::size_type i;
+
+    for (i=0; i < key_size; i++)
+    {
+      const TrackPoints &track = matches[i];
+
+      if(track.containImage(corresponding_image_) &&
+        track.containImage(otherImage) )
+      {
+        const KeyPoint &kp = keypoints_[track.getIndexPoint(corresponding_image_)];
+        pointsVals.push_back(cv::Point2f(kp.pt.x,kp.pt.y));
+      }
+    }
   }
 }

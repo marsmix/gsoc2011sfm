@@ -20,7 +20,7 @@
 
 #include <cmath>
 
-#include "libmv_mapping.h"
+#include "../src/libmv_mapping.h"
 #include "test_data_sets.h"
 
 namespace libmv {

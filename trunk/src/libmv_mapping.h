@@ -167,11 +167,12 @@ namespace libmv {
     typedef typename EigenMat::Scalar DataType;
     CV_Assert( sizeof(DataType) == input.elemSize1() );
 
-    if( EigenMat::Options & 0x1 == Eigen::ColMajor )
+    if( (EigenMat::Options & 0x1) == Eigen::ColMajor )
     {
       input = input.t();
-      Eigen::Map<EigenMat> eigen_tmp( (DataType*)input.data,
-        input.cols, input.rows);
+      Eigen::Map<EigenMat, 0, OuterStride<>> eigen_tmp(
+      (DataType*)input.data,
+        input.cols, input.rows, OuterStride<>(input.step/8));
       output = eigen_tmp;
     }
     else
@@ -189,10 +190,10 @@ namespace libmv {
     typedef typename EigenMat::Scalar DataType;
     CV_Assert( sizeof(DataType) == CV_ELEM_SIZE1(cvNameOfType) );
 
-    if( EigenMat::Options & 0x1 == Eigen::ColMajor )
+    if( (EigenMat::Options & 0x1) == Eigen::ColMajor )
     {
       cv::Mat tmp(input.cols(), input.rows(), cvNameOfType,
-        input.data());
+        input.data(), input.outerStride());
       output = tmp.t();
     }
     else
@@ -343,6 +344,20 @@ namespace libmv {
     else
       return 0.0;
   }
+  template<typename TMatX, typename TMatA>
+  inline void EncodeEpipolarEquation(const TMatX &x1, const TMatX &x2, TMatA *A) {
+    for (int i = 0; i < x1.cols(); ++i) {
+      (*A)(i, 0) = x2(0, i) * x1(0, i);  // 0 represents x coords,
+      (*A)(i, 1) = x2(0, i) * x1(1, i);  // 1 represents y coords.
+      (*A)(i, 2) = x2(0, i);
+      (*A)(i, 3) = x2(1, i) * x1(0, i);
+      (*A)(i, 4) = x2(1, i) * x1(1, i);
+      (*A)(i, 5) = x2(1, i);
+      (*A)(i, 6) = x1(0, i);
+      (*A)(i, 7) = x1(1, i);
+      (*A)(i, 8) = 1.0;
+    }
+  }
 
   // x's are 2D coordinates (x,y,1) in each image; Ps are projective cameras. The
   // output, X, is a homogeneous four vectors.
@@ -367,6 +382,65 @@ namespace libmv {
       *X = X_and_alphas.head(4);
   }
 
+  // HZ 12.2 pag.312
+  void TriangulateDLT(const Mat34 &P1, const Vec2 &x1,
+    const Mat34 &P2, const Vec2 &x2,
+    Vec4 *X_homogeneous);
+
+  void TriangulateDLT(const Mat34 &P1, const Vec2 &x1,
+    const Mat34 &P2, const Vec2 &x2,
+    Vec3 *X_euclidean);
+
+  //////////////////////////////////////////////////////////////////////////
+  //from fundamental.cc:
+  void FundamentalFromEssential(const Mat3 &E,
+    const Mat3 &K1,
+    const Mat3 &K2,
+    Mat3 *F);
+  // Approximation of reprojection error; page 287 of HZ equation 11.9. This
+  // avoids triangulating the point, relying only on the entries in F.
+  inline double SampsonDistance2(const Mat &F, const Vec2 &x1, const Vec2 &x2){
+    Vec3 x(x1(0), x1(1), 1.0);
+    Vec3 y(x2(0), x2(1), 1.0);
+
+    Vec3 F_x = F * x;
+    Vec3 Ft_y = F.transpose() * y;
+    double y_F_x = y.dot(F_x);
+
+    return (y_F_x * y_F_x) / (  F_x.head<2>().squaredNorm()
+      + Ft_y.head<2>().squaredNorm());
+  }
+  double SampsonDistance2(const Mat &F, const Mat2X &x1, const Mat2X &x2);
+
+  double Depth(const Mat3 &R, const Vec3 &t, const Vec3 &X);
+
+  double Depth(const Mat3 &R, const Vec3 &t, const Vec4 &X);
+
+  void FivePointsRelativePose(const Mat2X &x1, const Mat2X &x2,
+    vector<Mat3> *Es);
+
+  void P_From_KRt(const Mat3 &K, const Mat3 &R, const Vec3 &t, Mat34 *P);
+
+  // HZ 9.6 pag 259 (Result 9.19)
+  void MotionFromEssential(const Mat3 &E,
+    std::vector<Mat3> *Rs,
+    std::vector<Vec3> *ts);
+
+  // HZ 9.6 pag 259 (9.6.3 Geometrical interpretation of the 4 solutions)
+  int MotionFromEssentialChooseSolution(const std::vector<Mat3> &Rs,
+    const std::vector<Vec3> &ts,
+    const Mat3 &K1,
+    const Vec2 &x1,
+    const Mat3 &K2,
+    const Vec2 &x2);
+
+  bool MotionFromEssentialAndCorrespondence(const Mat3 &E,
+    const Mat3 &K1,
+    const Vec2 &x1,
+    const Mat3 &K2,
+    const Vec2 &x2,
+    Mat3 *R,
+    Vec3 *t);
 
 }
 

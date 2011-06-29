@@ -123,7 +123,7 @@ namespace OpencvSfM{
     else
       return false;
   }
-  Mat PointOfView::getProjectionMatrix() const
+  cv::Mat PointOfView::getProjectionMatrix() const
   {
     return device_->getIntraMatrix() * projection_matrix_;
   };

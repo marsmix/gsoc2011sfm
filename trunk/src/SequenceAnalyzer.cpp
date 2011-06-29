@@ -1,4 +1,4 @@
-#include "MotionEstimator.h"
+#include "SequenceAnalyzer.h"
 
 #include <iostream>
 #include <sstream>
@@ -12,271 +12,70 @@ using cv::Point3d;
 namespace OpencvSfM{
 
 
-  bool TrackPoints::addMatch(const int image_src, const int point_idx1)
+  SequenceAnalyzer::SequenceAnalyzer(MotionProcessor input_sequence,
+    cv::Ptr<cv::FeatureDetector> feature_detector,
+    cv::Ptr<cv::DescriptorExtractor> descriptor_extractor,
+    cv::Ptr<PointsMatcher> match_algorithm)
+    :match_algorithm_(match_algorithm),
+    feature_detector_(feature_detector),
+    descriptor_extractor_(descriptor_extractor)
   {
-    if( track_consistance<0 )
-      return false;
+    //only finite sequences can be used:
+    CV_Assert(input_sequence.isBidirectional());
+    //go back to the begining:
+    input_sequence.setProperty(CV_CAP_PROP_POS_FRAMES,0);
 
-    //If a track contains more than one keypoint in the same image but
-    //a different keypoint, it is deemed inconsistent.
-    vector<unsigned int>::iterator indexImg = images_indexes_.begin();
-    vector<unsigned int>::iterator end_iter = images_indexes_.end();
-    unsigned int index=0;
-    while(indexImg != end_iter)
+    //load entire sequence! Can be problematic but if a user want to have
+    //more controls, he can use the other constructor...
+
+    int nbFrame=0;
+    Mat currentImage=input_sequence.getFrame();
+    while ( !currentImage.empty() )// && nbFrame<50 )
     {
-      if ( *indexImg == image_src )
-      {
-        if( point_indexes_[index] == point_idx1 )
-        {
-          if( track_consistance>=0 )
-            track_consistance++;
-        }
-        else
-          track_consistance=-1;
 
-        return track_consistance>=0;
-      }
-      index++;
-      indexImg++;
+      Ptr<PointsToTrack> ptrPoints_tmp( new PointsToTrackWithImage (
+        nbFrame, currentImage, Mat(), feature_detector, descriptor_extractor));
+      ptrPoints_tmp->computeKeypointsAndDesc();
+
+      points_to_track_.push_back( ptrPoints_tmp );
+      images_.push_back(currentImage);
+      nbFrame++;
+      currentImage=input_sequence.getFrame();
     }
-
-    images_indexes_.push_back(image_src);
-    point_indexes_.push_back(point_idx1);
-    return track_consistance>=0;
   }
 
-  bool TrackPoints::containImage(const int image_wanted)
-  {
-    if(std::find(images_indexes_.begin(),images_indexes_.end(),image_wanted) ==
-      images_indexes_.end())
-      return false;
-    return true;
-  }
-
-  bool TrackPoints::containPoint(const int image_src, const int point_idx1)
-  {
-    //we don't use find here because we want the number instead of iterator...
-    vector<unsigned int>::iterator indexImg = images_indexes_.begin();
-    vector<unsigned int>::iterator end_iter = images_indexes_.end();
-    unsigned int index=0;
-    while(indexImg != end_iter)
-    {
-      if ( *indexImg == image_src )
-      {
-        if( point_indexes_[index] == point_idx1 )
-          return true;
-      }
-      index++;
-      indexImg++;
-    }
-    return false;
-  }
-
-  DMatch TrackPoints::toDMatch(const int img1,const int img2) const
-  {
-    DMatch outMatch;
-    char nbFound=0;
-    //we don't use find here because we want the number instead of iterator...
-    vector<unsigned int>::const_iterator indexImg = images_indexes_.begin();
-    vector<unsigned int>::const_iterator end_iter = images_indexes_.end();
-    unsigned int index=0;
-    while(indexImg != end_iter)
-    {
-      if ( *indexImg == img1 )
-      {
-        nbFound++;
-        outMatch.queryIdx = point_indexes_[index];
-        if(nbFound==2)
-          return outMatch;
-      }
-      if ( *indexImg == img2 )
-      {
-        nbFound++;
-        outMatch.trainIdx = point_indexes_[index];
-        if(nbFound==2)
-          return outMatch;
-      }
-      index++;
-      indexImg++;
-    }
-    return outMatch;
-  };
-
-  void TrackPoints::getMatch(const unsigned int index,
-    int &idImage, int &idPoint) const
-  {
-    char nbFound=0;
-    if( index < images_indexes_.size() )
-    {
-      idImage = images_indexes_[index];
-      idPoint = point_indexes_[index];
-    }
-  };
-
-  int TrackPoints::getIndexPoint(const unsigned int image) const
-  {
-    vector<unsigned int>::const_iterator result =
-      std::find(images_indexes_.begin(),images_indexes_.end(),image);
-    if( result == images_indexes_.end())
-      return -1;
-    return point_indexes_[ result - images_indexes_.begin() ];
-  };
-  
-  double TrackPoints::errorEstimate(std::vector<PointOfView>& cameras,
-    const std::vector<cv::Ptr<PointsToTrack>> &points_to_track,
-    cv::Vec3d& points3D) const
-  {
-    double distance=0.0;
-    unsigned int nviews = images_indexes_.size();
-    for (unsigned int cpt = 0; cpt < nviews; cpt++) {
-      int num_camera=images_indexes_[cpt];
-      int num_point=point_indexes_[cpt];
-      cv::Ptr<PointsToTrack> points2D = points_to_track[ num_camera ];
-
-      const KeyPoint& p=points2D->getKeypoint(num_point);
-      cv::Vec2d projP = cameras[num_camera].project3DPointIntoImage(points3D);
-
-      //compute back-projection
-      distance += ((p.pt.x-projP[0])*(p.pt.x-projP[0]) + 
-        (p.pt.y-projP[1])*(p.pt.y-projP[1]) );
-    }
-    return distance/static_cast<double>(nviews);
-  }
-  double TrackPoints::triangulateLinear(vector<PointOfView>& cameras,
-    const std::vector<cv::Ptr<PointsToTrack>> &points_to_track,
-    cv::Vec3d& points3D, const vector<int> &masks)
-  {
-    unsigned int nviews = 0;
-    bool hasMask=false;
-    unsigned int i;
-    if( masks.size()==images_indexes_.size() )
-    {
-      for (i=0; i<images_indexes_.size(); ++i)
-      {
-        if(masks[i]!=0)
-          nviews++;
-      }
-      hasMask=true;
-    }else
-    {
-      nviews = images_indexes_.size();
-    }
-
-    Mat design = Mat::zeros(3*nviews, 4 + nviews,CV_64FC1);
-    unsigned  int real_position=0;
-    i = 0;
-    for (real_position = 0; real_position < images_indexes_.size();
-      ++real_position ) {
-      if( !hasMask || ( hasMask && masks[real_position]!=0))
-      {
-        int num_camera=images_indexes_[ real_position ];
-        int num_point=point_indexes_[ real_position ];
-        cv::Ptr<PointsToTrack> points2D = points_to_track[ num_camera ];
-        const KeyPoint& p=points2D->getKeypoint(num_point);
-
-        design(cv::Range(3*i,3*i+3), cv::Range(0,4)) = 
-          -cameras[num_camera].getProjectionMatrix();
-        design.at<double>(3*i + 0, 4 + i) = p.pt.x;
-        design.at<double>(3*i + 1, 4 + i) = p.pt.y;
-        design.at<double>(3*i + 2, 4 + i) = 1.0;
-        i++;
-      }
-    }
-    Mat X_and_alphas;
-    cv::SVD::solveZ(design, X_and_alphas);
-
-    double scal_factor=X_and_alphas.at<double>(3,0);
-    points3D[0]=X_and_alphas.at<double>(0,0)/scal_factor;
-    points3D[1]=X_and_alphas.at<double>(1,0)/scal_factor;
-    points3D[2]=X_and_alphas.at<double>(2,0)/scal_factor;
-
-    //update the point 3D:
-    if(point3D.empty())
-      point3D = Ptr<cv::Vec3d>( new cv::Vec3d(points3D) );
-    else
-      *point3D = points3D;
-
-    return errorEstimate(cameras, points_to_track, points3D);
-  }
-  
-  double TrackPoints::triangulateRobust(std::vector<PointOfView>& cameras,
-    const std::vector<cv::Ptr<PointsToTrack>> &points_to_track, cv::Vec3d& points3D,
-    double reproj_error)
-  {
-    cv::RNG& rng = cv::theRNG();
-    unsigned int nviews = images_indexes_.size();
-    double distance=0, best_distance=1e20;
-    vector<int> masks;
-    cv::Vec3d bestPoints3D;
-
-    if( !point3D.empty() )
-    {
-      double error = errorEstimate(cameras, points_to_track, *point3D);
-      if( error<reproj_error )
-      {
-        points3D = *point3D;
-        return error;
-      }
-    }
-
-    int num_iter=0, max_iter=10;
-    for(num_iter=0; num_iter<max_iter; ++num_iter)
-    {
-      masks.clear();
-      int nb_vals=0;
-      for (unsigned int cpt = 0; cpt < nviews; cpt++) {
-        int valTmp = rng(2);
-        if( valTmp>0 )
-          nb_vals++;
-        masks.push_back(valTmp);
-      }
-      while( nb_vals<2 )
-      {
-        int valTmp = rng(nviews);
-        if( masks[valTmp] == 0 )
-        {
-          masks[valTmp] = 1;
-          nb_vals++;
-        }
-      }
-      //create mask:
-      triangulateLinear( cameras, points_to_track, points3D, masks);
-
-      distance = errorEstimate(cameras, points_to_track, points3D);
-      if( distance < best_distance )
-      {
-        //new best model...
-        bestPoints3D = points3D;
-        best_distance = distance;
-        if( best_distance<reproj_error )
-          num_iter=nviews;//quit the loop!
-      }
-    }
-    points3D = bestPoints3D;
-    //update the point 3D:
-    if(point3D.empty())
-      point3D = Ptr<cv::Vec3d>( new cv::Vec3d(points3D) );
-    else
-      *point3D = points3D;
-    return distance;
-  }
-  MotionEstimator::MotionEstimator(vector<Ptr<PointsToTrack>> &points_to_track,
+  SequenceAnalyzer::SequenceAnalyzer(std::vector<cv::Mat> &images,
+    vector<Ptr<PointsToTrack>> &points_to_track,
     Ptr<PointsMatcher> match_algorithm)
-    :points_to_track_(points_to_track),match_algorithm_(match_algorithm)
+    :images_(images),points_to_track_(points_to_track),
+    match_algorithm_(match_algorithm)
   {
   }
 
-
-  MotionEstimator::~MotionEstimator(void)
+  SequenceAnalyzer::~SequenceAnalyzer(void)
   {
   }
 
-  void MotionEstimator::addNewImagesOfPoints(Ptr<PointsToTrack> points)
+  void SequenceAnalyzer::addNewImage(cv::Mat image, Ptr<PointsToTrack> points)
   {
-    points_to_track_.push_back(points);
+    if(points.empty())
+    {
+      CV_Assert( !feature_detector_.empty() &&
+        !descriptor_extractor_.empty() );
+      int nbFrame = points_to_track_.size();
+      Ptr<PointsToTrack> ptrPoints_tmp( new PointsToTrackWithImage (
+        nbFrame, image, Mat(), feature_detector_, descriptor_extractor_));
+      ptrPoints_tmp->computeKeypointsAndDesc();
+
+      points_to_track_.push_back( ptrPoints_tmp );
+    }
+    else
+      points_to_track_.push_back(points);
+
+    images_.push_back(image);
   }
 
-  void MotionEstimator::computeMatches()
+  void SequenceAnalyzer::computeMatches()
   {
     //First compute missing features descriptors:
     vector<Ptr<PointsToTrack>>::iterator it=points_to_track_.begin();
@@ -375,7 +174,7 @@ namespace OpencvSfM{
     }
   }
 
-  void MotionEstimator::keepOnlyCorrectMatches()
+  void SequenceAnalyzer::keepOnlyCorrectMatches()
   {
     unsigned int tracks_size = tracks_.size();
     unsigned int index=0;
@@ -394,7 +193,7 @@ namespace OpencvSfM{
     }
   }
 
-  void MotionEstimator::addMatches(vector<DMatch> &newMatches,
+  void SequenceAnalyzer::addMatches(vector<DMatch> &newMatches,
     unsigned int img1, unsigned int img2)
   {
     //add to tracks_ the new matches:
@@ -432,7 +231,8 @@ namespace OpencvSfM{
       match_it++;
     }
   }
-  void MotionEstimator::addTracks(vector<TrackPoints> &newTracks)
+
+  void SequenceAnalyzer::addTracks(vector<TrackPoints> &newTracks)
   {
 
     vector<TrackPoints>::iterator match_it = newTracks.begin();
@@ -446,15 +246,14 @@ namespace OpencvSfM{
     }
   }
 
-  void MotionEstimator::showTracks(vector<Mat>& images,
-    int timeBetweenImg)
+  void SequenceAnalyzer::showTracks( int timeBetweenImg )
   {
 
     //First compute missing features descriptors:
     unsigned int it=0;
     unsigned int end_iter = points_to_track_.size() - 1 ;
-    if(images.size() - 1 < end_iter)
-      end_iter = images.size() - 1;
+    if(images_.size() - 1 < end_iter)
+      end_iter = images_.size() - 1;
     while (it < end_iter)
     {
       vector<DMatch> matches_to_print;
@@ -473,7 +272,7 @@ namespace OpencvSfM{
         match_it++;
       }
 
-      Mat firstImg=images[ it ];
+      Mat firstImg=images_[ it ];
       Mat outImg;
 
       PointsMatcher::drawMatches(firstImg, points_to_track_[it]->getKeypoints(),
@@ -489,20 +288,20 @@ namespace OpencvSfM{
     }
   }
 
-  void MotionEstimator::read( const cv::FileNode& node, MotionEstimator& me )
+  void SequenceAnalyzer::read( const cv::FileNode& node, SequenceAnalyzer& me )
   {
     std::string myName=node.name();
-    if( myName != "MotionEstimator")
-      return;//this node is not for us...
+    if( myName != "SequenceAnalyzer")
+      CV_Error( CV_StsError, "SequenceAnalyzer FileNode is not correct!" );
 
     if( node.empty() || !node.isMap() )
-      CV_Error( CV_StsError, "MotionEstimator FileNode is not correct!" );
+      CV_Error( CV_StsError, "SequenceAnalyzer FileNode is not correct!" );
 
     int nb_pictures = (int) node["nbPictures"];
-    //initialisation of various vector (empty)
+    //initialisation of all empty vectors
     for(int i=0; i<nb_pictures; i++)
     {
-      Ptr<PointsToTrack> ptt = Ptr<PointsToTrack>(new PointsToTrack());
+      Ptr<PointsToTrack> ptt = Ptr<PointsToTrack>(new PointsToTrack(i));
       me.points_to_track_.push_back(ptt);
 
       Ptr<PointsMatcher> p_m = Ptr<PointsMatcher>(new PointsMatcher(
@@ -518,7 +317,7 @@ namespace OpencvSfM{
     //list of track where a track is stored like this:
     // nbPoints idImage1 point1  idImage2 point2 ...
     if( node_TrackPoints.empty() || !node_TrackPoints.isSeq() )
-      CV_Error( CV_StsError, "MotionEstimator FileNode is not correct!" );
+      CV_Error( CV_StsError, "SequenceAnalyzer FileNode is not correct!" );
     cv::FileNodeIterator it = node_TrackPoints.begin(),
       it_end = node_TrackPoints.end();
     while( it != it_end )
@@ -556,12 +355,12 @@ namespace OpencvSfM{
     }
   }
 
-  void MotionEstimator::write( cv::FileStorage& fs, const MotionEstimator& me )
+  void SequenceAnalyzer::write( cv::FileStorage& fs, const SequenceAnalyzer& me )
   {
     vector<TrackPoints>::size_type key_size = me.tracks_.size();
     int idImage=-1, idPoint=-1;
 
-    fs << "MotionEstimator" << "{";
+    fs << "SequenceAnalyzer" << "{";
     fs << "nbPictures" << (int)me.points_to_track_.size();
     fs << "TrackPoints" << "[";
     for (vector<TrackPoints>::size_type i=0; i < key_size; i++)
@@ -600,42 +399,28 @@ namespace OpencvSfM{
     fs << "]" << "}";
   }
 
-  void MotionEstimator::triangulateNView(vector<PointOfView>& cameras,
-    vector<cv::Vec3d>& points3D)
+  void SequenceAnalyzer::constructImagesGraph()
   {
+    images_graph_.initStructure(points_to_track_.size());
+    
     //for each points:
     vector<TrackPoints>::size_type key_size = tracks_.size();
-    vector<PointOfView>::size_type num_camera = cameras.size();
-    int idImage=-1, idPoint=-1;
     vector<TrackPoints>::size_type i;
-    /*
-    libmv::vector<libmv::Mat34> Ps(key_size);
-    for (i=0; i < num_camera; i++)
-    {
-      Mat projTmp = cameras[i].getProjectionMatrix();
-      Eigen::Map<libmv::Mat43> eigen_tmp((double*)projTmp.data);
-      Ps[i] = eigen_tmp.transpose();
-    }*/
 
     for (i=0; i < key_size; i++)
     {
       TrackPoints &track = tracks_[i];
       unsigned int nviews = track.images_indexes_.size();
       
-      unsigned int maxImg=0;
       for(unsigned int cpt=0;cpt<nviews;cpt++)
-        if(maxImg<track.images_indexes_[cpt])
-          maxImg=track.images_indexes_[cpt];
-      CV_Assert(nviews < cameras.size());
-
-      cv::Vec3d point_final;
-      //double distance=track.triangulateRobust( cameras,points_to_track_, point_final );
-      double distance=track.triangulateLinear( cameras,points_to_track_, point_final );
-
-      //this is used to take only correct 3D points:
-      if(distance<10)
-        points3D.push_back(point_final);
-      
+      {
+        unsigned int imgSrc = track.images_indexes_[cpt];
+        for(unsigned int cpt1=imgSrc+1;cpt1<nviews;cpt1++)
+        {
+          images_graph_.addLink(imgSrc, track.images_indexes_[cpt1]);
+        }
+      }
     }
   }
+
 }
