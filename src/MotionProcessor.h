@@ -54,6 +54,16 @@ public:
   ~MotionProcessor(void);
 
   /**
+  * Use this function to know if this flux is bidirectional (i.e.
+  * frames can be iterate randomly)
+  * Can be used to know if the sequence is finite
+  * @return true is you can access to frames randomly, false else
+  */
+  inline bool isBidirectional()
+  {
+    return type_of_input_ != IS_WEBCAM;
+  }
+  /**
   * You can attach this camera to a webcam
   * use this method to set it as the input source!
   * @param idWebCam id of the webcam

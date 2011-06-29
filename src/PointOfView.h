@@ -93,6 +93,16 @@ namespace OpencvSfM{
     * @return Matrix K of intra parameters
     */
     virtual cv::Mat getProjectionMatrix() const;
+
+    virtual cv::Mat getRotationMatrix() const
+    {
+      return rotation_;
+    };
+
+    virtual cv::Mat getTranslationVector() const
+    {
+      return translation_;
+    };
   };
 
 }

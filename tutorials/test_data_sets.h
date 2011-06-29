@@ -21,8 +21,8 @@
 #ifndef LIBMV_MULTIVIEW_TEST_DATA_SETS_H_
 #define LIBMV_MULTIVIEW_TEST_DATA_SETS_H_
 
-#include "PointOfView.h"
-#include "libmv_mapping.h"
+#include "../src/PointOfView.h"
+#include "../src/libmv_mapping.h"
 #include "opencv2/core/core.hpp"
 
 namespace libmv {

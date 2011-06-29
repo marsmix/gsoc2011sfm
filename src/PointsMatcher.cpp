@@ -207,8 +207,8 @@ namespace OpencvSfM{
     // draw matches
     for( vector<DMatch>::size_type m = 0; m < total_size; m++ )
     {
-      int i1 = matches1to2[m].queryIdx;
-      int i2 = matches1to2[m].trainIdx;
+      int i1 = matches1to2[m].trainIdx;
+      int i2 = matches1to2[m].queryIdx;
       if( matchesMask.empty() || matchesMask[m] )
       {
         const KeyPoint &kp1 = keypoints1[i1], &kp2 = keypoints2[i2];
@@ -241,14 +241,16 @@ namespace OpencvSfM{
     if( node.empty() || !node.isSeq() )
       CV_Error( CV_StsError, "PointsMatcher FileNode is not correct!" );
 
+    int numImg=0;
     cv::FileNodeIterator it = node.begin(), it_end = node.end();
     while( it != it_end )
     {
-      Ptr<PointsToTrack> ptt = Ptr<PointsToTrack>(new PointsToTrack());
+      Ptr<PointsToTrack> ptt = Ptr<PointsToTrack>(new PointsToTrack(numImg));
       cv::FileNode& node_tmp = (*it)["PointsToTrack"];
       PointsToTrack::read( node_tmp, *ptt );
       points.pointCollection_.push_back(ptt);
       it++;
+      numImg++;
     }
   }
 

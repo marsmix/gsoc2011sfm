@@ -2,12 +2,12 @@
 //But be aware to set other tests to 0...
 #if 0
 
-#include "MotionEstimator.h"
-#include "PointsMatcher.h"
-#include "PointsToTrackWithImage.h"
-#include "MotionProcessor.h"
-#include "PointOfView.h"
-#include "CameraPinhole.h"
+#include "../src/SequenceAnalyzer.h"
+#include "../src/PointsMatcher.h"
+#include "../src/PointsToTrackWithImage.h"
+#include "../src/MotionProcessor.h"
+#include "../src/PointOfView.h"
+#include "../src/CameraPinhole.h"
 #include <opencv2/calib3d/calib3d.hpp>
 #include <fstream>
 

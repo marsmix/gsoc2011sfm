@@ -2,12 +2,13 @@
 //But be aware to set other tests to 0...
 #if 1
 
-#include "PointsToTrackWithImage.h"
-#include "MotionProcessor.h"
-#include "MotionEstimator.h"
-#include "PointOfView.h"
-#include "CameraPinhole.h"
-#include "libmv_mapping.h"
+#include "../src/PointsToTrackWithImage.h"
+#include "../src/MotionProcessor.h"
+#include "../src/SequenceAnalyzer.h"
+#include "../src/PointOfView.h"
+#include "../src/CameraPinhole.h"
+#include "../src/libmv_mapping.h"
+#include "../src/ProjectiveEstimator.h"
 #include <opencv2/calib3d/calib3d.hpp>
 
 #include <iostream>
@@ -24,8 +25,8 @@ using namespace OpencvSfM;
 //////////////////////////////////////////////////////////////////////////
 //Only to see how we can create a 3D structure estimation using calibrated cameras
 //////////////////////////////////////////////////////////////////////////
-
-vector<PointOfView> loadCamerasFromFile(string fileName)
+enum{LOAD_INTRA=1,LOAD_POSITION=2,LOAD_FULL=3};
+vector<PointOfView> loadCamerasFromFile(string fileName, int flag_model)
 {
   vector<PointOfView> outVect;
   ifstream pointsDef(fileName);
@@ -56,7 +57,27 @@ vector<PointOfView> loadCamerasFromFile(string fileName)
         for(int j=0;j<3;j++)
           pointsDef>>translation[j];
         //now create a point of view:
-        outVect.push_back(PointOfView(new CameraPinhole(intra_params),rotation,translation));
+        if( (flag_model & LOAD_FULL) == LOAD_FULL)
+        {
+          outVect.push_back(
+            PointOfView(new CameraPinhole(intra_params),rotation,translation));
+        }
+        else
+        {
+          if( (flag_model & LOAD_FULL) == LOAD_POSITION)
+          {
+            outVect.push_back(
+              PointOfView(new CameraPinhole(),rotation,translation));
+          }
+          else
+          {
+            if( (flag_model & LOAD_FULL) == LOAD_INTRA)
+            {
+              outVect.push_back(
+                PointOfView(new CameraPinhole(intra_params)));
+            }
+          }
+        }
       }
     }
   }
@@ -77,27 +98,14 @@ void main(){
     cout<<"please compute points matches using testMotionEstimator.cpp first!"<<endl;
     return;
   }
-
-  //and create a new PointsToTrack using this file:
-  vector<Ptr<PointsToTrack>> points_empty;
-  MotionEstimator motion_estim_loaded( points_empty, matches_algo );
-
-  FileStorage fsRead("motion_tracks.yml", FileStorage::READ);
-  FileNode myPtt = fsRead.getFirstTopLevelNode();
-  MotionEstimator::read(myPtt, motion_estim_loaded);
-  fsRead.release();
-
-  vector<TrackPoints> &tracks=motion_estim_loaded.getTracks();
-  cout<<"numbers of correct tracks loaded:"<<tracks.size()<<endl;
-
-  vector<PointOfView> myCameras=loadCamerasFromFile("../Medias/temple/temple_par.txt");
-  vector<Vec3d> triangulated;
   MotionProcessor mp;
   mp.setInputSource("../Medias/temple/",IS_DIRECTORY);
-  
+
+  vector<PointOfView> myCameras=loadCamerasFromFile("../Medias/temple/temple_par.txt",
+    LOAD_INTRA);
   vector<PointOfView>::iterator itPoV=myCameras.begin();
-  int index_image=-1, maxImg=motion_estim_loaded.getNumViews();
-  while (itPoV!=myCameras.end() && index_image<maxImg )
+  int index_image=-1;
+  while (itPoV!=myCameras.end() )
   {
     Mat imgTmp=mp.getFrame();//get the current image
     if(imgTmp.empty())
@@ -106,41 +114,26 @@ void main(){
     images.push_back(imgTmp);
   }
 
-  cout<<"triangulation of points."<<endl;
-  motion_estim_loaded.triangulateNView(myCameras/*,images*/,triangulated);
-  cout<<triangulated.size()<<" points found."<<endl;
+  //and create a new PointsToTrack using this file:
+  vector<Ptr<PointsToTrack>> points_empty;
+  SequenceAnalyzer motion_estim_loaded( images, points_empty, matches_algo );
 
-  //now for each point of view, we draw the picture and these points projected:
-  itPoV=myCameras.begin();
-  index_image=0;
-  while (itPoV!=myCameras.end() && index_image<maxImg )
-  {
-    Mat imgTmp=images[index_image];//get the current image
-    if(imgTmp.empty())
-      break;//end of sequence: quit!
-    index_image++;
+  FileStorage fsRead("motion_tracks.yml", FileStorage::READ);
+  FileNode myPtt = fsRead.getFirstTopLevelNode();
+  SequenceAnalyzer::read(myPtt, motion_estim_loaded);
+  fsRead.release();
 
-    //create the vector of 3D points viewed by this camera:
-    vector<Vec3d> points3D;
-    vector<KeyPoint> points2DOrigine;
-    //motion_estim_loaded.filterPoints(triangulated,index_image,points3D,points2DOrigine);
-    vector<Vec2d> pixelProjected=itPoV->project3DPointsIntoImage(triangulated);
-    //convert Vec2d into KeyPoint:
-    vector<KeyPoint> points2D;
-    for(unsigned int j=0;j<pixelProjected.size();j++)
-      points2D.push_back( KeyPoint( (float)pixelProjected[j][0],
-      (float)pixelProjected[j][1], 10.0 ) );
+  vector<TrackPoints> &tracks=motion_estim_loaded.getTracks();
+  cout<<"numbers of correct tracks loaded:"<<tracks.size()<<endl;
 
-    Mat imgTmp1,imgTmp2;
-    drawKeypoints(imgTmp,points2DOrigine,imgTmp1,Scalar(255,255,255));
-    drawKeypoints(imgTmp,points2D,imgTmp2,Scalar(255,255,255));
-    imshow("Points origine...",imgTmp1);
-    imshow("Points projected...",imgTmp2);
-    cv::waitKey(0);
-    itPoV++;
-  }
   //now for fun show the sequence on images:
-  motion_estim_loaded.showTracks(images,0);
+  //motion_estim_loaded.showTracks(0);
+
+  //myCameras contains only intra value. I will use motion_estim_loaded to
+  //compute position of cameras:
+  ProjectiveEstimator pe(motion_estim_loaded, myCameras);
+
+  pe.comptueReconstruction();
 }
 
 

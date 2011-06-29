@@ -2,7 +2,7 @@
 //But be aware to set other tests to 0...
 #if 0
 
-#include "CameraPinholeDistor.h"
+#include "../src/CameraPinholeDistor.h"
 #include <iostream>
 
 using namespace std;

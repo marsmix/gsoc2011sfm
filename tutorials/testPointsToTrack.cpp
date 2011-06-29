@@ -2,10 +2,10 @@
 //But be aware to set other tests to 0...
 #if 0
 
-#include "PointsToTrackWithImage.h"
-#include "MotionProcessor.h"
-#include "MotionEstimator.h"
-#include "PointsMatcher.h"
+#include "../src/PointsToTrackWithImage.h"
+#include "../src/MotionProcessor.h"
+#include "../src/SequenceAnalyzer.h"
+#include "../src/PointsMatcher.h"
 #include <opencv2/calib3d/calib3d.hpp>
 
 #include <iostream>

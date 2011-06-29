@@ -16,14 +16,22 @@ namespace OpencvSfM
   using cv::line;
   using cv::circle;
 
-  PointsToTrackWithImage::PointsToTrackWithImage(Mat imageToAnalyse,Mat maskOfAnalyse,Ptr<FeatureDetector> feature_detector,Ptr<DescriptorExtractor> descriptor_detector)
-    :imageToAnalyse_(imageToAnalyse),maskOfAnalyse_(maskOfAnalyse),feature_detector_(feature_detector),descriptor_detector_(descriptor_detector)
+  PointsToTrackWithImage::PointsToTrackWithImage(int corresponding_image,
+    Mat imageToAnalyse, Mat maskOfAnalyse,Ptr<FeatureDetector> feature_detector,
+    Ptr<DescriptorExtractor> descriptor_detector)
+    :PointsToTrack(corresponding_image),imageToAnalyse_(imageToAnalyse),
+    maskOfAnalyse_(maskOfAnalyse),feature_detector_(feature_detector),
+    descriptor_detector_(descriptor_detector)
   {
   }
 
-  PointsToTrackWithImage::PointsToTrackWithImage(Mat imageToAnalyse,Mat maskOfAnalyse,string feature_detector, string descriptor_detector/*=""SIFT""*/)
-    :imageToAnalyse_(imageToAnalyse),maskOfAnalyse_(maskOfAnalyse),
-    feature_detector_(FeatureDetector::create(feature_detector)),descriptor_detector_(DescriptorExtractor::create(descriptor_detector))
+  PointsToTrackWithImage::PointsToTrackWithImage(int corresponding_image,
+    Mat imageToAnalyse, Mat maskOfAnalyse,string feature_detector,
+    string descriptor_detector/*=""SIFT""*/)
+    :PointsToTrack(corresponding_image),imageToAnalyse_(imageToAnalyse),
+    maskOfAnalyse_(maskOfAnalyse),
+    feature_detector_(FeatureDetector::create(feature_detector)),
+    descriptor_detector_(DescriptorExtractor::create(descriptor_detector))
   {
   }
 

@@ -2,8 +2,8 @@
 //But be aware to set other tests to 0...
 #if 0
 
-#include "CameraPinhole.h"
-#include "PointOfView.h"
+#include "../src/CameraPinhole.h"
+#include "../src/PointOfView.h"
 #include <iostream>
 
 using namespace std;
