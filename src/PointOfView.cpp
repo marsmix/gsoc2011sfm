@@ -1,5 +1,7 @@
 #include "PointOfView.h"
 
+#include "libmv_mapping.h"
+#include <iostream>
 
 using cv::Mat;
 using cv::Vec4d;

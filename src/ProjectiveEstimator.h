@@ -43,10 +43,8 @@ namespace OpencvSfM{
       libmv::Mat3 rotation_mat;
       libmv::convertCvMatToEigen(camera.getRotationMatrix(),rotation_mat);
       rotations_.push_back(rotation_mat);
-      std::cout<<rotation_mat<<std::endl;
       libmv::Vec3 translation_vec;
       libmv::convertCvMatToEigen(camera.getTranslationVector(),translation_vec);
-      std::cout<<translation_vec<<std::endl;
       translations_.push_back(translation_vec);
     }
     

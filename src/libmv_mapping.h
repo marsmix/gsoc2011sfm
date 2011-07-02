@@ -177,8 +177,9 @@ namespace libmv {
     }
     else
     {
-      Eigen::Map<EigenMat> eigen_tmp( (DataType*)input.data,
-        input.rows, input.cols);
+      Eigen::Map<EigenMat, 0, OuterStride<>> eigen_tmp(
+        (DataType*)input.data,
+        input.rows, input.cols, OuterStride<>(input.step/8));
       output = eigen_tmp;
     }
   }
@@ -192,14 +193,17 @@ namespace libmv {
 
     if( (EigenMat::Options & 0x1) == Eigen::ColMajor )
     {
-      cv::Mat tmp(input.cols(), input.rows(), cvNameOfType,
-        input.data(), input.outerStride());
-      output = tmp.t();
+      Eigen::Matrix<DataType, Eigen::Dynamic, Eigen::Dynamic,
+        Eigen::RowMajor> in = input;
+
+      cv::Mat tmp(in.rows(), in.cols(), cvNameOfType,
+        in.data(), in.outerStride() * CV_ELEM_SIZE(cvNameOfType));
+      output = tmp.clone();
     }
     else
     {
       cv::Mat tmp( input.rows(), input.cols(), cvNameOfType,
-        input.data());
+        input.data(), input.outerStride() * CV_ELEM_SIZE(cvNameOfType));
       output = tmp.clone();
     }
   }
