@@ -11,12 +11,13 @@ namespace OpencvSfM{
     const libmv::Mat3 &K1, const libmv::Mat3 &K2,
     libmv::Mat3 &E)
   {
-    unsigned int nPoints = x1.rows();
-    CV_Assert( nPoints == x2.rows() );
+    unsigned int nPoints = x1.cols();
+    CV_Assert( nPoints == x2.cols() );
+    CV_Assert( nPoints >= 5 );//need 5 points!
 
     libmv::vector<libmv::Mat3> Es;
     cv::RNG& rng = cv::theRNG();
-    vector<int> masks;
+    vector<int> masks(nPoints);
     double max_error = 1e9;
 
     int num_iter=0, max_iter=10;
@@ -25,12 +26,9 @@ namespace OpencvSfM{
       masks.clear();
       int nb_vals=0;
       for (unsigned int cpt = 0; cpt < nPoints; cpt++) {
-        int valTmp = rng(2);
-        if( valTmp>0 )
-          nb_vals++;
-        masks.push_back(valTmp);
+        masks.push_back(0);
       }
-      while( nb_vals<5 )
+      while( nb_vals < 5 )
       {
         int valTmp = rng(nPoints);
         if( masks[valTmp] == 0 )
@@ -66,7 +64,7 @@ namespace OpencvSfM{
         double error = libmv::SampsonDistance2( F, x1, x2);
 
         if (max_error > error ) {
-            error = max_error;
+            max_error = error;
             E = Es[i];
         }
       }
@@ -131,10 +129,10 @@ namespace OpencvSfM{
     libmv::Mat3 R;
     libmv::Vec3 t;
     bool ok = libmv::MotionFromEssentialAndCorrespondence( E,
-      intra_params_[image1], x1,
-      intra_params_[image2], x2,
+      intra_params_[image1], x1.col(1),
+      intra_params_[image2], x2.col(1),
       &R, &t);
-
+    std::cout<<R<<std::endl<<t<<std::endl;
     //As R and t are relative to first cam, set them to the real position:
     rotations_[image2] = R * rotations_[image1].transpose().inverse();
     translations_[image2] = t + R * translations_[image1];
@@ -183,6 +181,7 @@ namespace OpencvSfM{
     //we will start the reconstruction using bestMatches[index_of_max]
     img1 = bestMatches[index_of_max].imgSrc;
     img2 = bestMatches[index_of_max].imgDest;
+
     updateTwoViewMotion(tracks, points_to_track, img1, img2);
   }
 }
