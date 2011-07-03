@@ -103,6 +103,8 @@ void main(){
 
   vector<PointOfView> myCameras=loadCamerasFromFile("../Medias/temple/temple_par.txt",
     LOAD_INTRA);
+  vector<PointOfView> myCamerasReal=loadCamerasFromFile("../Medias/temple/temple_par.txt",
+    LOAD_FULL);
   vector<PointOfView>::iterator itPoV=myCameras.begin();
   int index_image=-1;
   while (itPoV!=myCameras.end() )
@@ -133,7 +135,7 @@ void main(){
   //compute position of cameras:
   ProjectiveEstimator pe(motion_estim_loaded, myCameras);
 
-  pe.comptueReconstruction();
+  pe.comptueReconstruction(myCamerasReal);
 }
 
 

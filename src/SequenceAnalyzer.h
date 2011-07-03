@@ -147,6 +147,8 @@ namespace OpencvSfM{
       return maxImg;
     }
 
+    inline cv::Mat getImage(int idx) { return images_[idx]; };
+
     /**
     * This function add matches to tracks
     * @param newMatches new matches to add

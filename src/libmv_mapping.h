@@ -169,10 +169,10 @@ namespace libmv {
 
     if( (EigenMat::Options & 0x1) == Eigen::ColMajor )
     {
-      input = input.t();
+      cv::Mat inputT = input.t();
       Eigen::Map<EigenMat, 0, OuterStride<>> eigen_tmp(
-      (DataType*)input.data,
-        input.cols, input.rows, OuterStride<>(input.step/8));
+      (DataType*)inputT.data,
+        inputT.cols, inputT.rows, OuterStride<>(inputT.step/8));
       output = eigen_tmp;
     }
     else
@@ -401,6 +401,10 @@ namespace libmv {
     const Mat3 &K1,
     const Mat3 &K2,
     Mat3 *F);
+  void EssentialFromFundamental(const Mat3 &F,
+    const Mat3 &K1,
+    const Mat3 &K2,
+    Mat3 *E);
   // Approximation of reprojection error; page 287 of HZ equation 11.9. This
   // avoids triangulating the point, relying only on the entries in F.
   inline double SampsonDistance2(const Mat &F, const Vec2 &x1, const Vec2 &x2){

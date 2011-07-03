@@ -159,7 +159,7 @@ namespace OpencvSfM{
   }
   double TrackPoints::triangulateLinear(vector<PointOfView>& cameras,
     const std::vector<cv::Ptr<PointsToTrack>> &points_to_track,
-    cv::Vec3d& points3D, const vector<int> &masks)
+    cv::Vec3d& points3D, const vector<bool> &masks)
   {
     unsigned int nviews = 0;
     bool hasMask=false;
@@ -221,7 +221,7 @@ namespace OpencvSfM{
     cv::RNG& rng = cv::theRNG();
     unsigned int nviews = images_indexes_.size();
     double distance=0, best_distance=1e20;
-    vector<int> masks;
+    vector<bool> masks;
     cv::Vec3d bestPoints3D;
 
     if( !point3D.empty() )
@@ -240,8 +240,8 @@ namespace OpencvSfM{
       masks.clear();
       int nb_vals=0;
       for (unsigned int cpt = 0; cpt < nviews; cpt++) {
-        int valTmp = rng(2);
-        if( valTmp>0 )
+        bool valTmp = (rng(2) != 0);
+        if( valTmp )
           nb_vals++;
         masks.push_back(valTmp);
       }

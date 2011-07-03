@@ -27,6 +27,14 @@ namespace OpencvSfM{
     * @param points3D output of points in 3D
     */
     void computeStructure(std::vector<TrackPoints>& points3D);
+    /**
+    * Project previously 2D points matches for only two views
+    * @param img1 first image to use
+    * @param img1 second image to use
+    * @param points3D output of points in 3D
+    */
+    void computeTwoView(int img1, int img2,
+      std::vector<TrackPoints>& points3D);
   };
 
 }
