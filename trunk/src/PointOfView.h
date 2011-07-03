@@ -98,10 +98,22 @@ namespace OpencvSfM{
     {
       return rotation_;
     };
+    virtual void setRotationMatrix(cv::Mat newRot)
+    {
+      for(int i=0; i<3; ++i)
+        for(int j=0; j<3; ++j)
+          rotation_.at<double>(i,j) = newRot.at<double>(i,j);
+    };
 
     virtual cv::Mat getTranslationVector() const
     {
       return translation_;
+    };
+
+    virtual void setTranslationVector(cv::Mat newVect)
+    {
+      for(int i=0; i<3; ++i)
+        translation_.at<double>(i,0) = newVect.at<double>(i,0);
     };
   };
 

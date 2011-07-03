@@ -39,6 +39,9 @@ namespace OpencvSfM{
     operator cv::Ptr<cv::Vec3d>() {
       return point3D;
     }
+    operator cv::Vec3d() {
+      return *point3D;
+    }
     TrackPoints():track_consistance(0){};
     /**
     * This function add matches to track
@@ -102,11 +105,21 @@ namespace OpencvSfM{
         return -1;
       return point_indexes_[ result - images_indexes_.begin() ];
     };
+    /**
+    * use this function to get the image corresponding to the nth entry
+    * of this track
+    * @param idx index of wanted point
+    * @return number of image
+    */
+    inline int getImageIndex(const unsigned int idx) const
+    {
+      return images_indexes_[ idx ];
+    };
 
     double triangulateLinear(std::vector<PointOfView>& cameras,
       const std::vector<cv::Ptr<PointsToTrack>> &points_to_track,
       cv::Vec3d& points3D,
-      const std::vector<int> &masks = std::vector<int>());
+      const std::vector<bool> &masks = std::vector<bool>());
     double triangulateRobust(std::vector<PointOfView>& cameras,
       const std::vector<cv::Ptr<PointsToTrack>> &points_to_track,
       cv::Vec3d& points3D,

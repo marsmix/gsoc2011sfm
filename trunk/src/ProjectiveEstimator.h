@@ -51,7 +51,7 @@ namespace OpencvSfM{
     /**
     * improve cameras positions.
     */
-    void comptueReconstruction();
+    void comptueReconstruction(std::vector<PointOfView>& camReal);
 
   protected:
     void updateTwoViewMotion(std::vector<TrackPoints>& tracks,
