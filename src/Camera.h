@@ -1,6 +1,7 @@
 #ifndef _GSOC_SFM_CAMERA_H
 #define _GSOC_SFM_CAMERA_H 1
 
+#include "macro.h" //SFM_EXPORTS
 #include "opencv2/core/core.hpp"
 //#include "../otherProjects/libmv_core/estimator/fundamental_estimator.h"
 #include "PointOfView.h"
@@ -45,7 +46,7 @@ namespace OpencvSfM{
   * So this class is devoted to the conversion between 2D points from pixel image coordinates and 2D points in normalized image coordinates,
   * or ray projection using intra parameters.
   */
-  class Camera
+  class SFM_EXPORTS Camera
   {
     friend class PointOfView;//PointOfView is a good friend of Camera as it's intimately related!
   protected:

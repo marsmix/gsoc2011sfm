@@ -1,6 +1,7 @@
 #ifndef _GSOC_SFM_POINTSMATCHED_H
 #define _GSOC_SFM_POINTSMATCHED_H 1
 
+#include "macro.h" //SFM_EXPORTS
 #include "PointsToTrack.h"
 
 #include "opencv2/features2d/features2d.hpp"
@@ -11,7 +12,7 @@ namespace OpencvSfM{
   *
   * Any Matcher that inherit from DescriptorMatcher can be used (For example, you can use FlannBasedMatcher or BruteForceMatcher).
   */
-  class PointsMatcher
+  class SFM_EXPORTS PointsMatcher
   {
   public:
     /**

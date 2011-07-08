@@ -1,6 +1,7 @@
 #ifndef _GSOC_SFM_FIELD_OF_VIEW_H
 #define _GSOC_SFM_FIELD_OF_VIEW_H 1
 
+#include "macro.h" //SFM_EXPORTS
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
@@ -39,7 +40,7 @@ namespace OpencvSfM{
   * \f]
   * 
   */
-  class PointOfView
+  class SFM_EXPORTS PointOfView
   {
   protected:
     cv::Mat rotation_;///<Rotation matrix R (data is stored into projection_matrix_)

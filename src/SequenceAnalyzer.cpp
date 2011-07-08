@@ -248,6 +248,8 @@ namespace OpencvSfM{
 
   void SequenceAnalyzer::showTracks( int timeBetweenImg )
   {
+    if( points_to_track_.size() == 0 )
+      return;//nothing to do...
 
     //First compute missing features descriptors:
     unsigned int it=0;

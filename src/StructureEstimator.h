@@ -1,6 +1,7 @@
 #ifndef _GSOC_SFM_STRUCTURE_ESTIMATOR_H
 #define _GSOC_SFM_STRUCTURE_ESTIMATOR_H 1
 
+#include "macro.h" //SFM_EXPORTS
 #include "SequenceAnalyzer.h"
 
 namespace OpencvSfM{
@@ -9,7 +10,7 @@ namespace OpencvSfM{
   * \brief This class tries to find the 3D structure
   * using a sequence and cameras fully parameterized
   */
-  class StructureEstimator
+  class SFM_EXPORTS StructureEstimator
   {
   protected:
     SequenceAnalyzer &sequence_;

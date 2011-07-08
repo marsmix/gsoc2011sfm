@@ -1,6 +1,7 @@
 #ifndef _GSOC_SFM_POINTS_3D_ESTIMATION_H
 #define _GSOC_SFM_POINTS_3D_ESTIMATION_H 1
 
+#include "macro.h" //SFM_EXPORTS
 #include "SequenceAnalyzer.h"
 #include "PointOfView.h"
 #include "libmv_mapping.h"
@@ -16,7 +17,7 @@ namespace OpencvSfM{
   * As this class use a lot of libmv functions, the parameters are
   * using libmv structures...
   */
-  class ProjectiveEstimator
+  class SFM_EXPORTS ProjectiveEstimator
   {
   protected:
     int index_origin;///<index of camera set as origin...
