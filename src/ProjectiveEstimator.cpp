@@ -1,5 +1,6 @@
 #include "ProjectiveEstimator.h"
 #include "StructureEstimator.h"
+#include <opencv2/core/eigen.hpp>
 
 using std::vector;
 using cv::Ptr;
@@ -8,7 +9,7 @@ namespace OpencvSfM{
   //only for intern usage, no external interface...
   //Idea from Snavely : Modeling the World from Internet Photo Collections
   //See with libmv team if such a function is usefull:
-  void robust5Points(const libmv::Mat2X &x1, const libmv::Mat2X &x2,
+  double robust5Points(const libmv::Mat2X &x1, const libmv::Mat2X &x2,
     const libmv::Mat3 &K1, const libmv::Mat3 &K2,
     libmv::Mat3 &E)
   {
@@ -21,7 +22,7 @@ namespace OpencvSfM{
     vector<int> masks(nPoints);
     double max_error = 1e9;
 
-    int num_iter=0, max_iter=10;
+    int num_iter=0, max_iter=nPoints-5;
     for(num_iter=0; num_iter<max_iter; ++num_iter)
     {
       masks.clear();
@@ -70,6 +71,7 @@ namespace OpencvSfM{
         }
       }
     }
+    return max_error;
   }
 
 
@@ -115,51 +117,53 @@ namespace OpencvSfM{
     x2.resize(2,matches.size());
 
     key_size = matches.size();
+    vector<cv::Vec2d> pointImg1,pointImg2;
     for (i=0; i < key_size; ++i)
     {
       TrackPoints &track = matches[i];
       cv::DMatch match = track.toDMatch(image1, image2);
       
-      /*
-      x1(0,i) = point_img1->getKeypoint(match.trainIdx).pt.x;
-      x1(1,i) = point_img1->getKeypoint(match.trainIdx).pt.y;
-      x2(0,i) = point_img2->getKeypoint(match.queryIdx).pt.x;
-      x2(1,i) = point_img2->getKeypoint(match.queryIdx).pt.y;
-      */
-
-      vector<cv::Vec2d> pointImg1;
       pointImg1.push_back( cv::Vec2d(point_img1->getKeypoint(match.trainIdx).pt.x,
         point_img1->getKeypoint(match.trainIdx).pt.y) );
-      vector<cv::Vec2d> pointImg2;
       pointImg2.push_back( cv::Vec2d( point_img2->getKeypoint(match.queryIdx).pt.x,
         point_img2->getKeypoint(match.queryIdx).pt.y) );
-      vector<cv::Vec2d> pointNorm1 = cameras_[image1].getIntraParameters()->
-        pixelToNormImageCoordinates(pointImg1);
-      vector<cv::Vec2d> pointNorm2 = cameras_[image2].getIntraParameters()->
-        pixelToNormImageCoordinates(pointImg2);
-      x1(0,i) = pointNorm1[0][0];
-      x1(1,i) = pointNorm1[0][1];
-      x2(0,i) = pointNorm2[0][0];
-      x2(1,i) = pointNorm2[0][1];
     }
-    robust5Points( x1, x2, intra_params_[image1], intra_params_[image2], E );
+    vector<cv::Vec2d> pointNorm1 = cameras_[image1].getIntraParameters()->
+      pixelToNormImageCoordinates(pointImg1);
+    vector<cv::Vec2d> pointNorm2 = cameras_[image2].getIntraParameters()->
+      pixelToNormImageCoordinates(pointImg2);
+    key_size = pointNorm1.size();
+    for (i=0; i < key_size; ++i)
+    {
+      x1(0,i) = -pointNorm1[i][0];
+      x1(1,i) = -pointNorm1[i][1];
+      x2(0,i) = -pointNorm2[i][0];
+      x2(1,i) = -pointNorm2[i][1];
+    }
+    
+    double error = robust5Points( x1, x2,
+      intra_params_[image1], intra_params_[image2], E );
+
+    std::cout<<"max_error: "<<error<<std::endl;
 
     //From this essential matrix extract relative motion:
     libmv::Mat3 R;
     libmv::Vec3 t;
+    libmv::Vec2 x1Col, x2Col;
+    x1Col << x1(0,15), x1(1,15);
+    x2Col << x2(0,15), x2(1,15);
     bool ok = libmv::MotionFromEssentialAndCorrespondence( E,
-      intra_params_[image1], x1.col(1),
-      intra_params_[image2], x2.col(1),
+      intra_params_[image1], x1Col,
+      intra_params_[image2], x2Col,
       &R, &t);
 
-    //As R and t are relative to first cam, set them to the real position:
-    rotations_[image2] = R * rotations_[image1].transpose().inverse();
+    rotations_[image2] = R * rotations_[image1];
     translations_[image2] = t + R * translations_[image1];
 
     //update camera's structure:
     cv::Mat newRotation,newTranslation;
-    libmv::convertEigenToCvMat( rotations_[image2], CV_64F, newRotation );
-    libmv::convertEigenToCvMat( translations_[image2], CV_64F, newTranslation );
+    cv::eigen2cv( rotations_[image2], newRotation );
+    cv::eigen2cv( translations_[image2], newTranslation );
     cameras_[image2].setRotationMatrix( newRotation );
     cameras_[image2].setTranslationVector( newTranslation );
   }
@@ -193,14 +197,16 @@ namespace OpencvSfM{
     vector<TrackPoints>& tracks = sequence_.getTracks();
     vector<Ptr<PointsToTrack>> &points_to_track = sequence_.getPoints();
     ImagesGraphConnection &images_graph = sequence_.getImgGraph();
+    double ransac_threshold = 0.4 * sequence_.getImage(0).rows / 100.0;
     //now create the graph:
     
     int img1,img2;
     int nbMatches = images_graph.getHighestLink(img1,img2);
     vector<ImageLink> bestMatches;
-    images_graph.getOrderedLinks(bestMatches, static_cast<int>(.8*nbMatches),
-      nbMatches);
-    int max_inliners=0,index_of_max=0;
+    images_graph.getOrderedLinks(bestMatches, 100, nbMatches);
+    double min_inliners=1e7;
+    int index_of_min=0;
+    cv::Mat minFundamental;
     for(unsigned int cpt=0;cpt<bestMatches.size();cpt++)
     {
       //construct the homography and choose the worse matches:
@@ -213,35 +219,44 @@ namespace OpencvSfM{
         bestMatches[cpt].imgSrc, pointsImg2);
 
       //compute the homography:
-      cv::findHomography(pointsImg1,pointsImg2,status,CV_RANSAC,50);
+      cv::findHomography(pointsImg1,pointsImg2,status,CV_RANSAC,
+        ransac_threshold );
       //count the inliner points:
-      int inliners=0;
+      double inliners=0;
       for(unsigned int i=0;i<status.size();++i)
       {
         if( status[i] != 0 )
           inliners++;
       }
-      if(inliners>max_inliners)
+      double percent_inliner = inliners/static_cast<double>(pointsImg1.size());
+      if( percent_inliner < min_inliners )
       {
-        max_inliners = inliners;
-        index_of_max = cpt;
+        min_inliners = percent_inliner;
+        index_of_min = cpt;
+        minFundamental = cv::findFundamentalMat(pointsImg1, pointsImg2,
+          status, cv::FM_LMEDS);
       }
     }
-
-    //we will start the reconstruction using bestMatches[index_of_max]
-    img1 = bestMatches[index_of_max].imgSrc;
-    img2 = bestMatches[index_of_max].imgDest;
-
+    
+    //we will start the reconstruction using bestMatches[index_of_min]
+    //to avoid degenerate cases such as coincident cameras
+    img1 = bestMatches[index_of_min].imgSrc;
+    img2 = bestMatches[index_of_min].imgDest;
     updateTwoViewMotion(tracks, points_to_track, img1, img2);
 
     
     //////////////////////////////////////////////////////////////////////////
-    libmv::Mat3 rotation_mat,rot_real;
-    libmv::convertCvMatToEigen(camReal[img1].getRotationMatrix(),rotation_mat);
-    libmv::convertCvMatToEigen(camReal[img2].getRotationMatrix(),rot_real);
-    libmv::Vec3 translation_vec,trans_real;
-    libmv::convertCvMatToEigen(camReal[img1].getTranslationVector(),translation_vec);
-    libmv::convertCvMatToEigen(camReal[img2].getTranslationVector(),trans_real);
+    std::cout<<"best between "<<img1<<" and "<<img2<<std::endl;
+    libmv::Mat3 rotation_mat,rot_real,rot_relativ;
+    cv::cv2eigen(camReal[img1].getRotationMatrix(),rotation_mat);
+    cv::cv2eigen(camReal[img2].getRotationMatrix(),rot_real);
+    libmv::Vec3 translation_vec,trans_real,trans_relative;
+    cv::cv2eigen(camReal[img1].getTranslationVector(),translation_vec);
+    cv::cv2eigen(camReal[img2].getTranslationVector(),trans_real);
+
+    libmv::RelativeCameraMotion(rotation_mat, translation_vec,
+      rot_real, trans_real,
+      &rot_relativ, &trans_relative);
 
     translation_vec = translations_[img2] + rotations_[img1] * translation_vec;
     NormalizeL2(&translation_vec);
@@ -249,19 +264,21 @@ namespace OpencvSfM{
 
     std::cout<<"translation computed:"<<std::endl<<translation_vec<<std::endl;
     std::cout<<"translation real:"<<std::endl<<trans_real<<std::endl<<std::endl;
-    rotation_mat = rotations_[img1] * rotation_mat.transpose().inverse();
-    std::cout<<"rotation computed:"<<std::endl<<rotation_mat<<std::endl;
+
+    std::cout<<"rotation computed:"<<std::endl<<cameras_[img2].getRotationMatrix()<<std::endl;
     std::cout<<"rotation real:"<<std::endl<<rot_real<<std::endl<<std::endl;
+    std::cout<<"Relative rotation real:"<<std::endl<<rot_relativ<<std::endl<<std::endl;
 
     double dist = FrobeniusDistance(rotation_mat, rot_real);
     double dist1 = DistanceL2(translation_vec, trans_real);
+    std::cout<<dist<<"; "<<dist1<<std::endl;
     //////////////////////////////////////////////////////////////////////////
     
-
+    
     camReal[img1] = cameras_[img1];
     camReal[img2] = cameras_[img2];
 
-    StructureEstimator se(sequence_, cameras_);
+    StructureEstimator se(sequence_, camReal);
     vector<TrackPoints> points3DTrack;
     se.computeTwoView(img1, img2, points3DTrack);
     vector<cv::Vec3d> points3D;

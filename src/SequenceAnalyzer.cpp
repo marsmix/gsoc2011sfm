@@ -90,7 +90,7 @@ namespace OpencvSfM{
     }
 
     //here, all keypoints and descriptors are computed.
-    //Now create and train matcher:
+    //Now create and train the matcher:
     it=points_to_track_.begin();
     //We skip previous matcher already computed:
     it+=matches_.size();
@@ -124,14 +124,14 @@ namespace OpencvSfM{
         vector<DMatch> matches_i_j;
 
         point_matcher->crossMatch(point_matcher1,matches_i_j,masks);
+
 //////////////////////////////////////////////////////////////////////////
 //For now we use fundamental function from OpenCV but soon use libmv !
 
-
         //First compute points matches:
         int size_match=matches_i_j.size();
-        Mat srcP(1,size_match,CV_32FC2);
-        Mat destP(1,size_match,CV_32FC2);
+        vector<cv::Point2f> srcP;
+        vector<cv::Point2f> destP;
         vector<uchar> status;
 
         //vector<KeyPoint> points1 = point_matcher->;
@@ -140,14 +140,27 @@ namespace OpencvSfM{
             matches_i_j[cpt].queryIdx);
           const KeyPoint &key2 = point_matcher->getKeypoint(
             matches_i_j[cpt].trainIdx);
-          srcP.at<float[2]>(0,cpt)[0] = key1.pt.x;
-          srcP.at<float[2]>(0,cpt)[1] = key1.pt.y;
-          destP.at<float[2]>(0,cpt)[0] = key2.pt.x;
-          destP.at<float[2]>(0,cpt)[1] = key2.pt.y;
+          srcP.push_back(cv::Point2f(key1.pt.x,key1.pt.y));
+          destP.push_back(cv::Point2f(key2.pt.x,key2.pt.y));
           status.push_back(1);
         }
-
         Mat fundam = cv::findFundamentalMat(srcP, destP, status, cv::FM_RANSAC);
+
+        //refine the mathing :
+        for( int cpt = 0; cpt < size_match; ++cpt ){
+          if( status[cpt] == 0 )
+          {
+            status[cpt] = status[--size_match];
+            status.pop_back();
+            srcP[cpt] = srcP[size_match];
+            srcP.pop_back();
+            destP[cpt] = destP[size_match];
+            destP.pop_back();
+            matches_i_j[cpt--] = matches_i_j[size_match];
+            matches_i_j.pop_back();
+          }
+        }
+        fundam = cv::findFundamentalMat(srcP, destP, status, cv::FM_LMEDS);
 
         //refine the mathing :
         for( int cpt = 0; cpt < size_match; ++cpt ){
@@ -159,13 +172,23 @@ namespace OpencvSfM{
             matches_i_j.pop_back();
           }
         }
-
+        /*
+        //refine the mathing :
+        matches_i_j.clear();
+        point_matcher->matchWithFundamental(point_matcher1,fundam,images_[i],
+          matches_i_j,masks);*/
+        
 
 //////////////////////////////////////////////////////////////////////////
-        if(matches_i_j.size()>mininum_points_matches)
+        if( matches_i_j.size() > mininum_points_matches )
+        {
           addMatches(matches_i_j,i,j);
-        
-        std::clog<<"find matches between "<<i<<" "<<j<<std::endl;
+          std::clog<<"find "<<matches_i_j.size()<<
+            " matches between "<<i<<" "<<j<<std::endl;
+        }else
+        {
+          std::clog<<"can't find matches between "<<i<<" "<<j<<std::endl;
+        }
         j++;
         matches_it1++;
       }
@@ -252,40 +275,44 @@ namespace OpencvSfM{
       return;//nothing to do...
 
     //First compute missing features descriptors:
-    unsigned int it=0;
+    unsigned int it=0,it1=0;
     unsigned int end_iter = points_to_track_.size() - 1 ;
     if(images_.size() - 1 < end_iter)
       end_iter = images_.size() - 1;
     while (it < end_iter)
     {
-      vector<DMatch> matches_to_print;
-      //add to matches_to_print only points of img it and it+1:
-
-      vector<TrackPoints>::iterator match_it = tracks_.begin();
-      vector<TrackPoints>::iterator match_it_end = tracks_.end();
-
-      while ( match_it != match_it_end )
+      it1=it+1;
+      while (it1 < end_iter)
       {
-        if( match_it->containImage(it) &&
-          match_it->containImage(it+1) )
+        vector<DMatch> matches_to_print;
+        //add to matches_to_print only points of img it and it+1:
+
+        vector<TrackPoints>::iterator match_it = tracks_.begin();
+        vector<TrackPoints>::iterator match_it_end = tracks_.end();
+
+        while ( match_it != match_it_end )
         {
-          matches_to_print.push_back(match_it->toDMatch(it,it+1));
+          if( match_it->containImage(it) &&
+            match_it->containImage(it1) )
+          {
+            matches_to_print.push_back(match_it->toDMatch(it,it1));
+          }
+          match_it++;
         }
-        match_it++;
+
+        Mat firstImg=images_[ it ];
+        Mat outImg;
+
+        PointsMatcher::drawMatches(firstImg, points_to_track_[it]->getKeypoints(),
+          points_to_track_[ it1 ]->getKeypoints(),
+          matches_to_print, outImg,
+          cv::Scalar::all(-1), cv::Scalar::all(-1), vector<char>(),
+          cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
+
+        imshow("showTracks",outImg);
+        cv::waitKey(timeBetweenImg);
+        it1++;
       }
-
-      Mat firstImg=images_[ it ];
-      Mat outImg;
-
-      PointsMatcher::drawMatches(firstImg, points_to_track_[it]->getKeypoints(),
-        points_to_track_[ it + 1 ]->getKeypoints(),
-        matches_to_print, outImg,
-        cv::Scalar::all(-1), cv::Scalar::all(-1), vector<char>(),
-        cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
-
-      imshow("showTracks",outImg);
-      cv::waitKey(timeBetweenImg);
-
       it++;
     }
   }

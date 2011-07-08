@@ -51,7 +51,6 @@
 #define LIBMV_NUMERIC_NUMERIC_H
 
 #include "macro.h"
-
 #include <Eigen/Cholesky>
 #include <Eigen/Core>
 #include <Eigen/Eigenvalues>
@@ -163,52 +162,6 @@ namespace libmv {
   typedef Eigen::NumTraits<double> EigenDouble;
   using namespace Eigen;
 
-  template <typename EigenMat>
-  inline void convertCvMatToEigen(cv::Mat input, EigenMat& output)
-  {
-    typedef typename EigenMat::Scalar DataType;
-    CV_Assert( sizeof(DataType) == input.elemSize1() );
-
-    if( (EigenMat::Options & 0x1) == Eigen::ColMajor )
-    {
-      cv::Mat inputT = input.t();
-      Eigen::Map<EigenMat, 0, OuterStride<>> eigen_tmp(
-      (DataType*)inputT.data,
-        inputT.cols, inputT.rows, OuterStride<>(inputT.step/8));
-      output = eigen_tmp;
-    }
-    else
-    {
-      Eigen::Map<EigenMat, 0, OuterStride<>> eigen_tmp(
-        (DataType*)input.data,
-        input.rows, input.cols, OuterStride<>(input.step/8));
-      output = eigen_tmp;
-    }
-  }
-
-  template <typename EigenMat>
-  inline void convertEigenToCvMat(typename EigenMat& input, int cvNameOfType,
-    cv::Mat& output)
-  {
-    typedef typename EigenMat::Scalar DataType;
-    CV_Assert( sizeof(DataType) == CV_ELEM_SIZE1(cvNameOfType) );
-
-    if( (EigenMat::Options & 0x1) == Eigen::ColMajor )
-    {
-      Eigen::Matrix<DataType, Eigen::Dynamic, Eigen::Dynamic,
-        Eigen::RowMajor> in = input;
-
-      cv::Mat tmp(in.rows(), in.cols(), cvNameOfType,
-        in.data(), in.outerStride() * CV_ELEM_SIZE(cvNameOfType));
-      output = tmp.clone();
-    }
-    else
-    {
-      cv::Mat tmp( input.rows(), input.cols(), cvNameOfType,
-        input.data(), input.outerStride() * CV_ELEM_SIZE(cvNameOfType));
-      output = tmp.clone();
-    }
-  }
   // A simple container class, which guarantees 16 byte alignment needed for most
   // vectorization. Don't use this container for classes that cannot be copied
   // via memcpy.
@@ -452,6 +405,12 @@ namespace libmv {
     Mat3 *R,
     Vec3 *t);
 
+  void RelativeCameraMotion(const Mat3 &R1,
+    const Vec3 &t1,
+    const Mat3 &R2,
+    const Vec3 &t2,
+    Mat3 *R,
+    Vec3 *t);
 }
 
 #endif

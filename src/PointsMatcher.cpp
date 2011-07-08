@@ -134,6 +134,83 @@ namespace OpencvSfM{
     return outPointMatcher;
   }
 
+  void PointsMatcher::matchWithFundamental( Ptr<PointsMatcher> otherMatcher,
+    cv::Mat fundamentalMat,
+    cv::Mat img1,
+    vector<DMatch>& matches,
+    const std::vector<cv::Mat>& masks )
+  {
+    train();
+
+    //TODO: for now this function only work with matcher having only one picture
+    CV_Assert( this->pointCollection_.size()==1 );
+    CV_Assert( otherMatcher->pointCollection_.size()==1 );
+
+    const vector<cv::KeyPoint>& src_points = pointCollection_[0]->getKeypoints();
+    const vector<cv::KeyPoint>& dest_points = otherMatcher->pointCollection_[0]->
+      getKeypoints();
+
+    matches.clear();
+    vector<vector<DMatch>> matchesKNN;
+    knnMatch( otherMatcher->pointCollection_[0], matchesKNN, 4, masks );
+
+
+    //now construct the vector of DMatch, but in the other way (2 -> 1):
+    vector<vector<DMatch>> matchesKNNOtherWay;
+    otherMatcher->knnMatch( pointCollection_[0], matchesKNNOtherWay, 2, masks );
+    //now check for reciprocity:
+    unsigned int nbPoints=matchesKNN.size();
+    for(unsigned int i=0; i<nbPoints; ++i)
+    {
+      bool isFound=false;
+      double distMin=1e15;
+      unsigned int sizeVect=matchesKNN[i].size(),
+        minMatch = 0;
+
+      const cv::KeyPoint p = dest_points[i];
+      cv::Mat x(3,1,CV_64F);
+      x.at<double>(0,0) = p.pt.x;
+      x.at<double>(1,0) = p.pt.y;
+      x.at<double>(2,0) = 1;
+      // See page 287 equation (11.9) of HZ.
+      cv::Mat F_x = fundamentalMat.t() * x;
+      double l_a = F_x.at<double>(0,0);
+      double l_b = F_x.at<double>(1,0);
+      double l_c = F_x.at<double>(2,0);
+      double nu = l_a*l_a + l_b*l_b;
+      nu = nu ? 1./sqrt(nu) : 1.;
+      l_a *= nu; l_b *= nu; l_c *= nu;
+      nu = 1.0 / sqrt( l_a * l_a + l_b * l_b );
+
+      for(unsigned int j=0; j<sizeVect; ++j)
+      {
+        DMatch d1=matchesKNN[i][j];
+        cv::KeyPoint p1 = src_points[d1.trainIdx];
+        double dist = abs(l_a * p1.pt.x + l_b * p1.pt.y + l_c) * nu;
+        if( dist<distMin )
+        {
+          distMin = dist;
+          minMatch = j;
+        }
+      }
+      if( distMin < 1 )
+      {
+        DMatch d_best=matchesKNN[i][minMatch];
+        sizeVect=matchesKNNOtherWay[d_best.trainIdx].size();
+        for(unsigned int j=0; j<sizeVect && !isFound; ++j)
+        {
+          DMatch d2=matchesKNNOtherWay[d_best.trainIdx][j];
+
+          if(d2.trainIdx == d_best.queryIdx)
+          {
+            isFound = true;
+            matches.push_back(d_best);
+          }
+        }
+      }
+    }
+  }
+
   void PointsMatcher::crossMatch( Ptr<PointsMatcher> otherMatcher,
     vector<DMatch>& matches,
     const std::vector<cv::Mat>& masks )
@@ -218,9 +295,9 @@ namespace OpencvSfM{
 
         cv::Point center1( cvRound(kp1.pt.x), cvRound(kp1.pt.y) );
         cv::Point center2( cvRound(kp2.pt.x), cvRound(kp2.pt.y) );
-        int radius = 3;
+        int radius = 1;
         cv::circle( outImg, center1, radius, color, 1, CV_AA );
-        cv::circle( outImg, center2, radius, color, 1, CV_AA );
+        //cv::circle( outImg, center2, radius, color, 1, CV_AA );
         cv::line( outImg, center1, center2, color, 1, CV_AA );
 
       }
