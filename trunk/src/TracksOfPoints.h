@@ -3,6 +3,7 @@
 #define _GSOC_SFM_TRACKS_OF_POINTS_H 1
 
 
+#include "macro.h" //SFM_EXPORTS
 #include "PointsToTrack.h"
 #include "PointOfView.h"
 #include "opencv2/calib3d/calib3d.hpp"
@@ -19,7 +20,7 @@ namespace OpencvSfM{
   * 
   * Discussion: Store index of points or 2D position?
   */
-  class TrackPoints
+  class SFM_EXPORTS TrackPoints
   {
     friend class SequenceAnalyzer;
 
@@ -140,7 +141,7 @@ namespace OpencvSfM{
   * \brief This class modelizes the images graph connections
   * 
   */
-  class ImagesGraphConnection
+  class SFM_EXPORTS ImagesGraphConnection
   {
   protected:
     /**

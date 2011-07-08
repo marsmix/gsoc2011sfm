@@ -1,6 +1,7 @@
 #ifndef _GSOC_SFM_POINTS_TO_TRACK_SIFT_H
 #define _GSOC_SFM_POINTS_TO_TRACK_SIFT_H 1
 
+#include "macro.h" //SFM_EXPORTS
 #include "pointstotrack.h"
 
 namespace OpencvSfM{
@@ -11,7 +12,7 @@ namespace OpencvSfM{
   * This class focus on the first task in SfM: find points in image which are easy to track...
   * When available, a feature vector for each points is very helpful: the matching will be easier.
   */
-  class PointsToTrackWithImage :
+  class SFM_EXPORTS PointsToTrackWithImage :
     public PointsToTrack
   {
   protected:

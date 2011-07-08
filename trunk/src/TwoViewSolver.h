@@ -2,6 +2,7 @@
 #define _GSOC_SFM_CAMERA_H 1
 
 
+#include "macro.h" //SFM_EXPORTS
 #include "opencv2/core/core.hpp"
 
 namespace OpencvSfM{
@@ -9,7 +10,7 @@ namespace OpencvSfM{
   * \brief This class is a virtual base class for two view solvers, like fundamental matrix, essential matrix, triangulation...
   The only method needed is solve which take two matrix as input and one other as output.
   */
-  class TwoViewSolver
+  class SFM_EXPORTS TwoViewSolver
   {
   protected:
     unsigned short minimum_inputs_;

@@ -3,6 +3,7 @@
 
 //A lot of methods are inspired of LIBMV project (http://code.google.com/p/libmv_core/)
 
+#include "macro.h" //SFM_EXPORTS
 #include "opencv2/calib3d/calib3d.hpp"
 #include "Camera.h"
 
@@ -20,7 +21,7 @@ namespace OpencvSfM{
   *
   * So this class is devoted to the conversion between 3D points (using camera coordinate) and 2D points (using image coordinate) using the methods convertFromImageTo3Dray or convertFrom3DToImage
   */
-  class CameraPinhole:public Camera{
+  class SFM_EXPORTS CameraPinhole:public Camera{
   protected:
     cv::Mat intra_params_;///<store intra parameters(3*3 matrix). This matrix contains focal informations, principal point coordinates and skew of axis
     cv::Mat inv_intra_params_;///<This is the inverse transformation of intra_params_. Used to speed up calculus...

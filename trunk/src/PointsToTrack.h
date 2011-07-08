@@ -1,6 +1,7 @@
 #ifndef _GSOC_SFM_POINTS_TO_TRACK_H
 #define _GSOC_SFM_POINTS_TO_TRACK_H 1
 
+#include "macro.h" //SFM_EXPORTS
 #include "opencv2/features2d/features2d.hpp"
 #include "TracksOfPoints.h"
 
@@ -8,7 +9,7 @@
 
 
 namespace OpencvSfM{
-  class TrackPoints;
+  class SFM_EXPORTS TrackPoints;
 
 /*! \brief This class can be used to store informations about point
   * and features. This is an abstract class: you can't use it directly.
@@ -20,7 +21,7 @@ namespace OpencvSfM{
   * When available, a feature vector for each points is very helpful:
   * the matching will be easier.
   */
-  class PointsToTrack
+  class SFM_EXPORTS PointsToTrack
   {
   protected:
     std::vector<cv::KeyPoint> keypoints_;///<This attribute will store points coordinates and sometimes orientation and size

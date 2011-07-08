@@ -1,6 +1,7 @@
 #ifndef _GSOC_SFM_SEQUENCE_ANALYZER_H
 #define _GSOC_SFM_SEQUENCE_ANALYZER_H 1
 
+#include "macro.h" //SFM_EXPORTS
 #include "PointsToTrackWithImage.h"
 #include "MotionProcessor.h"
 #include "PointsMatcher.h"
@@ -21,7 +22,7 @@ namespace OpencvSfM{
   * features, then matches them and keeps them only when
   * there is more than 2 pictures containing the point.
   */
-  class SequenceAnalyzer
+  class SFM_EXPORTS SequenceAnalyzer
   {
   protected:
     static const int mininum_points_matches = 10;

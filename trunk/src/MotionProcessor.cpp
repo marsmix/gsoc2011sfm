@@ -8,7 +8,9 @@ using cv::VideoCapture;
 using std::string;
 using cv::imread;
 using std::ostringstream;
+#ifdef HAVE_BOOST
 using boost::filesystem::path;
+#endif
 
 namespace cv{
   CVAPI(int) cvHaveImageReader( const char* filename );
@@ -67,6 +69,7 @@ namespace OpencvSfM{
 
     if(inputType == IS_DIRECTORY)
     {
+#ifdef HAVE_BOOST
       path dirTmp(nameOfFile.c_str());
       if ( !boost::filesystem::exists(dirTmp) || !boost::filesystem::is_directory(dirTmp) ) {
         return false;
@@ -75,8 +78,9 @@ namespace OpencvSfM{
       boost::filesystem::directory_iterator iter= boost::filesystem::directory_iterator(dirTmp);
       while(iter != boost::filesystem::directory_iterator())
       {
-        if( cv::cvHaveImageReader((const char*)iter->path().generic_string().c_str()) )
-          nameOfFiles_.push_back(iter->path());
+        string name_of_file = iter->path().string();
+        if( cv::cvHaveImageReader((const char*)name_of_file.c_str()) )
+          nameOfFiles_.push_back(name_of_file);
         iter++;
       }
       //if we don't have loaded files, return an error!
@@ -86,6 +90,9 @@ namespace OpencvSfM{
       // sort, since directory iteration
       // is not ordered on some file systems
       std::sort(nameOfFiles_.begin(), nameOfFiles_.end());
+#else
+      return false;
+#endif
     }
     return true;
   };
@@ -108,7 +115,7 @@ namespace OpencvSfM{
     {
       //Someone as changed the position of cursor...
       //Reload the wanted file:
-      imgTmp=imread(nameOfFiles_[numFrame_].string(),convertToRGB_);
+      imgTmp=imread(nameOfFiles_[numFrame_],convertToRGB_);
       this->numFrame_++;//and move to the next frame
     }
     else
@@ -149,7 +156,7 @@ namespace OpencvSfM{
         {
           if(numFrame_<nameOfFiles_.size())
           {
-            imgTmp=imread(nameOfFiles_[numFrame_].string(),convertToRGB_);
+            imgTmp=imread(nameOfFiles_[numFrame_],convertToRGB_);
             this->numFrame_++;//and move to the next frame
           }
         }

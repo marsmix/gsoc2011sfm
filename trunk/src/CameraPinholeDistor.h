@@ -3,6 +3,7 @@
 
 //A lot of methods are inspired of LIBMV project (http://code.google.com/p/libmv_core/)
 
+#include "macro.h" //SFM_EXPORTS
 #include "CameraPinhole.h"
 #include "opencv2/imgproc/imgproc.hpp"
 
@@ -20,7 +21,7 @@ namespace OpencvSfM{
   *
   * So this class is devoted to the conversion between 3D points (using camera coordinate) and 2D points (using image coordinate) using the methods convertFromImageTo3Dray or convertFrom3DToImage
   */
-  class CameraPinholeDistor:public CameraPinhole{
+  class SFM_EXPORTS CameraPinholeDistor:public CameraPinhole{
   protected:
     cv::Vec<double, 6> radial_dist_;///<used to store radial dist parameters (/f$k_1/f$ to /f$k_6/f$)
     unsigned char nb_radial_params_;///<number of radial dist parameters (0, 2, 3 or 6)

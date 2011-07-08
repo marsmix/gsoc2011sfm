@@ -1,6 +1,6 @@
 //Set to 1 if you want to test the points detection and matching
 //But be aware to set other tests to 0...
-#if 1
+#if 0
 
 #include "../src/PointsToTrackWithImage.h"
 #include "../src/MotionProcessor.h"
@@ -93,11 +93,6 @@ void main(){
   //universal method to get the current image:
   vector<Mat> images;
 
-  if( !boost::filesystem::exists( boost::filesystem::status("motion_tracks.yml") ) )
-  {
-    cout<<"please compute points matches using testMotionEstimator.cpp first!"<<endl;
-    return;
-  }
   MotionProcessor mp;
   mp.setInputSource("../Medias/temple/",IS_DIRECTORY);
 
@@ -120,10 +115,35 @@ void main(){
   vector<Ptr<PointsToTrack>> points_empty;
   SequenceAnalyzer motion_estim_loaded( images, points_empty, matches_algo );
 
-  FileStorage fsRead("motion_tracks.yml", FileStorage::READ);
-  FileNode myPtt = fsRead.getFirstTopLevelNode();
-  SequenceAnalyzer::read(myPtt, motion_estim_loaded);
-  fsRead.release();
+  if( !boost::filesystem::exists( boost::filesystem::status("motion_tracks.yml") ) )
+  {
+    if( !boost::filesystem::exists( boost::filesystem::status("motion_tracks1.yml") ) )
+    {
+      cout<<"please compute points matches using testMotionEstimator.cpp first!"<<endl;
+      return;
+    }
+    else
+    {
+      FileStorage fsRead("motion_tracks1.yml", FileStorage::READ);
+      FileNode myPtt = fsRead.getFirstTopLevelNode();
+      SequenceAnalyzer::read(myPtt, motion_estim_loaded);
+      fsRead.release();
+      motion_estim_loaded.keepOnlyCorrectMatches();
+      //now save the tracks:
+      FileStorage fsOutMotion("motion_tracks.yml", FileStorage::WRITE);
+      //Can't find a way to enable the following notation:
+      //fs << *ptt1;
+      SequenceAnalyzer::write(fsOutMotion,motion_estim_loaded);
+      fsOutMotion.release();
+    }
+  }
+  else
+  {
+    FileStorage fsRead("motion_tracks.yml", FileStorage::READ);
+    FileNode myPtt = fsRead.getFirstTopLevelNode();
+    SequenceAnalyzer::read(myPtt, motion_estim_loaded);
+    fsRead.release();
+  }
 
   vector<TrackPoints> &tracks=motion_estim_loaded.getTracks();
   cout<<"numbers of correct tracks loaded:"<<tracks.size()<<endl;

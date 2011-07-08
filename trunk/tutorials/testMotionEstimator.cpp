@@ -1,6 +1,6 @@
 //Set to 1 if you want to test the points detection and matching
 //But be aware to set other tests to 0...
-#if 0
+#if 1
 
 #include "../src/PointsToTrackWithImage.h"
 #include "../src/MotionProcessor.h"
@@ -10,6 +10,7 @@
 #include <opencv2/calib3d/calib3d.hpp>
 
 #include <iostream>
+#include <string>
 
 using namespace std;
 using namespace cv;
@@ -24,12 +25,22 @@ using namespace OpencvSfM;
 //Only to see how we can use MotionEstimator
 //////////////////////////////////////////////////////////////////////////
 
-void main(){
+int main(){
   MotionProcessor mp;
-
   //first load images:
   //Here we will a folder with a lot of images, but we can do the same thing with any other type of input
-  mp.setInputSource("../Medias/temple/",IS_DIRECTORY);
+  if( !mp.setInputSource("../Medias/temple/",IS_DIRECTORY) )//or ../gsoc2011sfm/Medias/temple/
+  {
+    cout<<"Can't find \"Medias/temple/\" dataset, or Boost library was not used..."<<endl;
+    string correctDir = "";
+    cout<<"Please enter the correct data directory:"<<endl;
+    getline(cin, correctDir);
+    if( !mp.setInputSource(correctDir.c_str(),IS_DIRECTORY) )
+    {
+      cout<<"Problem not solved..."<<endl;
+      return -1;
+    }
+  }
 
   //Configure input (not needed, but show how we can do 
   //mp.setProperty(CV_CAP_PROP_CONVERT_RGB,0);//Only greyscale, due to SIFT
@@ -78,7 +89,7 @@ void main(){
       //if the image is loaded, find the points:
       cout<<"Create a new PointsToTrack..."<<endl;
 
-      ptrPoints_tmp = Ptr<PointsToTrack>( new PointsToTrackWithImage (
+      ptrPoints_tmp = Ptr<PointsToTrack>( new PointsToTrackWithImage (nbFrame,
         currentImage, Mat(), detector, desc_extractor));
       ptrPoints_tmp->computeKeypointsAndDesc();
       
@@ -92,7 +103,7 @@ void main(){
     //now save the tracks:
     FileStorage fsOut("motion_points.yml", FileStorage::WRITE);
     fsOut << "Vector_of_motionTrack" << "[";
-    for(int i=0;i<vec_points_to_track.size(); i++)
+    for(unsigned int i=0;i<vec_points_to_track.size(); i++)
     {
       PointsToTrack::write(fsOut,*vec_points_to_track[i]);
     }
@@ -101,7 +112,7 @@ void main(){
 
   }
 
-  MotionEstimator motion_estim(vec_points_to_track,matches_algo);
+  SequenceAnalyzer motion_estim(images,vec_points_to_track,matches_algo);
 
   motion_estim.computeMatches();
 
@@ -112,7 +123,7 @@ void main(){
   FileStorage fsOutMotion1("motion_tracks1.yml", FileStorage::WRITE);
   //Can't find a way to enable the following notation:
   //fs << *ptt1;
-  MotionEstimator::write(fsOutMotion1,motion_estim);
+  SequenceAnalyzer::write(fsOutMotion1,motion_estim);
   fsOutMotion1.release();
 
   motion_estim.keepOnlyCorrectMatches();
@@ -120,15 +131,15 @@ void main(){
   tracks=motion_estim.getTracks();
   cout<<"numbers of correct tracks:"<<tracks.size()<<endl;
 
-  //now for fun show the sequence on images:
-  motion_estim.showTracks(images,1000);
-
   //now save the tracks:
   FileStorage fsOutMotion("motion_tracks.yml", FileStorage::WRITE);
   //Can't find a way to enable the following notation:
   //fs << *ptt1;
-  MotionEstimator::write(fsOutMotion,motion_estim);
+  SequenceAnalyzer::write(fsOutMotion,motion_estim);
   fsOutMotion.release();
+  //now for fun show the sequence on images:
+  motion_estim.showTracks(0);
+
   
   /*
   //and create a new PointsToTrack using this file:
@@ -145,6 +156,7 @@ void main(){
   vector<TrackPoints> &tracks=motion_estim_loaded.getTracks();
   cout<<"numbers of correct tracks:"<<tracks.size()<<endl;
   motion_estim_loaded.showTracks(images,0);*/
+  return 0;
 }
 
 
