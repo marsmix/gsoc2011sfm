@@ -25,7 +25,7 @@ namespace OpencvSfM{
   class SFM_EXPORTS SequenceAnalyzer
   {
   protected:
-    static const int mininum_points_matches = 10;
+    static const int mininum_points_matches = 40;
     static const int mininum_image_matches = 2;
     /**
     * optional, method to use for feature detection

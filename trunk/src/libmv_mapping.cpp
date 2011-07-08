@@ -1,7 +1,6 @@
 #include "libmv_mapping.h"
 
 
-
 namespace libmv {
 
 
@@ -403,5 +402,15 @@ namespace libmv {
     }
 
     return error_total;
+  }
+
+  void RelativeCameraMotion(const Mat3 &R1,
+    const Vec3 &t1,
+    const Mat3 &R2,
+    const Vec3 &t2,
+    Mat3 *R,
+    Vec3 *t) {
+      *R = R2 * R1.transpose();
+      *t = t2 - (*R) * t1;
   }
 }

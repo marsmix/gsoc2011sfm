@@ -5,6 +5,7 @@
 #include "SequenceAnalyzer.h"
 #include "PointOfView.h"
 #include "libmv_mapping.h"
+#include "opencv2/core/eigen.hpp"
 #include <iostream>
 
 namespace OpencvSfM{
@@ -39,13 +40,13 @@ namespace OpencvSfM{
     {
       libmv::Mat3 intra_param;
       cv::Ptr<Camera> intra=camera.getIntraParameters();
-      libmv::convertCvMatToEigen(intra->getIntraMatrix(),intra_param);
+      cv::cv2eigen(intra->getIntraMatrix(),intra_param);
       intra_params_.push_back(intra_param);
       libmv::Mat3 rotation_mat;
-      libmv::convertCvMatToEigen(camera.getRotationMatrix(),rotation_mat);
+      cv::cv2eigen(camera.getRotationMatrix(),rotation_mat);
       rotations_.push_back(rotation_mat);
       libmv::Vec3 translation_vec;
-      libmv::convertCvMatToEigen(camera.getTranslationVector(),translation_vec);
+      cv::cv2eigen(camera.getTranslationVector(),translation_vec);
       translations_.push_back(translation_vec);
     }
     
