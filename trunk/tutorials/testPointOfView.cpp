@@ -1,6 +1,3 @@
-//Set to 1 if you want to test the cameras
-//But be aware to set other tests to 0...
-#if 0
 
 #include "../src/CameraPinhole.h"
 #include "../src/PointOfView.h"
@@ -15,7 +12,10 @@ using namespace cv;
 //You will need files to test. Download the temple dataset here : http://vision.middlebury.edu/mview/data/
 //////////////////////////////////////////////////////////////////////////
 
-void main()
+#include "test_data_sets.h"
+
+NEW_TUTO(Setup_Camera, "Learn how setup cameras",
+  "Using intra parameters and positions of cameras, we project 3D poins into cameras' coordinates.")
 {
   //create an arbitrary camera (from data/temple_par.txt) :
   Mat intra=Mat::eye(3, 3, CV_64F);
@@ -53,4 +53,3 @@ void main()
     Vec4d point3DHomog(points3D[i][0],points3D[i][1],points3D[i][2],1);
   }
 }
-#endif

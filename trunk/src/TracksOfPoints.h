@@ -9,7 +9,8 @@
 #include "opencv2/calib3d/calib3d.hpp"
 
 namespace OpencvSfM{
-  class PointsToTrack;
+  class SFM_EXPORTS PointsToTrack;
+  class SFM_EXPORTS PointOfView;
   //class SequenceAnalyzer;
   /**
   * \brief This class store the track of keypoints.

@@ -1,6 +1,3 @@
-//Set to 1 if you want to test the points detection and matching
-//But be aware to set other tests to 0...
-#if 0
 
 #include "../src/PointsToTrackWithImage.h"
 #include "../src/MotionProcessor.h"
@@ -9,56 +6,17 @@
 #include <opencv2/calib3d/calib3d.hpp>
 #include <fstream>
 
-#include <iostream>
-
-using namespace std;
-using namespace cv;
-using namespace OpencvSfM;
 
 //////////////////////////////////////////////////////////////////////////
 //This file will not be in the final version of API, consider it like a tuto/draft...
 //You will need files to test. Download the temple dataset here : http://vision.middlebury.edu/mview/data/
 //////////////////////////////////////////////////////////////////////////
 
-vector<PointOfView> loadCamerasFromFile(string fileName)
-{
-  vector<PointOfView> outVect;
-  ifstream pointsDef(fileName);
-  bool isOK=pointsDef.is_open();
-  //first get the numbers of cameras:
-  int nbCameras;
-  if(pointsDef>>nbCameras)
-  {
-    string name_of_picture;
-    Mat intra_params,rotation;
-    Vec3d translation;
-    intra_params.create(3, 3, CV_64F);
-    rotation.create(3, 3, CV_64F);
-    double* data_intra_param=(double*)intra_params.data;
-    double* data_rotation=(double*)rotation.data;
-    for (int i=0;i<nbCameras;i++)
-    {
-      //first the name of image:
-      if(pointsDef>>name_of_picture)
-      {
-        //the 9 values of K:
-        for(int j=0;j<9;j++)
-          pointsDef>>data_intra_param[j];
-        //the 9 values of rotation:
-        for(int j=0;j<9;j++)
-          pointsDef>>data_rotation[j];
-        //the 3 values of translation:
-        for(int j=0;j<3;j++)
-          pointsDef>>translation[j];
-        //now create a point of view:
-        outVect.push_back(PointOfView(new CameraPinhole(intra_params),rotation,translation));
-      }
-    }
-  }
-  return outVect;
-}
+#include "test_data_sets.h"
 
-void main(){
+NEW_TUTO(Camera_tuto, "Learn how you can mix 3D objects and fully parameterized cameras",
+  "Using fully parameterized cameras, we draw a bounding box around the object.")
+{
   vector<PointOfView> myCameras=loadCamerasFromFile("../Medias/temple/temple_par.txt");
 
   //As the (tight) bounding box for the temple model is (-0.054568 0.001728 -0.042945) - (0.047855 0.161892 0.032236)
@@ -99,5 +57,3 @@ void main(){
     itPoV++;
   }
 }
-
-#endif
