@@ -12,17 +12,46 @@
 
 #include "test_data_sets.h"
 
-NEW_TUTO(Triangulation_tests, "Test of triangulation",
-  "Using points and cameras parameters, try to compute motion and object. Only for debug!"){
+NEW_TUTO(Triangulation_tests, "Visualization of 3D points (DEBUG ONLY)",
+  "Using points projections and cameras parameters, try to find the 3D positions.\nThis is useful to test correctness of algorithms."){
 
   int nviews = 5;
   int npoints = 6;
-  std::ifstream inPoints("logPoints.txt");
+  std::ifstream inPoints("../logPoints.txt");
+  if( !inPoints.is_open() )
+  {
+    cout<<"This tuto need a file \"logPoints.txt\" with following syntax:"<<endl;
+    cout<<"ProjectionMat0"<<endl;
+    cout<<"K[0] K[1] K[2] K[3] K[4] K[5] K[6] K[7] K[8]"<<endl;
+    cout<<"R[0] R[1] R[2] R[3] R[4] R[5] R[6] R[7] R[8]"<<endl;
+    cout<<"T[0] T[1] T[2]"<<endl;
+    cout<<"ProjectionMat1"<<endl;
+    cout<<"K[0] K[1] K[2] K[3] K[4] K[5] K[6] K[7] K[8]"<<endl;
+    cout<<"... ... ... ..."<<endl;
+    cout<<"2D points"<<endl;
+    cout<<"3D_pos[0] 3D_pos[1] 3D_pos[2]"<<endl;
+    cout<<"2D_view_Cam1[0] 2D_view_Cam1[1]"<<endl;
+    cout<<"2D_view_Cam2[0] 2D_view_Cam2[1]"<<endl;
+    cout<<"2D_view_Cam3[0] 2D_view_Cam3[1]"<<endl;
+    cout<<"... ... ... ..."<<endl;
+    cout<<"2D points"<<endl;
+    cout<<"3D_pos[0] 3D_pos[1] 3D_pos[2]"<<endl;
+    cout<<"2D_view_Cam1[0] 2D_view_Cam1[1]"<<endl;
+    cout<<"... ... ... ..."<<endl;
+    cout<<"... ... ... ..."<<endl<<endl;
+
+    cout<<"You can create any numbers of cameras you want"<<
+      " and any numbers of 3D points, but be careful"<<
+      " to have a 2D projection for each camera!"<<endl;
+    cout<<"Please create this file before runing this tuto!"<<endl;
+    return;
+  }
   string skeepWord;
 
   // Collect P matrices together.
   vector<PointOfView> cameras;
   for (int j = 0; j < nviews; ++j) {
+    cout<<"Loading a new camera..."<<endl;
     double R[9];
     double T[3];
     double K[9];
@@ -99,6 +128,19 @@ NEW_TUTO(Triangulation_tests, "Test of triangulation",
 
   StructureEstimator structure (motion_estim, cameras);
   structure.computeStructure(tracks);
+
+  //compute estimation error:
+  double estim_error = 0.0;
+  for(unsigned int it = 0; it < points3D.size(); ++it)
+  {
+    cv::Ptr<cv::Vec3d> p3D = tracks[it];
+    double distX = points3D[it][0] - (*p3D)[0];
+    double distY = points3D[it][1] - (*p3D)[1];
+    double distZ = points3D[it][2] - (*p3D)[2];
+    estim_error += sqrt(distX * distX + distY * distY + distZ * distZ);
+  }
+
+  cout<<endl<<"Triangulation error: "<<estim_error<<endl<<endl;
   
   //now for each point of view, we draw the picture and these points projected:
   vector<PointOfView>::iterator itPoV=cameras.begin();
@@ -111,7 +153,6 @@ NEW_TUTO(Triangulation_tests, "Test of triangulation",
     index_image++;
 
     //create the vector of 3D points viewed by this camera:
-    vector<Vec3d> points3D;
     vector<KeyPoint> points2DOrigine;
     //motion_estim_loaded.filterPoints(triangulated,index_image,points3D,points2DOrigine);
     vector<Vec2d> pixelProjected=itPoV->project3DPointsIntoImage(tracks);

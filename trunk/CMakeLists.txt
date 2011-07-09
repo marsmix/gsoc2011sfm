@@ -6,6 +6,7 @@ set(CMAKE_VERBOSE OFF CACHE BOOL "Verbose mode")
 if (CMAKE_VERBOSE)
         set (CMAKE_VERBOSE_MAKEFILE 1)
 endif()
+cmake_policy(SET CMP0015 OLD)
 
 project (opencvSfM)
 add_definitions(-DSFM_API_EXPORTS)

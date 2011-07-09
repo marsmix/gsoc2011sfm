@@ -309,8 +309,9 @@ namespace OpencvSfM{
           cv::Scalar::all(-1), cv::Scalar::all(-1), vector<char>(),
           cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
 
-        imshow("showTracks",outImg);
-        cv::waitKey(timeBetweenImg);
+      imshow("showTracks",outImg);
+      cv::waitKey(timeBetweenImg);
+
         it1++;
       }
       it++;
