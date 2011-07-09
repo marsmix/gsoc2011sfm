@@ -1,13 +1,5 @@
-//Set to 1 if you want to test the cameras
-//But be aware to set other tests to 0...
-#if 0
 
 #include "../src/CameraPinholeDistor.h"
-#include <iostream>
-
-using namespace std;
-using namespace OpencvSfM;
-using namespace cv;
 
 //////////////////////////////////////////////////////////////////////////
 //This file will not be in the final version of API, consider it like a tuto/draft...
@@ -19,7 +11,10 @@ using namespace cv;
 //transform pixels in camera normalized coordinates into image pixels.
 //The only way I found was to use LM iteration to find the original point...
 //////////////////////////////////////////////////////////////////////////
-void main()
+#include "test_data_sets.h"
+
+NEW_TUTO(Camera_dist_tuto, "Learn what you can do with a pinhole distorded camera",
+  "Using intra parameters, switch between camera / image coordinates.")
 {
   Mat intra=Mat::eye(3, 3, CV_64F);
   double* data = (double*)intra.data;
@@ -58,13 +53,4 @@ void main()
     cout<<pointsImgPixel[i][0]<<" "<<pointsImgPixel[i][1]<<endl;
   }
 
-  //////////////////////////////////////////////////////////////////////////
-  //Compute projection matrix
-  //////////////////////////////////////////////////////////////////////////
-  double m[3][3] = {{5, 2, 1}, {2, 3, 4}, {2, 5, 1}};
-  cv::Mat rotation = cv::Mat(3, 3, CV_64F, m);
-  Vec3d translation(5,10,20);
-  Mat projectionMat=camera.computeProjectionMatrix(rotation,translation);
-
 }
-#endif

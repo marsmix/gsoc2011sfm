@@ -1,97 +1,146 @@
-// Copyright (c) 2007, 2008 libmv authors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to
-// deal in the Software without restriction, including without limitation the
-// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-// sell copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-// IN THE SOFTWARE.
 
-#ifndef LIBMV_MULTIVIEW_TEST_DATA_SETS_H_
-#define LIBMV_MULTIVIEW_TEST_DATA_SETS_H_
+#ifndef SFM_TEST_DATA_SETS_H_
+#define SFM_TEST_DATA_SETS_H_
 
 #include "../src/PointOfView.h"
-#include "../src/libmv_mapping.h"
-#include "opencv2/core/core.hpp"
+#include "../src/CameraPinhole.h"
+#include <opencv2/core/core.hpp>
 
-namespace libmv {
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
 
-  cv::Mat HStack (const cv::Mat& lhs, const cv::Mat& rhs) {
-    cv::Mat res(lhs.rows, lhs.cols+rhs.cols, lhs.type());
+//Should not use "using namespace" but as we are in
+//tutorial section, this will help readability
+using namespace std;
+using namespace OpencvSfM;
+using namespace cv;
 
-    cv::Mat mat_tmp=res(cv::Range::all(),cv::Range(0,lhs.cols));
-    lhs.copyTo( left_tmp );
+// Use this annotation at the end of a struct/class definition to
+// prevent the compiler from optimizing away instances that are never
+// used.
+#if defined(__GNUC__) && !defined(COMPILER_ICC)
+# define _ATTRIBUTE_UNUSED_ __attribute__ ((unused))
+#else
+# define _ATTRIBUTE_UNUSED_
+#endif
+// A macro to disallow operator=
+// This should be used in the private: declarations for a class.
+#define _DISALLOW_ASSIGN_(type)\
+  void operator=(type const &)
 
-    mat_tmp = res(cv::Range::all(),cv::Range(lhs.cols, lhs.cols+rhs.cols));
-    rhs.copyTo( mat_tmp );
-    return res;
-  };
+// A macro to disallow copy constructor and operator=
+// This should be used in the private: declarations for a class.
+#define _DISALLOW_COPY_AND_ASSIGN_(type)\
+  type(type const &);\
+  _DISALLOW_ASSIGN_(type)
 
-  // An N-view metric dataset . An important difference between this
-  // and the other reconstruction data types is that all points are seen by all
-  // cameras.
-  struct NViewDataSet {
-    std::vector<OpencvSfM::PointOfView> cameras;
-    std::vector<cv::Vec3d> C;   // Camera centers.
-    std::vector<cv::Vec3d> X;     // 3D points.
-    std::vector<std::vector<cv::Vec2d>> x;  // Projected points; may have noise added.
-    //std::vector<std::vector<int>>  x_ids;// Indexes of points corresponding to the projections
+class Intern_tutorial_list;
 
-    int n;  // Actual number of cameras.
+// Defines the abstract factory interface that creates instances
+// of a Test object.
+class TutoFactoryBase {
+ public:
+  virtual ~TutoFactoryBase() {}
 
-    cv::Mat P(int i) {
-      assert(i < n);
-      return cameras[i].getProjectionMatrix();
-    }
-    void Reproject() {
-      x.clear();
-      for (int i = 0; i < n; ++i) {
-        x.push_back(cameras[i].project3DPointsIntoImage(X));
-      }
-    }
-    // TODO(keir): Add gaussian jitter functions.
-  };
+  // Creates a test instance to run. The instance is both created and destroyed
+  // within TestInfoImpl::Run()
+  virtual Intern_tutorial_list* CreateTest() = 0;
 
-  struct nViewDatasetConfigator
+ protected:
+  TutoFactoryBase(string n,string h) {name=n;help=h;}
+  string name;
+  string help;
+
+ private:
+  _DISALLOW_COPY_AND_ASSIGN_(TutoFactoryBase);
+};
+
+// This class create an instance of tutorial...
+template <class TutoClass>
+class TutoFactoryImpl : public TutoFactoryBase {
+ public:
+   TutoFactoryImpl(string n,string h):TutoFactoryBase(n,h){};
+  virtual Intern_tutorial_list* CreateTest() {
+    return new TutoClass(name,help); }
+};
+
+class Intern_tutorial_list
+{
+  static vector<Intern_tutorial_list*> list_of_tutos;
+  _DISALLOW_COPY_AND_ASSIGN_(Intern_tutorial_list);
+protected:
+  Intern_tutorial_list(string name,string help)
   {
-    /// Internal camera parameters
-    int _fx;
-    int _fy;
-    int _cx;
-    int _cy;
+    this->name_of_tuto = name;
+    this->tuto_help = help;
+  }
 
-    /// Camera random position parameters
-    double _dist;
-    double _jitter_amount;
+  virtual void tuto_body()=0;
 
-    nViewDatasetConfigator( int fx = 1000,  int fy = 1000,
-      int cx = 500,   int cy  = 500,
-      double distance = 1.5,
-      double jitter_amount = 0.01 );
-  };
+public:
+  
+  template <class TutoClass>
+  static Intern_tutorial_list* registerTuto(TutoFactoryImpl<TutoClass>* addTuto)
+  {
+    Intern_tutorial_list* out = addTuto->CreateTest();
+    list_of_tutos.push_back(out);
+    return out;
+  }
 
-  NViewDataSet NRealisticCamerasFull(int nviews, int npoints,
-    const nViewDatasetConfigator
-    config = nViewDatasetConfigator());
+  static int print_menu()
+  {
+    cout<<"Please choose a tutorial (-1 to quit): "<<endl;
+    for( unsigned int it = 0; it < list_of_tutos.size(); ++it)
+    {
+      cout<<it<<") "<<list_of_tutos[it]->name_of_tuto<<endl;
+      cout<<"  "<<list_of_tutos[it]->tuto_help<<endl<<endl;
+    }
+    int rep=-1;
+    cin>>rep;
+    return rep;
+  }
 
-  // Generates sparse projections (not all points are projected)
-  NViewDataSet NRealisticCamerasSparse(int nviews, int npoints,
-    float view_ratio = 0.6,
-    unsigned min_projections = 3,
-    const nViewDatasetConfigator
-    config = nViewDatasetConfigator());
+  static void run_tuto(int id_tuto)
+  {
+    if( id_tuto < 0 || id_tuto >= (int)list_of_tutos.size() )
+      cout<<"wrong number, please try again..."<<endl;
+    else
+      list_of_tutos[id_tuto]->tuto_body();
+  }
 
-} // namespace libmv
+  string name_of_tuto;
+  string tuto_help;
+};
+
+//////////////////////////////////////////////////////////////////////////
+//Only to see how we can create a 3D structure estimation using calibrated cameras
+//////////////////////////////////////////////////////////////////////////
+enum { LOAD_INTRA=1, LOAD_POSITION=2, LOAD_FULL=3};
+
+vector<PointOfView> loadCamerasFromFile(string fileName, int flag_model = LOAD_FULL);
+
+
+
+#define TUTO_CLASS_NAME_(tuto_name) \
+  class_##tuto_name##_Test
+// Helper macro for defining tuto.
+#define NEW_TUTO(t_name, tuto_name, tuto_help)\
+class TUTO_CLASS_NAME_(t_name) : public Intern_tutorial_list {\
+ public:\
+  TUTO_CLASS_NAME_(t_name)(string n,string h)\
+    :Intern_tutorial_list(n,h){}\
+  static Intern_tutorial_list* const add_to_vector _ATTRIBUTE_UNUSED_;\
+ private:\
+  _DISALLOW_COPY_AND_ASSIGN_( TUTO_CLASS_NAME_(t_name) );\
+  virtual void tuto_body();\
+};\
+Intern_tutorial_list* const TUTO_CLASS_NAME_(t_name)\
+  ::add_to_vector = Intern_tutorial_list\
+    ::registerTuto(new TutoFactoryImpl<TUTO_CLASS_NAME_(t_name)>(tuto_name, tuto_help));\
+void TUTO_CLASS_NAME_(t_name)::tuto_body()
+
+
 
 #endif  // LIBMV_MULTIVIEW_TEST_DATA_SETS_H_

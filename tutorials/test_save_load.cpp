@@ -1,30 +1,21 @@
 
-//Set to 1 if you want to test the points detection and matching
-//But be aware to set other tests to 0...
-#if 0
-
 #include "../src/PointsToTrackWithImage.h"
 #include "../src/MotionProcessor.h"
 #include "../src/SequenceAnalyzer.h"
 #include "../src/PointsMatcher.h"
 #include <opencv2/calib3d/calib3d.hpp>
 
-#include <iostream>
-
-using namespace std;
-using namespace cv;
-using namespace OpencvSfM;
 
 //////////////////////////////////////////////////////////////////////////
 //This file will not be in the final version of API, consider it like a tuto/draft...
 //You will need files to test. Download the temple dataset here : http://vision.middlebury.edu/mview/data/
 //////////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////////////////
-//Only to see how we can use PointsMatcher
-//////////////////////////////////////////////////////////////////////////
+#include "test_data_sets.h"
 
-void main(){
+NEW_TUTO(YAML_Tuto, "Learn how you can load/save object using YAML file format",
+  "After loading an image, we find points and decriptions, theen we save them in a text file. We then reload them to be sure that everything was fine.")
+{
 
   MotionProcessor mp;
   vector<Mat> masks;
@@ -56,7 +47,7 @@ void main(){
 
     cout<<"now create the two set of points with features..."<<endl;
     Ptr<PointsToTrack> ptt1;
-    ptt1=Ptr<PointsToTrack>(new PointsToTrackWithImage (
+    ptt1=Ptr<PointsToTrack>(new PointsToTrackWithImage (0,
       firstImage,Mat(),fastDetect,SurfDetect));
     ptt1->computeKeypointsAndDesc(true);
 
@@ -85,5 +76,3 @@ void main(){
   }
 
 }
-
-#endif

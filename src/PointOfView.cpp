@@ -114,6 +114,39 @@ namespace OpencvSfM{
     //transform points into pixel coordinates using camera intra parameters:
     return device_->normImageToPixelCoordinates(pointsOut);
   }
+  vector<Vec2d> PointOfView::project3DPointsIntoImage(vector<TrackPoints> points) const
+  {
+    //As we don't know what type of camera we use (with/without disportion, fisheyes...)
+    //we can't use classic projection matrix P = K . [R|t]
+    //Instead, we first compute points transformation into camera's system and then compute
+    //pixel coordinate using camera device function.
+
+    //As we need Mat object to compute projection, we create temporary objects:
+    Mat mat3DNorm(4,1,CV_64F);
+    double* point3DNorm=(double*)mat3DNorm.data;
+    Mat mat2DNorm(3,1,CV_64F);
+    double* point2DNorm=(double*)mat2DNorm.data;
+    
+    vector<Vec2d> pointsOut;
+    vector<TrackPoints>::iterator point=points.begin();
+    while(point!=points.end())
+    {
+      Vec3d convert_from_track = (*point);
+      point3DNorm[0] = convert_from_track[0];
+      point3DNorm[1] = convert_from_track[1];
+      point3DNorm[2] = convert_from_track[2];
+      point3DNorm[3] = 1;
+
+      //transform points into camera's coordinates:
+      mat2DNorm = ( projection_matrix_ * mat3DNorm);
+
+      pointsOut.push_back(Vec2d(point2DNorm[0]/point2DNorm[2],point2DNorm[1]/point2DNorm[2]));
+
+      point++;
+    }
+    //transform points into pixel coordinates using camera intra parameters:
+    return device_->normImageToPixelCoordinates(pointsOut);
+  }
 
   bool PointOfView::pointInFrontOfCamera(cv::Vec4d point) const
   {

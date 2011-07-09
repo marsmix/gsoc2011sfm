@@ -1,6 +1,3 @@
-//Set to 1 if you want to test the points detection and matching
-//But be aware to set other tests to 0...
-#if 1
 
 #include "../src/PointsToTrackWithImage.h"
 #include "../src/MotionProcessor.h"
@@ -9,23 +6,16 @@
 #include "../src/libmv_mapping.h"
 #include <opencv2/calib3d/calib3d.hpp>
 
-#include <iostream>
-#include <string>
-
-using namespace std;
-using namespace cv;
-using namespace OpencvSfM;
-
 //////////////////////////////////////////////////////////////////////////
 //This file will not be in the final version of API, consider it like a tuto/draft...
 //You will need files to test. Download the temple dataset here : http://vision.middlebury.edu/mview/data/
 //////////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////////////////
-//Only to see how we can use MotionEstimator
-//////////////////////////////////////////////////////////////////////////
+#include "test_data_sets.h"
 
-int main(){
+NEW_TUTO(Track_creation, "Learn how you can compute tracks from a list of pictures",
+  "Using features detector and matcher, create a vector of tracks (a track is a list of 2D points from the same 3D point).\nYou will also learn how you can save an object using YAML!")
+{
   MotionProcessor mp;
   //first load images:
   //Here we will a folder with a lot of images, but we can do the same thing with any other type of input
@@ -38,7 +28,7 @@ int main(){
     if( !mp.setInputSource(correctDir.c_str(),IS_DIRECTORY) )
     {
       cout<<"Problem not solved..."<<endl;
-      return -1;
+      return;
     }
   }
 
@@ -156,8 +146,4 @@ int main(){
   vector<TrackPoints> &tracks=motion_estim_loaded.getTracks();
   cout<<"numbers of correct tracks:"<<tracks.size()<<endl;
   motion_estim_loaded.showTracks(images,0);*/
-  return 0;
 }
-
-
-#endif

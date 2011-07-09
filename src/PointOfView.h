@@ -6,13 +6,15 @@
 #include "opencv2/highgui/highgui.hpp"
 
 #include "Camera.h"
+#include "TracksOfPoints.h"
 #include <vector>
 #include <string>
 
 
 namespace OpencvSfM{
 
-  class Camera;///<We will need this class, but Camera need our class too...
+  class SFM_EXPORTS Camera;///<We will need this class, but Camera need our class too...
+  class SFM_EXPORTS TrackPoints;
 
   enum paramsToEstimate
   {
@@ -71,6 +73,12 @@ namespace OpencvSfM{
     */
     cv::Ptr<Camera> getIntraParameters() const{return device_;};
     
+    /**
+    * This method can convert 3D points from world coordinates to 2D points in pixel image coordinates
+    * @param points 3D points in world coordinates.
+    * @return 2D points in pixel image coordinates.
+    */
+    virtual std::vector<cv::Vec2d> project3DPointsIntoImage(std::vector<TrackPoints> points) const;
     /**
     * This method can convert 3D points from world coordinates to 2D points in pixel image coordinates
     * @param points 3D points in world coordinates.

@@ -1,6 +1,3 @@
-//Set to 1 if you want to test the points detection and matching
-//But be aware to set other tests to 0...
-#if 0
 
 #include "../src/PointsToTrackWithImage.h"
 #include "../src/MotionProcessor.h"
@@ -8,22 +5,16 @@
 #include "../src/PointsMatcher.h"
 #include <opencv2/calib3d/calib3d.hpp>
 
-#include <iostream>
-
-using namespace std;
-using namespace cv;
-using namespace OpencvSfM;
-
 //////////////////////////////////////////////////////////////////////////
 //This file will not be in the final version of API, consider it like a tuto/draft...
 //You will need files to test. Download the temple dataset here : http://vision.middlebury.edu/mview/data/
 //////////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////////////////
-//Only to see how we can use PointsMatcher
-//////////////////////////////////////////////////////////////////////////
+#include "test_data_sets.h"
 
-void main(){
+NEW_TUTO(Points_Definitions, "How features can be defined",
+  "Using 2 pictures loaded using a motion processor, we find points, match them and find the fundamental matrix."){
+
   MotionProcessor mp;
   vector<Mat> masks;
 
@@ -39,9 +30,8 @@ void main(){
   //universal method to get the current image:
   Mat firstImage=mp.getFrame();
   Mat secondImage=mp.getFrame();
-  Mat thirdImage=mp.getFrame();
 
-  if(firstImage.empty()||secondImage.empty()||thirdImage.empty())
+  if(firstImage.empty()||secondImage.empty())
   {
     cout<<"test can not be run... can't find different images..."<<endl;
   }
@@ -57,11 +47,9 @@ void main(){
 
     cout<<"now create the two set of points with features..."<<endl;
     Ptr<PointsToTrack> ptt1;
-    ptt1=Ptr<PointsToTrack>(new PointsToTrackWithImage (firstImage,Mat(),fastDetect,SurfDetect));
+    ptt1=Ptr<PointsToTrack>(new PointsToTrackWithImage (0, firstImage,Mat(),fastDetect,SurfDetect));
     Ptr<PointsToTrack> ptt2;
-    ptt2=Ptr<PointsToTrack>(new PointsToTrackWithImage (secondImage,Mat(),fastDetect,SurfDetect));
-    Ptr<PointsToTrack> ptt3;
-    ptt3=Ptr<PointsToTrack>(new PointsToTrackWithImage (thirdImage,Mat(),fastDetect,SurfDetect));
+    ptt2=Ptr<PointsToTrack>(new PointsToTrackWithImage (1, secondImage,Mat(),fastDetect,SurfDetect));
 
     cout<<"now try to find matches, so we create a matcher (classic bruteForce)"<<endl<<endl;
     Ptr<DescriptorMatcher> matcher;
@@ -77,7 +65,6 @@ void main(){
     //So we set ptt2 as training data:
     cout<<"Add points of image 2 as references points"<<endl;
     matches.add(ptt2);
-    //matches.add(ptt3);
 
     Ptr<PointsMatcher> matches2= matches.clone();
     matches2->add(ptt1);
@@ -190,5 +177,3 @@ void main(){
   }
 }
 */
-
-#endif
