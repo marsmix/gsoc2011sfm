@@ -3,6 +3,7 @@
 #include "../src/MotionProcessor.h"
 #include "../src/SequenceAnalyzer.h"
 #include "../src/PointsMatcher.h"
+#include "../src/config.h"
 #include <opencv2/calib3d/calib3d.hpp>
 
 
@@ -22,7 +23,7 @@ NEW_TUTO(YAML_Tuto, "Learn how you can load/save object using YAML file format",
 
   //first load images:
   //Here we will a folder with a lot of images, but we can do the same thing with any other type of input
-  mp.setInputSource("../Medias/temple/",IS_DIRECTORY);
+  mp.setInputSource(FROM_SRC_ROOT("Medias/temple/"),IS_DIRECTORY);
 
   //Configure input (not needed, but show how we can do 
   mp.setProperty(CV_CAP_PROP_CONVERT_RGB,0);//Only greyscale, due to SIFT
@@ -58,7 +59,7 @@ NEW_TUTO(YAML_Tuto, "Learn how you can load/save object using YAML file format",
     matches_algo->add(ptt1);
 
     //now save the points:
-    FileStorage fsOut("test.yml", FileStorage::WRITE);
+    FileStorage fsOut(FROM_SRC_ROOT("Medias/test.yml"), FileStorage::WRITE);
     //Can't find a way to enable the following notation:
     //fs << *ptt1;
     PointsMatcher::write(fsOut,*matches_algo);
@@ -67,7 +68,7 @@ NEW_TUTO(YAML_Tuto, "Learn how you can load/save object using YAML file format",
     //and create a new PointsToTrack using this file:
     Ptr<PointsMatcher> matches_new ( new PointsMatcher(matcher->clone(true)) );
     //ptt_New=Ptr<PointsToTrack>(new PointsToTrack ());
-    FileStorage fsRead("test.yml", FileStorage::READ);
+    FileStorage fsRead(FROM_SRC_ROOT("Medias/test.yml"), FileStorage::READ);
     FileNode myPtt = fsRead.getFirstTopLevelNode();
     //Can't find a way to enable the following notation:
     //myPtt >> ptt_New;

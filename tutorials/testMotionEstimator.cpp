@@ -4,6 +4,7 @@
 #include "../src/SequenceAnalyzer.h"
 #include "../src/PointsMatcher.h"
 #include "../src/libmv_mapping.h"
+#include "../src/config.h"
 #include <opencv2/calib3d/calib3d.hpp>
 
 //////////////////////////////////////////////////////////////////////////
@@ -19,17 +20,10 @@ NEW_TUTO(Track_creation, "Learn how you can compute tracks from a list of pictur
   MotionProcessor mp;
   //first load images:
   //Here we will a folder with a lot of images, but we can do the same thing with any other type of input
-  if( !mp.setInputSource("../Medias/temple/",IS_DIRECTORY) )//or ../gsoc2011sfm/Medias/temple/
+  if( !mp.setInputSource(FROM_SRC_ROOT("Medias/temple/"),IS_DIRECTORY) )
   {
-    cout<<"Can't find \"Medias/temple/\" dataset, or Boost library was not used..."<<endl;
-    string correctDir = "";
-    cout<<"Please enter the correct data directory:"<<endl;
-    getline(cin, correctDir);
-    if( !mp.setInputSource(correctDir.c_str(),IS_DIRECTORY) )
-    {
-      cout<<"Problem not solved..."<<endl;
-      return;
-    }
+    cout<<"Can't find \"Medias/temple/\" dataset"<<endl;
+    return;
   }
 
   //Configure input (not needed, but show how we can do 
@@ -50,10 +44,13 @@ NEW_TUTO(Track_creation, "Learn how you can compute tracks from a list of pictur
   vector<Mat> images;
   Mat currentImage=mp.getFrame();
 
-  if( boost::filesystem::exists( boost::filesystem::status("motion_points.yml") ) )
+  string pathFileTracks = FROM_SRC_ROOT("Medias/tracks_points_SIFT/motion_points.yml");
+  std::ifstream inPoints(pathFileTracks.c_str());
+  if( inPoints.is_open() )
   {
+    inPoints.close();
     cout<<"Load points from \"motion_points.yml\""<<endl;
-    FileStorage fsRead("motion_points.yml", FileStorage::READ);
+    FileStorage fsRead(pathFileTracks, FileStorage::READ);
     FileNodeIterator vecPtt = fsRead.getFirstTopLevelNode().begin();
     FileNodeIterator vecPtt_end = fsRead.getFirstTopLevelNode().end();
 
@@ -91,7 +88,7 @@ NEW_TUTO(Track_creation, "Learn how you can compute tracks from a list of pictur
     cout<<"Create the motion estimator:"<<endl;
 
     //now save the tracks:
-    FileStorage fsOut("motion_points.yml", FileStorage::WRITE);
+    FileStorage fsOut(pathFileTracks, FileStorage::WRITE);
     fsOut << "Vector_of_motionTrack" << "[";
     for(unsigned int i=0;i<vec_points_to_track.size(); i++)
     {
@@ -102,7 +99,7 @@ NEW_TUTO(Track_creation, "Learn how you can compute tracks from a list of pictur
 
   }
 
-  SequenceAnalyzer motion_estim(images,vec_points_to_track,matches_algo);
+  SequenceAnalyzer motion_estim(vec_points_to_track,matches_algo,images);
 
   motion_estim.computeMatches();
 
@@ -110,7 +107,8 @@ NEW_TUTO(Track_creation, "Learn how you can compute tracks from a list of pictur
   cout<<"numbers of tracks:"<<tracks.size()<<endl;
 
   //now save the tracks:
-  FileStorage fsOutMotion1("motion_tracks1.yml", FileStorage::WRITE);
+  pathFileTracks = FROM_SRC_ROOT("Medias/tracks_points_SIFT/motion_tracks1.yml");
+  FileStorage fsOutMotion1(pathFileTracks, FileStorage::WRITE);
   //Can't find a way to enable the following notation:
   //fs << *ptt1;
   SequenceAnalyzer::write(fsOutMotion1,motion_estim);
@@ -122,7 +120,8 @@ NEW_TUTO(Track_creation, "Learn how you can compute tracks from a list of pictur
   cout<<"numbers of correct tracks:"<<tracks.size()<<endl;
 
   //now save the tracks:
-  FileStorage fsOutMotion("motion_tracks.yml", FileStorage::WRITE);
+  pathFileTracks = FROM_SRC_ROOT("Medias/tracks_points_SIFT/motion_tracks.yml");
+  FileStorage fsOutMotion(pathFileTracks, FileStorage::WRITE);
   //Can't find a way to enable the following notation:
   //fs << *ptt1;
   SequenceAnalyzer::write(fsOutMotion,motion_estim);

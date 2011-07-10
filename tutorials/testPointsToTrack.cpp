@@ -3,6 +3,7 @@
 #include "../src/MotionProcessor.h"
 #include "../src/SequenceAnalyzer.h"
 #include "../src/PointsMatcher.h"
+#include "../src/config.h"
 #include <opencv2/calib3d/calib3d.hpp>
 
 //////////////////////////////////////////////////////////////////////////
@@ -20,7 +21,7 @@ NEW_TUTO(Points_Definitions, "How features can be defined",
 
   //first load images:
   //Here we will a folder with a lot of images, but we can do the same thing with any other type of input
-  mp.setInputSource("../Medias/temple/",IS_DIRECTORY);
+  mp.setInputSource(FROM_SRC_ROOT("Medias/temple/"),IS_DIRECTORY);
 
   //Configure input (not needed, but show how we can do 
   mp.setProperty(CV_CAP_PROP_CONVERT_RGB,0);//Only greyscale, due to SIFT

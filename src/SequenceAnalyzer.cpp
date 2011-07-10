@@ -44,12 +44,23 @@ namespace OpencvSfM{
     }
   }
 
-  SequenceAnalyzer::SequenceAnalyzer(std::vector<cv::Mat> &images,
+  SequenceAnalyzer::SequenceAnalyzer(
     vector<Ptr<PointsToTrack>> &points_to_track,
-    Ptr<PointsMatcher> match_algorithm)
+    Ptr<PointsMatcher> match_algorithm,
+    std::vector<cv::Mat> &images)
     :images_(images),points_to_track_(points_to_track),
     match_algorithm_(match_algorithm)
   {
+  }
+
+  using cv::DescriptorMatcher;
+  using cv::FlannBasedMatcher;
+  //by default, use flann based matcher
+  SequenceAnalyzer::SequenceAnalyzer(std::vector<cv::Mat> &images, cv::FileNode file)
+    :images_(images),
+    match_algorithm_(new PointsMatcher(Ptr<DescriptorMatcher>(new FlannBasedMatcher())))
+  {
+    read(file,*this);
   }
 
   SequenceAnalyzer::~SequenceAnalyzer(void)

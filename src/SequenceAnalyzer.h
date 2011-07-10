@@ -82,9 +82,16 @@ namespace OpencvSfM{
     * @param points_to_track list of points to track with (or not) features
     * @param match_algorithm algorithm to match points of each images
     */
-    SequenceAnalyzer(std::vector<cv::Mat> &images,
+    SequenceAnalyzer(
       std::vector<cv::Ptr<PointsToTrack>> &points_to_track,
-      cv::Ptr<PointsMatcher> match_algorithm );
+      cv::Ptr<PointsMatcher> match_algorithm,
+      std::vector<cv::Mat> &images = std::vector<cv::Mat>());
+    /**
+    * Constructor taking a list of images and a FileNode
+    * @param images input images. Points should be in the same order!
+    * @param file YAML file to get points and matches
+    */
+    SequenceAnalyzer(std::vector<cv::Mat> &images, cv::FileNode file);
 
     ~SequenceAnalyzer(void);
     /**

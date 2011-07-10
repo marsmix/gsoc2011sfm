@@ -91,6 +91,7 @@ public:
 
   static int print_menu()
   {
+    cout<<endl<<"//////////////////////////////////////////////////"<<endl;
     cout<<"Please choose a tutorial (-1 to quit): "<<endl;
     for( unsigned int it = 0; it < list_of_tutos.size(); ++it)
     {
@@ -99,6 +100,8 @@ public:
     }
     int rep=-1;
     cin>>rep;
+    cin.clear(); //clear the error bits for the cin input stream
+    cin.sync(); //synchronize the input buffer, discarding any leftover characters in the buffer 
     return rep;
   }
 
@@ -108,6 +111,10 @@ public:
       cout<<"wrong number, please try again..."<<endl;
     else
       list_of_tutos[id_tuto]->tuto_body();
+    cout<<endl<<"Please type enter to continue"<<endl;
+    cin.get(); //this should make it pause 
+    cin.clear(); //clear the error bits for the cin input stream
+    cin.sync(); //synchronize the input buffer, discarding any leftover characters in the buffer 
   }
 
   string name_of_tuto;
