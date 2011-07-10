@@ -22,7 +22,7 @@ namespace OpencvSfM{
       TrackPoints &track = tracks[i];
       unsigned int nviews = track.getNbTrack();
 
-      CV_Assert(nviews < cameras_.size());
+      CV_DbgAssert(nviews <= cameras_.size());
 
       cv::Vec3d point_final;
       double distance=track.triangulateRobust( cameras_,points_to_track, point_final );

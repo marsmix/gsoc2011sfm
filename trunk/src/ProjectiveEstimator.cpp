@@ -192,7 +192,7 @@ namespace OpencvSfM{
   }
   //////////////////////////////////////////////////////////////////////////
 
-  void ProjectiveEstimator::comptueReconstruction(vector<PointOfView>& camReal)
+  void ProjectiveEstimator::computeReconstruction(vector<PointOfView>& camReal)
   {
     vector<TrackPoints>& tracks = sequence_.getTracks();
     vector<Ptr<PointsToTrack>> &points_to_track = sequence_.getPoints();

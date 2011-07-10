@@ -52,8 +52,9 @@ namespace OpencvSfM{
     
     /**
     * improve cameras positions.
+    * camReal is only here to test quality of estimation...
     */
-    void comptueReconstruction(std::vector<PointOfView>& camReal);
+    void computeReconstruction(std::vector<PointOfView>& camReal);
 
   protected:
     void updateTwoViewMotion(std::vector<TrackPoints>& tracks,

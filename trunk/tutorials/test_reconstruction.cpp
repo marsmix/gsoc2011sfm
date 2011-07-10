@@ -5,6 +5,7 @@
 #include "../src/PointOfView.h"
 #include "../src/CameraPinhole.h"
 #include "../src/libmv_mapping.h"
+#include "../src/config.h"
 #include <opencv2/calib3d/calib3d.hpp>
 
 
@@ -22,23 +23,24 @@
 NEW_TUTO(Triangulation_tuto, "Learn how you can triangulate 2D points",
   "Using fully parameterized cameras, we find 2D points in the sequence and then triangulate them. We finally draw them on the sequence.")
 {
-  Ptr<DescriptorMatcher> matcher;
-  matcher=Ptr<DescriptorMatcher>(new FlannBasedMatcher());
-  Ptr<PointsMatcher> matches_algo ( new PointsMatcher(matcher) );
-
   //universal method to get the current image:
   vector<Mat> images;
 
-  if( !boost::filesystem::exists( boost::filesystem::status("motion_tracks.yml") ) )
+  string pathFileTracks = FROM_SRC_ROOT("Medias/tracks_points_SIFT/motion_tracks.yml");
+  std::ifstream inPoints(pathFileTracks.c_str());
+  if( !inPoints.is_open() )
   {
     cout<<"please compute points matches using testMotionEstimator.cpp first!"<<endl;
     return;
   }
+  inPoints.close();
   
-  vector<PointOfView> myCameras=loadCamerasFromFile("../Medias/temple/temple_par.txt");
+  cout<<"First load the cameras from Medias/temple/temple_par.txt"<<endl;
+  vector<PointOfView> myCameras=loadCamerasFromFile(FROM_SRC_ROOT("Medias/temple/temple_par.txt"));
   MotionProcessor mp;
-  mp.setInputSource("../Medias/temple/",IS_DIRECTORY);
-  
+  mp.setInputSource(FROM_SRC_ROOT("Medias/temple/"),IS_DIRECTORY);
+
+  cout<<"Then load all images from Medias/temple/"<<endl;
   vector<PointOfView>::iterator itPoV=myCameras.begin();
   int index_image=-1;
   while ( itPoV!=myCameras.end() )
@@ -50,22 +52,20 @@ NEW_TUTO(Triangulation_tuto, "Learn how you can triangulate 2D points",
     images.push_back(imgTmp);
   }
 
-  //and create a new PointsToTrack using this file:
-  vector<Ptr<PointsToTrack>> points_empty;
-  SequenceAnalyzer motion_estim_loaded( images, points_empty, matches_algo );
-
-  FileStorage fsRead("motion_tracks.yml", FileStorage::READ);
+  cout<<"Finally create a new PointsToTrack using Medias/tracks_points_SIFT/motion_tracks.yml"<<endl;
+  FileStorage fsRead(pathFileTracks, FileStorage::READ);
   FileNode myPtt = fsRead.getFirstTopLevelNode();
-  SequenceAnalyzer::read(myPtt, motion_estim_loaded);
+  SequenceAnalyzer motion_estim_loaded( images, myPtt );
   fsRead.release();
 
-  vector<TrackPoints> &tracks=motion_estim_loaded.getTracks();
-  cout<<"numbers of correct tracks loaded:"<<tracks.size()<<endl;
+  cout<<"numbers of correct tracks loaded:"<<
+    motion_estim_loaded.getTracks().size()<<endl;
 
   int maxImg=motion_estim_loaded.getNumViews();
 
   cout<<"triangulation of points."<<endl;
   StructureEstimator structure (motion_estim_loaded, myCameras);
+  vector<TrackPoints> tracks;
   structure.computeStructure(tracks);
   cout<<tracks.size()<<" points found."<<endl;
 
@@ -81,7 +81,6 @@ NEW_TUTO(Triangulation_tuto, "Learn how you can triangulate 2D points",
 
     //create the vector of 3D points viewed by this camera:
     vector<Vec3d> points3D;
-    vector<KeyPoint> points2DOrigine;
     //motion_estim_loaded.filterPoints(triangulated,index_image,points3D,points2DOrigine);
     vector<Vec2d> pixelProjected=itPoV->project3DPointsIntoImage(tracks);
     //convert Vec2d into KeyPoint:
@@ -90,10 +89,8 @@ NEW_TUTO(Triangulation_tuto, "Learn how you can triangulate 2D points",
       points2D.push_back( KeyPoint( (float)pixelProjected[j][0],
       (float)pixelProjected[j][1], 10.0 ) );
 
-    Mat imgTmp1,imgTmp2;
-    drawKeypoints(imgTmp,points2DOrigine,imgTmp1,Scalar(255,255,255));
+    Mat imgTmp2;
     drawKeypoints(imgTmp,points2D,imgTmp2,Scalar(255,255,255));
-    imshow("Points origine...",imgTmp1);
     imshow("Points projected...",imgTmp2);
     cv::waitKey(0);
     itPoV++;
