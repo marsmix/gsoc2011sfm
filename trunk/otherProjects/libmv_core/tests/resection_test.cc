@@ -28,7 +28,6 @@
 namespace {
 
   using namespace libmv;
-  using namespace libmv::projection_estimation;
 
   TEST(Resection, ThreeViews) {
     int nviews = 5;

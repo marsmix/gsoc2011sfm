@@ -6,19 +6,20 @@ macro(define_new_project name)
 	add_definitions(-DCVAPI_EXPORTS)
 
 	include_directories("${CMAKE_CURRENT_SOURCE_DIR}"
-	                    "${CMAKE_CURRENT_BINARY_DIR}")
+	                    "${CMAKE_CURRENT_BINARY_DIR}"
+	                    "${CMAKE_BINARY_DIR}")
 
 	file(GLOB bin_srcs "*.cpp")
 	file(GLOB bin_int_hdrs "*.h*")
 	source_group("Src" FILES ${bin_srcs})
-	source_group("Include" FILES ${bin_int_hdrs})
+	source_group("Include" FILES ${bin_int_hdrs} ${CMAKE_BINARY_DIR}/config.h)
 
 	#file(GLOB bin_hdrs "include/${name}/*.h*")
 	#source_group("Include" FILES ${bin_hdrs})
 
 	set(the_target "SfM_${name}")
 
-	add_executable(${the_target} ${bin_srcs} ${bin_hdrs} ${bin_int_hdrs})
+	add_executable(${the_target} ${bin_srcs} ${bin_hdrs} ${bin_int_hdrs} ${CMAKE_BINARY_DIR}/config.h)
 
 	# For dynamic link numbering convenions
 	set_target_properties(${the_target} PROPERTIES

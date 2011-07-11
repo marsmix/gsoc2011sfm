@@ -35,8 +35,6 @@
 
 namespace libmv
 {
-  namespace autocalibration
-  {
     // Create intra parameters using absolute conic:
     void _LIBMV_DLL_ K_From_AbsoluteConic(const Mat3 &W, Mat3 *K);
     //class to perform linear estimation of metric transformation H:
@@ -151,7 +149,7 @@ namespace libmv
       *A = Hinv * tmpA;
       *B = Hinv * tmpB;
     }
-  }
+
 }
 
 #endif

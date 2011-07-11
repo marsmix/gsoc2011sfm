@@ -32,9 +32,6 @@
 
 namespace libmv
 {
-  namespace projection_estimation
-  {
-
     //compute the relative motion between two cameras
     void _LIBMV_DLL_ RelativeCameraMotion(const Mat3 &R1, const Vec3 &t1,
       const Mat3 &R2, const Vec3 &t2, Mat3 *R, Vec3 *t);
@@ -213,7 +210,6 @@ namespace libmv
     */
     void _LIBMV_DLL_ EuclideanResectionEPnP(const Mat2X &x_camera, const Mat3X &X_world, 
       Mat3 *R, Vec3 *t);
-  }
 }
 
 #endif

@@ -60,7 +60,7 @@ struct NViewDataSet {
   }
   Mat3 F(int i, int j) {
     Mat3 F_;
-    fundamental_matrix::FundamentalFromProjections(P(i), P(j), &F_);
+    FundamentalFromProjections(P(i), P(j), &F_);
     return F_;
   }
   void Reproject() {

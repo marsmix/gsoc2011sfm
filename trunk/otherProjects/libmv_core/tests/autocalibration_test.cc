@@ -34,7 +34,7 @@ namespace {
       0,  0,  1;
 
     Mat3 w = (K * K.transpose()).inverse();
-    autocalibration::K_From_AbsoluteConic(w, &Kp);
+    K_From_AbsoluteConic(w, &Kp);
 
     EXPECT_MATRIX_NEAR(K, Kp, 1e-8);
   }
@@ -50,7 +50,7 @@ namespace {
       0,  0,   1;
 
     Mat3 w = (K * K.transpose()).inverse();
-    autocalibration::K_From_AbsoluteConic(w, &Kp);
+    K_From_AbsoluteConic(w, &Kp);
 
     EXPECT_MATRIX_NEAR(Kpositive, Kp, 1e-8);
   }
@@ -62,7 +62,7 @@ namespace {
       0, width, height / 2,
       0,     0,          1;
 
-    autocalibration::AutoCalibrationLinear a;
+    AutoCalibrationLinear a;
 
     // Add cameras with random rotation and translation.
     for (int i = 0; i < 3; ++i) {
@@ -106,7 +106,7 @@ namespace {
       -4,  0,  2,  0,
       1,  2,  3,  1;
 
-    autocalibration::AutoCalibrationLinear a;
+    AutoCalibrationLinear a;
 
     // Add cameras with random rotation and translation.
     Mat34 Ps[num_cams];

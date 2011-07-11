@@ -35,8 +35,8 @@ TEST(SixPointNView, ThreeView) {
   NViewDataSet d = NRealisticCamerasFull(nviews, npoints);
 
   Mat2X xs = HStack(HStack(d.x[0], d.x[1]), d.x[2]);
-  vector<autocalibration::SixPointReconstruction> reconstructions;
-  autocalibration::SixPointNView(xs, &reconstructions);
+  vector<SixPointReconstruction> reconstructions;
+  SixPointNView(xs, &reconstructions);
 
   //LOG(INFO) << "Got " << reconstructions.size() << " reconstructions.";
   for (int i = 0; i < reconstructions.size(); ++i) {

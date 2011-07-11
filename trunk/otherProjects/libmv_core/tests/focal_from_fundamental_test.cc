@@ -25,9 +25,6 @@
 
   namespace {
     using namespace libmv;
-    using namespace libmv::fundamental_matrix;
-    using namespace libmv::essential_matrix;
-    using namespace libmv::projection_estimation;
 
 // Two cameras looking with orthogonal (non-crossing) viewing rays.
 // One at the origin and looking to the z direction.
