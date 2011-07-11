@@ -75,7 +75,7 @@ namespace OpencvSfM{
   {
     vector<Vec2d> pointsPixelCoord=CameraPinhole::normImageToPixelCoordinates(points);
     //TODO: remove the distortion!
-    CV_Error( CV_StsBadFunc, "This function is not yet implemented!\nPlease cast your object to use explicitly CameraPinhole::normImageToPixelCoordinates");
+    //CV_Error( CV_StsBadFunc, "This function is not yet implemented!\nFor now use the CameraPinhole::normImageToPixelCoordinates");
     return pointsPixelCoord;
   }
 }

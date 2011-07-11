@@ -49,9 +49,11 @@ class TutoFactoryBase {
   virtual Intern_tutorial_list* CreateTest() = 0;
 
  protected:
-  TutoFactoryBase(string n,string h) {name=n;help=h;}
+  TutoFactoryBase(string n,string h,string f)
+  {name=n;help=h;file=f;}
   string name;
   string help;
+  string file;
 
  private:
   _DISALLOW_COPY_AND_ASSIGN_(TutoFactoryBase);
@@ -61,9 +63,10 @@ class TutoFactoryBase {
 template <class TutoClass>
 class TutoFactoryImpl : public TutoFactoryBase {
  public:
-   TutoFactoryImpl(string n,string h):TutoFactoryBase(n,h){};
+   TutoFactoryImpl(string n,string h,string f)
+     :TutoFactoryBase(n,h,f){};
   virtual Intern_tutorial_list* CreateTest() {
-    return new TutoClass(name,help); }
+    return new TutoClass(name,help,file); }
 };
 
 class Intern_tutorial_list
@@ -71,10 +74,11 @@ class Intern_tutorial_list
   static vector<Intern_tutorial_list*> list_of_tutos;
   _DISALLOW_COPY_AND_ASSIGN_(Intern_tutorial_list);
 protected:
-  Intern_tutorial_list(string name,string help)
+  Intern_tutorial_list(string name,string help,string file)
   {
     this->name_of_tuto = name;
     this->tuto_help = help;
+    this->file_of_tuto = file;
   }
 
   virtual void tuto_body()=0;
@@ -110,14 +114,20 @@ public:
     if( id_tuto < 0 || id_tuto >= (int)list_of_tutos.size() )
       cout<<"wrong number, please try again..."<<endl;
     else
+    {
+      cout<<"Running "<<list_of_tutos[id_tuto]->file_of_tuto<<"..."<<endl;
       list_of_tutos[id_tuto]->tuto_body();
+    }
     cout<<endl<<"Please type enter to continue"<<endl;
-    cin.get(); //this should make it pause 
     cin.clear(); //clear the error bits for the cin input stream
     cin.sync(); //synchronize the input buffer, discarding any leftover characters in the buffer 
+    cin.get(); //this should make it pause 
+    cin.clear();
+    cin.sync();
   }
-
+  
   string name_of_tuto;
+  string file_of_tuto;
   string tuto_help;
 };
 
@@ -136,8 +146,8 @@ vector<PointOfView> loadCamerasFromFile(string fileName, int flag_model = LOAD_F
 #define NEW_TUTO(t_name, tuto_name, tuto_help)\
 class TUTO_CLASS_NAME_(t_name) : public Intern_tutorial_list {\
  public:\
-  TUTO_CLASS_NAME_(t_name)(string n,string h)\
-    :Intern_tutorial_list(n,h){}\
+  TUTO_CLASS_NAME_(t_name)(string n,string h,string f)\
+    :Intern_tutorial_list(n,h,f){}\
   static Intern_tutorial_list* const add_to_vector _ATTRIBUTE_UNUSED_;\
  private:\
   _DISALLOW_COPY_AND_ASSIGN_( TUTO_CLASS_NAME_(t_name) );\
@@ -145,7 +155,8 @@ class TUTO_CLASS_NAME_(t_name) : public Intern_tutorial_list {\
 };\
 Intern_tutorial_list* const TUTO_CLASS_NAME_(t_name)\
   ::add_to_vector = Intern_tutorial_list\
-    ::registerTuto(new TutoFactoryImpl<TUTO_CLASS_NAME_(t_name)>(tuto_name, tuto_help));\
+    ::registerTuto(new TutoFactoryImpl<TUTO_CLASS_NAME_(t_name)>(tuto_name, tuto_help,\
+    __FILE__));\
 void TUTO_CLASS_NAME_(t_name)::tuto_body()
 
 

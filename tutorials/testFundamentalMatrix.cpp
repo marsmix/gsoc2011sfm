@@ -20,8 +20,10 @@ NEW_TUTO(Camera_tuto, "Learn how you can mix 3D objects and fully parameterized 
 {
   vector<PointOfView> myCameras=loadCamerasFromFile(FROM_SRC_ROOT("Medias/temple/temple_par.txt"));
 
-  //As the (tight) bounding box for the temple model is (-0.054568 0.001728 -0.042945) - (0.047855 0.161892 0.032236)
-  //I will create some 3D points and see if they are correcly reprojected:
+  cout<<"As the (tight) bounding box for the temple model is "<<
+    "(-0.054568 0.001728 -0.042945) - (0.047855 0.161892 0.032236)"<<
+    ", I create 3D points on corners of this boundng box"<<
+    "and see if they are correcly reprojected:"<<endl;
 
   vector<Vec3d> points3D;
   points3D.push_back(Vec3d( -0.054568, 0.001728, -0.042945 ));
@@ -35,9 +37,12 @@ NEW_TUTO(Camera_tuto, "Learn how you can mix 3D objects and fully parameterized 
 
   //now for each point of view, we draw the picture and these points projected:
   MotionProcessor mp;
-  //Here we will a folder with a lot of images, but we can do the same thing with any other type of input
+  //Here we will open a folder with a lot of images
+  //but we can do the same thing with any other type of input
   mp.setInputSource(FROM_SRC_ROOT("Medias/temple/"),IS_DIRECTORY);
 
+  cout<<"load images from Medias/temple/ and draw theses points"<<endl;
+  namedWindow("Points projected...", CV_WINDOW_AUTOSIZE);
   vector<PointOfView>::iterator itPoV=myCameras.begin();
   while (itPoV!=myCameras.end())
   {
@@ -54,7 +59,7 @@ NEW_TUTO(Camera_tuto, "Learn how you can mix 3D objects and fully parameterized 
     drawKeypoints(imgTmp,points2D,imgTmp,Scalar(255,255,255));
     imshow("Points projected...",imgTmp);
     cv::waitKey(0);
-    cv::waitKey(40);
     itPoV++;
   }
+  cvDestroyWindow("Points projected...");
 }

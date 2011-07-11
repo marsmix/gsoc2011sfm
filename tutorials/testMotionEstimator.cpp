@@ -30,21 +30,21 @@ NEW_TUTO(Track_creation, "Learn how you can compute tracks from a list of pictur
   //mp.setProperty(CV_CAP_PROP_CONVERT_RGB,0);//Only greyscale, due to SIFT
 
   Ptr<FeatureDetector> detector;
-  detector=Ptr<FeatureDetector>(new SiftFeatureDetector());
+  detector=Ptr<FeatureDetector>(new FastFeatureDetector());
   Ptr<DescriptorExtractor> desc_extractor;
-  desc_extractor=Ptr<DescriptorExtractor>(new SiftDescriptorExtractor());
+  desc_extractor=Ptr<DescriptorExtractor>(new BriefDescriptorExtractor(32));
   vector<Ptr<PointsToTrack>> vec_points_to_track;
   Ptr<PointsToTrack> ptrPoints_tmp;
 
   Ptr<DescriptorMatcher> matcher;
-  matcher=Ptr<DescriptorMatcher>(new FlannBasedMatcher());
+  matcher=Ptr<DescriptorMatcher>(new BruteForceMatcher<Hamming>());
   Ptr<PointsMatcher> matches_algo ( new PointsMatcher(matcher) );
 
   //universal method to get the current image:
   vector<Mat> images;
   Mat currentImage=mp.getFrame();
 
-  string pathFileTracks = FROM_SRC_ROOT("Medias/tracks_points_SIFT/motion_points.yml");
+  string pathFileTracks = FROM_SRC_ROOT("Medias/tracks_points_BRIEF/motion_points.yml");
   std::ifstream inPoints(pathFileTracks.c_str());
   if( inPoints.is_open() )
   {
@@ -85,10 +85,14 @@ NEW_TUTO(Track_creation, "Learn how you can compute tracks from a list of pictur
       nbFrame++;
       currentImage=mp.getFrame();
     }
-    cout<<"Create the motion estimator:"<<endl;
 
     //now save the tracks:
     FileStorage fsOut(pathFileTracks, FileStorage::WRITE);
+    if( !fsOut.isOpened() )
+    {
+      cout<<"Can't create "<<pathFileTracks<<"!\nPlease verify you have access to the directory!"<<endl;
+      return;
+    }
     fsOut << "Vector_of_motionTrack" << "[";
     for(unsigned int i=0;i<vec_points_to_track.size(); i++)
     {
@@ -98,6 +102,7 @@ NEW_TUTO(Track_creation, "Learn how you can compute tracks from a list of pictur
     fsOut.release();
 
   }
+  cout<<"Create the sequence analyzer:"<<endl;
 
   SequenceAnalyzer motion_estim(vec_points_to_track,matches_algo,images);
 
@@ -107,8 +112,13 @@ NEW_TUTO(Track_creation, "Learn how you can compute tracks from a list of pictur
   cout<<"numbers of tracks:"<<tracks.size()<<endl;
 
   //now save the tracks:
-  pathFileTracks = FROM_SRC_ROOT("Medias/tracks_points_SIFT/motion_tracks1.yml");
+  pathFileTracks = FROM_SRC_ROOT("Medias/tracks_points_BRIEF/motion_tracks1.yml");
   FileStorage fsOutMotion1(pathFileTracks, FileStorage::WRITE);
+  if( !fsOutMotion1.isOpened() )
+  {
+    cout<<"Can't create "<<pathFileTracks<<"!\nPlease verify you have access to the directory!"<<endl;
+    return;
+  }
   //Can't find a way to enable the following notation:
   //fs << *ptt1;
   SequenceAnalyzer::write(fsOutMotion1,motion_estim);
@@ -120,8 +130,13 @@ NEW_TUTO(Track_creation, "Learn how you can compute tracks from a list of pictur
   cout<<"numbers of correct tracks:"<<tracks.size()<<endl;
 
   //now save the tracks:
-  pathFileTracks = FROM_SRC_ROOT("Medias/tracks_points_SIFT/motion_tracks.yml");
+  pathFileTracks = FROM_SRC_ROOT("Medias/tracks_points_BRIEF/motion_tracks.yml");
   FileStorage fsOutMotion(pathFileTracks, FileStorage::WRITE);
+  if( !fsOutMotion.isOpened() )
+  {
+    cout<<"Can't create "<<pathFileTracks<<"!\nPlease verify you have access to the directory!"<<endl;
+    return;
+  }
   //Can't find a way to enable the following notation:
   //fs << *ptt1;
   SequenceAnalyzer::write(fsOutMotion,motion_estim);

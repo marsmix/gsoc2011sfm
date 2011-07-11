@@ -95,6 +95,7 @@ NEW_TUTO(Triangulation_tuto, "Learn how you can triangulate 2D points",
     cv::waitKey(0);
     itPoV++;
   }
+  cvDestroyWindow("Points projected...");
   //now for fun show the sequence on images:
-  motion_estim_loaded.showTracks(0);
+  //motion_estim_loaded.showTracks(0);
 }
