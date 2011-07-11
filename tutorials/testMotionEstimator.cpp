@@ -4,7 +4,7 @@
 #include "../src/SequenceAnalyzer.h"
 #include "../src/PointsMatcher.h"
 #include "../src/libmv_mapping.h"
-#include "../src/config.h"
+#include "config.h"
 #include <opencv2/calib3d/calib3d.hpp>
 
 //////////////////////////////////////////////////////////////////////////

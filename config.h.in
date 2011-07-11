@@ -4,7 +4,7 @@
 #define SFM_CONFIG_H_
 
 
-#cmakedefine ROOT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+#define ROOT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/"
 
 #define FROM_SRC_ROOT(file) ( string(ROOT_DIRECTORY) + file )
 

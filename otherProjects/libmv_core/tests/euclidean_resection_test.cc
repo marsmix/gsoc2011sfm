@@ -26,8 +26,6 @@
 
 namespace {
   using namespace libmv;
-  using namespace libmv::projection_estimation;
-  using namespace libmv::essential_matrix;
 
   // Generates all necessary inputs and desigred outputs for
   // the EuclideanResection.

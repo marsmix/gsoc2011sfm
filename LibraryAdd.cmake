@@ -6,19 +6,20 @@ macro(define_new_library name)
 	add_definitions(-DCVAPI_EXPORTS)
 
 	include_directories("${CMAKE_CURRENT_SOURCE_DIR}"
-	                    "${CMAKE_CURRENT_BINARY_DIR}")
+	                    "${CMAKE_CURRENT_BINARY_DIR}"
+	                    "${CMAKE_BINARY_DIR}")
 
 	file(GLOB lib_srcs "*.cpp")
 	file(GLOB lib_int_hdrs "*.h*")
 	source_group("Src" FILES ${lib_srcs})
-	source_group("Include" FILES ${lib_int_hdrs})
+	source_group("Include" FILES ${lib_int_hdrs} ${CMAKE_BINARY_DIR}/config.h)
 
 	#file(GLOB lib_hdrs "include/${name}/*.h*")
 	#source_group("Include" FILES ${lib_hdrs})
 
 	set(the_target "SfM_${name}")
 
-	add_library(${the_target} ${LIB_TYPE} ${lib_srcs} ${lib_hdrs} ${lib_int_hdrs})
+	add_library(${the_target} ${LIB_TYPE} ${lib_srcs} ${lib_hdrs} ${lib_int_hdrs} ${CMAKE_BINARY_DIR}/config.h)
 
 	# For dynamic link numbering convenions
 	set_target_properties(${the_target} PROPERTIES

@@ -33,8 +33,6 @@
 
 namespace libmv
 {
-  namespace essential_matrix
-  {
     ////////////////   How can we create an essential matrix:  //////////////
     //Using fundamental matrix and camera intra parameters, compute the Essential matrix
     void _LIBMV_DLL_ EssentialFromFundamental(const Mat3 &F,const Mat3 &K1,const Mat3 &K2,Mat3 *E);
@@ -55,7 +53,6 @@ namespace libmv
       Mat3 *R, Vec3 *t);
     // Computes at most 10 candidate essential matrix solutions from 5 correspondences.
     void _LIBMV_DLL_ FivePointsRelativePose(const Mat2X &x1, const Mat2X &x2, vector<Mat3> *E);
-  }
 }
 
 #endif

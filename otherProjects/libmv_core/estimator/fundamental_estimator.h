@@ -40,8 +40,6 @@
 
 namespace libmv
 {
-  namespace fundamental_matrix
-  {
     //////////////////////////////////////////////////////////////////////////
     ////////////////  How can we create a fundamental matrix:  ///////////////
 
@@ -107,8 +105,6 @@ namespace libmv
       const Vec2 &p1, const Vec2 &p1_new,
       const Vec2 &p2, const Vec2 &p2_new,
       Mat3 *F_new);
-  }
-
 }
 
 #endif

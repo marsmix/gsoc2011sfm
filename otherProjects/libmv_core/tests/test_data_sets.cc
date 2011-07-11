@@ -47,7 +47,7 @@ TwoViewDataSet TwoRealisticCameras(bool same_K) {
   P_From_KRt(d.K1, d.R1, d.t1, &d.P1);
   P_From_KRt(d.K2, d.R2, d.t2, &d.P2);
 
-  fundamental_matrix::FundamentalFromProjections(d.P1, d.P2, &d.F);
+  FundamentalFromProjections(d.P1, d.P2, &d.F);
   
   d.X.resize(3, 30);
   d.X.setRandom();

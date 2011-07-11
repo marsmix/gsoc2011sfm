@@ -28,9 +28,6 @@
 
 namespace {
   using namespace libmv;
-  using namespace libmv::essential_matrix;
-  using namespace libmv::fundamental_matrix;
-  using namespace libmv::projection_estimation;
 
 TEST(Fundamental, FundamentalFromProjections) {
   Mat34 P1_gt, P2_gt;
