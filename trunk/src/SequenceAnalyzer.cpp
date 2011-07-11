@@ -157,7 +157,9 @@ namespace OpencvSfM{
         }
         Mat fundam = cv::findFundamentalMat(srcP, destP, status, cv::FM_RANSAC);
 
+        unsigned int nbErrors = 0, nb_iter=0;
         //refine the mathing :
+        size_match = status.size();
         for( int cpt = 0; cpt < size_match; ++cpt ){
           if( status[cpt] == 0 )
           {
@@ -169,20 +171,34 @@ namespace OpencvSfM{
             destP.pop_back();
             matches_i_j[cpt--] = matches_i_j[size_match];
             matches_i_j.pop_back();
+            ++nbErrors;
           }
         }
-        fundam = cv::findFundamentalMat(srcP, destP, status, cv::FM_LMEDS);
 
-        //refine the mathing :
-        for( int cpt = 0; cpt < size_match; ++cpt ){
-          if( status[cpt] == 0 )
-          {
-            status[cpt] = status[--size_match];
-            status.pop_back();
-            matches_i_j[cpt--] = matches_i_j[size_match];
-            matches_i_j.pop_back();
+        while( nbErrors > 50 && nb_iter < 8 &&
+          matches_i_j.size() > mininum_points_matches )
+        {
+          fundam = cv::findFundamentalMat(srcP, destP, status, cv::FM_RANSAC, 1.5);
+          
+          //refine the mathing :
+          nbErrors =0 ;
+          size_match = status.size();
+          for( int cpt = 0; cpt < size_match; ++cpt ){
+            if( status[cpt] == 0 )
+            {
+              status[cpt] = status[--size_match];
+              status.pop_back();
+              srcP[cpt] = srcP[size_match];
+              srcP.pop_back();
+              destP[cpt] = destP[size_match];
+              destP.pop_back();
+              matches_i_j[cpt--] = matches_i_j[size_match];
+              matches_i_j.pop_back();
+              ++nbErrors;
+            }
           }
-        }
+          nb_iter++;
+        };
         /*
         //refine the mathing :
         matches_i_j.clear();
@@ -191,7 +207,7 @@ namespace OpencvSfM{
         
 
 //////////////////////////////////////////////////////////////////////////
-        if( matches_i_j.size() > mininum_points_matches )
+        if( matches_i_j.size() > mininum_points_matches && nb_iter < 8 )
         {
           addMatches(matches_i_j,i,j);
           std::clog<<"find "<<matches_i_j.size()<<
@@ -327,6 +343,7 @@ namespace OpencvSfM{
       }
       it++;
     }
+    cvDestroyWindow("showTracks");
   }
 
   void SequenceAnalyzer::read( const cv::FileNode& node, SequenceAnalyzer& me )
