@@ -94,7 +94,7 @@ namespace OpencvSfM{
   }
 
   void ProjectiveEstimator::updateTwoViewMotion(vector<TrackPoints>& tracks,
-    vector<Ptr<PointsToTrack>> &points_to_track,
+    vector< Ptr< PointsToTrack > > &points_to_track,
     int image1, int image2)
   {
     libmv::Mat3 E;
@@ -195,7 +195,7 @@ namespace OpencvSfM{
   void ProjectiveEstimator::computeReconstruction(vector<PointOfView>& camReal)
   {
     vector<TrackPoints>& tracks = sequence_.getTracks();
-    vector<Ptr<PointsToTrack>> &points_to_track = sequence_.getPoints();
+    vector< Ptr< PointsToTrack > > &points_to_track = sequence_.getPoints();
     ImagesGraphConnection &images_graph = sequence_.getImgGraph();
     double ransac_threshold = 0.4 * sequence_.getImage(0).rows / 100.0;
     //now create the graph:

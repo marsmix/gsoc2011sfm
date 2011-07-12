@@ -105,7 +105,7 @@ namespace OpencvSfM{
     std::string myName=node.name();
     if( myName != "PointsToTrack")
       return;//this node is not for us...
-    cv::FileNode& node_keypoints = node["keypoints"];
+    cv::FileNode node_keypoints = node["keypoints"];
     if( node_keypoints.empty() )
       CV_Error( CV_StsError, "PointsToTrack FileNode is not correct!" );
 

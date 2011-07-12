@@ -1,4 +1,5 @@
 
+#include "config.h"
 #include "../src/CameraPinhole.h"
 #include "../src/PointOfView.h"
 #include <iostream>

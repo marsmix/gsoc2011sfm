@@ -58,7 +58,7 @@ namespace OpencvSfM{
 
   protected:
     void updateTwoViewMotion(std::vector<TrackPoints>& tracks,
-      std::vector<cv::Ptr<PointsToTrack>> &points_to_track,
+      std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
       int image1, int image2);
   };
 

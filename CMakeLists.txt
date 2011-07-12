@@ -6,7 +6,10 @@ set(CMAKE_VERBOSE OFF CACHE BOOL "Verbose mode")
 if (CMAKE_VERBOSE)
         set (CMAKE_VERBOSE_MAKEFILE 1)
 endif()
-cmake_policy(SET CMP0015 OLD)
+
+if( CMAKE_CACHE_MAJOR_VERSION>=2 AND CMAKE_CACHE_MINOR_VERSION>6)
+	cmake_policy(SET CMP0015 OLD)
+endif()
 
 project (opencvSfM)
 add_definitions(-DSFM_API_EXPORTS)
@@ -65,7 +68,7 @@ if(Boost_FOUND)
 else()
 	find_path(BOOST_ROOT "boost"
 	DOC "The path to Boost root directory (before boost_1_XX_X)")
-	message(" ** Warning: Boost library Could NOT be found, you will not be able to process automatically a folder full of images /!\\")
+	message(STATUS " ** Warning: Boost library Could NOT be found, you will not be able to process automatically a folder full of images /!\\")
 endif()
 
 find_path(EIGEN_DIR "Eigen/Core"
@@ -75,9 +78,15 @@ find_path(EIGEN_DIR "Eigen/Core"
 #Generate the source list:
 #include_directories("${PROJECT_SOURCE_DIR}/src")
 #include_directories("${PROJECT_SOURCE_DIR}/tutorials")
+include( CheckIncludeFiles )
+check_include_files( "pthread.h" HAVE_PTHREAD_H )
 
-set(SFM_LINKER_LIBS ${OpenCV_LIBS})
-set(SFM_LINKER_LIBS ${SFM_LINKER_LIBS} ${Boost_LIBRARIES})
+set(SFM_LINKER_LIBS ${OpenCV_LIBS} ${Boost_LIBRARIES})
+
+if(${HAVE_PTHREAD_H})
+	find_package( Threads )
+	set(SFM_LINKER_LIBS ${SFM_LINKER_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+endif()
 
 include_directories(${EIGEN_DIR})
 

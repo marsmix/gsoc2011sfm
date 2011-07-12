@@ -138,7 +138,7 @@ namespace OpencvSfM{
   };
 
   double TrackPoints::errorEstimate(std::vector<PointOfView>& cameras,
-    const std::vector<cv::Ptr<PointsToTrack>> &points_to_track,
+    const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
     cv::Vec3d& points3D) const
   {
     double distance=0.0;
@@ -158,7 +158,7 @@ namespace OpencvSfM{
     return distance/static_cast<double>(nviews);
   }
   double TrackPoints::triangulateLinear(vector<PointOfView>& cameras,
-    const std::vector<cv::Ptr<PointsToTrack>> &points_to_track,
+    const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
     cv::Vec3d& points3D, const vector<bool> &masks)
   {
     unsigned int nviews = 0;
@@ -215,8 +215,8 @@ namespace OpencvSfM{
   }
 
   double TrackPoints::triangulateRobust(std::vector<PointOfView>& cameras,
-    const std::vector<cv::Ptr<PointsToTrack>> &points_to_track, cv::Vec3d& points3D,
-    double reproj_error)
+    const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
+    cv::Vec3d& points3D, double reproj_error)
   {
     cv::RNG& rng = cv::theRNG();
     unsigned int nviews = images_indexes_.size();

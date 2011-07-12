@@ -6,6 +6,8 @@
 
 #define ROOT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/"
 
+#cmakedefine HAVE_PTHREAD_H 
+
 #define FROM_SRC_ROOT(file) ( string(ROOT_DIRECTORY) + file )
 
 #endif

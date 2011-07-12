@@ -2,7 +2,7 @@
 #define _GSOC_SFM_POINTS_TO_TRACK_SIFT_H 1
 
 #include "macro.h" //SFM_EXPORTS
-#include "pointstotrack.h"
+#include "PointsToTrack.h"
 
 namespace OpencvSfM{
 

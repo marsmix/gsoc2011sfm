@@ -45,7 +45,8 @@ namespace OpencvSfM{
 
     vector<Mat> pointsDesc;
     Ptr<PointsToTrack> pointCollection;
-    vector<Ptr<PointsToTrack>>::iterator it = pointCollection_.begin(),
+    vector< Ptr< PointsToTrack > >::iterator it =
+      pointCollection_.begin(),
       it_end = pointCollection_.end();
     while( it != it_end )
     {
@@ -151,12 +152,12 @@ namespace OpencvSfM{
       getKeypoints();
 
     matches.clear();
-    vector<vector<DMatch>> matchesKNN;
+    vector< vector< DMatch > > matchesKNN;
     knnMatch( otherMatcher->pointCollection_[0], matchesKNN, 4, masks );
 
 
     //now construct the vector of DMatch, but in the other way (2 -> 1):
-    vector<vector<DMatch>> matchesKNNOtherWay;
+    vector< vector< DMatch > > matchesKNNOtherWay;
     otherMatcher->knnMatch( pointCollection_[0], matchesKNNOtherWay, 2, masks );
     //now check for reciprocity:
     unsigned int nbPoints=matchesKNN.size();
@@ -322,10 +323,10 @@ namespace OpencvSfM{
     cv::FileNodeIterator it = node.begin(), it_end = node.end();
     while( it != it_end )
     {
-      Ptr<PointsToTrack> ptt = Ptr<PointsToTrack>(new PointsToTrack(numImg));
-      cv::FileNode& node_tmp = (*it)["PointsToTrack"];
-      PointsToTrack::read( node_tmp, *ptt );
-      points.pointCollection_.push_back(ptt);
+      Ptr<PointsToTrack> ptt_tmp = Ptr<PointsToTrack>(new PointsToTrack(numImg));
+      cv::FileNode node_tmp = (*it)["PointsToTrack"];
+      PointsToTrack::read( node_tmp, *ptt_tmp );
+      points.pointCollection_.push_back(ptt_tmp);
       it++;
       numImg++;
     }

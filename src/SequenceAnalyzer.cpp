@@ -10,8 +10,6 @@ using std::vector;
 using cv::Point3d;
 
 namespace OpencvSfM{
-
-
   SequenceAnalyzer::SequenceAnalyzer(MotionProcessor input_sequence,
     cv::Ptr<cv::FeatureDetector> feature_detector,
     cv::Ptr<cv::DescriptorExtractor> descriptor_extractor,
@@ -45,9 +43,9 @@ namespace OpencvSfM{
   }
 
   SequenceAnalyzer::SequenceAnalyzer(
-    vector<Ptr<PointsToTrack>> &points_to_track,
+    vector< Ptr< PointsToTrack > > &points_to_track,
     Ptr<PointsMatcher> match_algorithm,
-    std::vector<cv::Mat> &images)
+    const std::vector<cv::Mat> &images)
     :images_(images),points_to_track_(points_to_track),
     match_algorithm_(match_algorithm)
   {
@@ -89,8 +87,10 @@ namespace OpencvSfM{
   void SequenceAnalyzer::computeMatches()
   {
     //First compute missing features descriptors:
-    vector<Ptr<PointsToTrack>>::iterator it=points_to_track_.begin();
-    vector<Ptr<PointsToTrack>>::iterator end_iter = points_to_track_.end();
+    vector< Ptr< PointsToTrack > >::iterator it =
+      points_to_track_.begin();
+    vector< Ptr< PointsToTrack > >::iterator end_iter =
+      points_to_track_.end();
     while (it != end_iter)
     {
       Ptr<PointsToTrack> points_to_track_i=(*it);
@@ -118,8 +118,8 @@ namespace OpencvSfM{
 
     //Now we are ready to match each picture with other:
     vector<Mat> masks;
-    vector<Ptr<PointsMatcher>>::iterator matches_it=matches_.begin();
-    vector<Ptr<PointsMatcher>>::iterator end_matches_it=matches_.end();
+    vector< Ptr< PointsMatcher > >::iterator matches_it = matches_.begin();
+    vector< Ptr< PointsMatcher > >::iterator end_matches_it = matches_.end();
     unsigned int i=0,j=0;
     while (matches_it != end_matches_it)
     {
@@ -127,7 +127,7 @@ namespace OpencvSfM{
 
       //the folowing vector is computed only the first time
 
-      vector<Ptr<PointsMatcher>>::iterator matches_it1 = matches_it+1;
+      vector< Ptr< PointsMatcher > >::iterator matches_it1 = matches_it+1;
       j=i+1;
       while (matches_it1 != end_matches_it)
       {
@@ -151,8 +151,8 @@ namespace OpencvSfM{
             matches_i_j[cpt].queryIdx);
           const KeyPoint &key2 = point_matcher->getKeypoint(
             matches_i_j[cpt].trainIdx);
-          srcP.push_back(cv::Point2f(key1.pt.x,key1.pt.y));
-          destP.push_back(cv::Point2f(key2.pt.x,key2.pt.y));
+          srcP.push_back( cv::Point2f(key1.pt.x,key1.pt.y) );
+          destP.push_back( cv::Point2f(key2.pt.x,key2.pt.y) );
           status.push_back(1);
         }
         Mat fundam = cv::findFundamentalMat(srcP, destP, status, cv::FM_RANSAC);
@@ -369,7 +369,7 @@ namespace OpencvSfM{
       me.matches_.push_back(p_m);
     }
 
-    cv::FileNode& node_TrackPoints = node["TrackPoints"];
+    cv::FileNode node_TrackPoints = node["TrackPoints"];
 
     //tracks are stored in the following form:
     //list of track where a track is stored like this:

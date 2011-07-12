@@ -1,10 +1,11 @@
+
+#include "config.h"
 #include "../src/SequenceAnalyzer.h"
 #include "../src/PointsMatcher.h"
 #include "../src/PointsToTrackWithImage.h"
 #include "../src/StructureEstimator.h"
 #include "../src/PointOfView.h"
 #include "../src/CameraPinhole.h"
-#include "config.h"
 #include <opencv2/calib3d/calib3d.hpp>
 #include <fstream>
 
@@ -18,7 +19,7 @@ NEW_TUTO(Triangulation_tests, "Visualization of 3D points (DEBUG ONLY)",
   int npoints = 6;
 
   cout<<"first load cameras and points..."<<endl;
-  std::ifstream inPoints(FROM_SRC_ROOT("Points_tests/logPoints.txt"));
+  std::ifstream inPoints(FROM_SRC_ROOT("Points_tests/logPoints.txt").c_str());
   if( !inPoints.is_open() )
   {
     cout<<"This tuto need a file \"logPoints.txt\" with following syntax:"<<endl;
@@ -72,8 +73,8 @@ NEW_TUTO(Triangulation_tests, "Visualization of 3D points (DEBUG ONLY)",
   }
 
   vector<cv::Vec3d> points3D;
-  vector<cv::Ptr<PointsToTrack>> points2D;
-  vector<vector<cv::KeyPoint>> tracks_keypoints(nviews);
+  vector< cv::Ptr< PointsToTrack > > points2D;
+  vector< vector< cv::KeyPoint > > tracks_keypoints(nviews);
   for (int i = 0; i < npoints; ++i) {
     cout<<"Loading a new point (and projections)..."<<endl;
     inPoints >> skeepWord;
@@ -99,7 +100,7 @@ NEW_TUTO(Triangulation_tests, "Visualization of 3D points (DEBUG ONLY)",
 
   Ptr<PointsMatcher> matches_algo ( new PointsMatcher(
     Ptr<DescriptorMatcher>(new FlannBasedMatcher() ) ) );
-  SequenceAnalyzer motion_estim(points2D,matches_algo);
+  SequenceAnalyzer motion_estim(points2D,matches_algo,vector<Mat>());
 
   //create tracks:
   vector<TrackPoints> tracks;

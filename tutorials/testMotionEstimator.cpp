@@ -1,10 +1,10 @@
 
+#include "config.h"
 #include "../src/PointsToTrackWithImage.h"
 #include "../src/MotionProcessor.h"
 #include "../src/SequenceAnalyzer.h"
 #include "../src/PointsMatcher.h"
 #include "../src/libmv_mapping.h"
-#include "config.h"
 #include <opencv2/calib3d/calib3d.hpp>
 
 //////////////////////////////////////////////////////////////////////////
@@ -33,7 +33,7 @@ NEW_TUTO(Track_creation, "Learn how you can compute tracks from a list of pictur
   detector=Ptr<FeatureDetector>(new FastFeatureDetector());
   Ptr<DescriptorExtractor> desc_extractor;
   desc_extractor=Ptr<DescriptorExtractor>(new BriefDescriptorExtractor(32));
-  vector<Ptr<PointsToTrack>> vec_points_to_track;
+  vector< Ptr< PointsToTrack > > vec_points_to_track;
   Ptr<PointsToTrack> ptrPoints_tmp;
 
   Ptr<DescriptorMatcher> matcher;

@@ -52,7 +52,7 @@ namespace OpencvSfM{
     virtual bool empty() const;
     /**
     * Clone the matcher.
-    * @param emptyTrainData – If emptyTrainData is false the method create deep copy of the object, i.e. copies both parameters and train data. If emptyTrainData is true the method create object copy with current parameters but with empty train data..
+    * @param emptyTrainData IIf emptyTrainData is false the method create deep copy of the object, i.e. copies both parameters and train data. If emptyTrainData is true the method create object copy with current parameters but with empty train data..
     * @return An other PointsMatcher instance
     */
     virtual cv::Ptr<PointsMatcher> clone( bool emptyTrainData=true ) const;
@@ -161,7 +161,7 @@ namespace OpencvSfM{
   protected:
 
     cv::Ptr<cv::DescriptorMatcher> matcher_;///<Algorithm used to find matches...
-    std::vector<cv::Ptr<PointsToTrack>> pointCollection_;///<Vector of points used to compute matches...
+    std::vector< cv::Ptr< PointsToTrack > > pointCollection_;///<Vector of points used to compute matches...
   };
 
 }
