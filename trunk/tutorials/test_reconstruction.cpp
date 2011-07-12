@@ -1,11 +1,11 @@
 
+#include "config.h"
 #include "../src/PointsToTrackWithImage.h"
 #include "../src/MotionProcessor.h"
 #include "../src/StructureEstimator.h"
 #include "../src/PointOfView.h"
 #include "../src/CameraPinhole.h"
 #include "../src/libmv_mapping.h"
-#include "config.h"
 #include <opencv2/calib3d/calib3d.hpp>
 
 

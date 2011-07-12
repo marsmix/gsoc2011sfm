@@ -119,16 +119,16 @@ namespace OpencvSfM{
     };
 
     double triangulateLinear(std::vector<PointOfView>& cameras,
-      const std::vector<cv::Ptr<PointsToTrack>> &points_to_track,
+      const std::vector< cv::Ptr<PointsToTrack> > &points_to_track,
       cv::Vec3d& points3D,
       const std::vector<bool> &masks = std::vector<bool>());
     double triangulateRobust(std::vector<PointOfView>& cameras,
-      const std::vector<cv::Ptr<PointsToTrack>> &points_to_track,
+      const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
       cv::Vec3d& points3D,
       double reproj_error = 4);
   protected:
-    double errorEstimate(std::vector<PointOfView>& cameras,
-      const std::vector<cv::Ptr<PointsToTrack>> &points_to_track,
+    double errorEstimate(std::vector< PointOfView >& cameras,
+      const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
       cv::Vec3d& points3D) const;
   };
   

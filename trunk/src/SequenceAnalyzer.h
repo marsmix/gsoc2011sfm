@@ -38,7 +38,7 @@ namespace OpencvSfM{
     /**
     * One list of points for each picture
     */
-    std::vector<cv::Ptr<PointsToTrack>> points_to_track_;
+    std::vector< cv::Ptr< PointsToTrack > > points_to_track_;
     /**
     * List of input images
     */
@@ -51,7 +51,7 @@ namespace OpencvSfM{
     * A matcher for each picture. Its role is to find quickly matches between
     * i^th picture and other images.
     */
-    std::vector<cv::Ptr<PointsMatcher>> matches_;
+    std::vector< cv::Ptr< PointsMatcher > > matches_;
     /**
     * List of each tracks found. A track is a connected set of matching
     * keypoints across multiple images
@@ -83,9 +83,9 @@ namespace OpencvSfM{
     * @param match_algorithm algorithm to match points of each images
     */
     SequenceAnalyzer(
-      std::vector<cv::Ptr<PointsToTrack>> &points_to_track,
+      std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
       cv::Ptr<PointsMatcher> match_algorithm,
-      std::vector<cv::Mat> &images = std::vector<cv::Mat>());
+      const std::vector<cv::Mat> &images);
     /**
     * Constructor taking a list of images and a FileNode
     * @param images input images. Points should be in the same order!
@@ -120,7 +120,7 @@ namespace OpencvSfM{
     /**
     * This method can be used to get the points
     */
-    inline std::vector<cv::Ptr<PointsToTrack>> &getPoints(){
+    inline std::vector< cv::Ptr< PointsToTrack > > &getPoints(){
       return points_to_track_;};
 
     inline ImagesGraphConnection& getImgGraph()

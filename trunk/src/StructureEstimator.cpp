@@ -9,7 +9,7 @@ namespace OpencvSfM{
   void StructureEstimator::computeStructure(vector<TrackPoints>& points3D)
   {
     vector<TrackPoints>& tracks = sequence_.getTracks();
-    vector<Ptr<PointsToTrack>> &points_to_track = sequence_.getPoints();
+    vector< Ptr< PointsToTrack > > &points_to_track = sequence_.getPoints();
 
     //for each points:
     vector<TrackPoints>::size_type key_size = tracks.size();
@@ -38,7 +38,7 @@ namespace OpencvSfM{
     vector<TrackPoints>& points3D)
   {
     vector<TrackPoints>& tracks = sequence_.getTracks();
-    vector<Ptr<PointsToTrack>> &points_to_track = sequence_.getPoints();
+    vector< Ptr< PointsToTrack > > &points_to_track = sequence_.getPoints();
 
     //for each points:
     vector<TrackPoints>::size_type key_size = tracks.size();

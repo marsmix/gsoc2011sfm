@@ -2,6 +2,7 @@
 #ifndef SFM_TEST_DATA_SETS_H_
 #define SFM_TEST_DATA_SETS_H_
 
+#include "config.h"
 #include "../src/PointOfView.h"
 #include "../src/CameraPinhole.h"
 #include <opencv2/core/core.hpp>
@@ -10,6 +11,19 @@
 #include <fstream>
 #include <vector>
 #include <string>
+
+#ifdef HAVE_PTHREAD_H
+#include <pthread.h>
+#define CREATE_STATIC_MUTEX(x) extern pthread_mutex_t x
+#define DECLARE_STATIC_MUTEX( my_mutex ) pthread_mutex_t my_mutex = PTHREAD_MUTEX_INITIALIZER
+#define P_MUTEX(x) pthread_mutex_lock(&x);
+#define V_MUTEX(x) pthread_mutex_unlock(&x)
+#else
+#define CREATE_STATIC_MUTEX(x) //static pthread_mutex_t x
+#define DECLARE_STATIC_MUTEX(x) //pthread_mutex_t x =  init
+#define P_MUTEX(x) //pthread_mutex_lock(&x)
+#define V_MUTEX(x) //pthread_mutex_unlock(&x)
+#endif
 
 //Should not use "using namespace" but as we are in
 //tutorial section, this will help readability
@@ -36,7 +50,7 @@ using namespace cv;
   type(type const &);\
   _DISALLOW_ASSIGN_(type)
 
-class Intern_tutorial_list;
+class Tutorial_Handler;
 
 // Defines the abstract factory interface that creates instances
 // of a Test object.
@@ -46,7 +60,7 @@ class TutoFactoryBase {
 
   // Creates a test instance to run. The instance is both created and destroyed
   // within TestInfoImpl::Run()
-  virtual Intern_tutorial_list* CreateTest() = 0;
+  virtual Tutorial_Handler* CreateTest() = 0;
 
  protected:
   TutoFactoryBase(string n,string h,string f)
@@ -59,22 +73,37 @@ class TutoFactoryBase {
   _DISALLOW_COPY_AND_ASSIGN_(TutoFactoryBase);
 };
 
+class Tutorial_Handler;
+class Intern_tutorial_list
+{
+  vector<Tutorial_Handler*> list_of_tutos;
+public:
+  static Intern_tutorial_list *getInstance()
+  {
+    static Intern_tutorial_list *ref_static = 
+      new Intern_tutorial_list();
+    return ref_static;
+  }
+  friend class Tutorial_Handler;
+};
+
 // This class create an instance of tutorial...
 template <class TutoClass>
 class TutoFactoryImpl : public TutoFactoryBase {
  public:
    TutoFactoryImpl(string n,string h,string f)
      :TutoFactoryBase(n,h,f){};
-  virtual Intern_tutorial_list* CreateTest() {
+  virtual Tutorial_Handler* CreateTest() {
     return new TutoClass(name,help,file); }
 };
 
-class Intern_tutorial_list
+CREATE_STATIC_MUTEX( my_mutex_Tutorial_Handler );
+
+class Tutorial_Handler
 {
-  static vector<Intern_tutorial_list*> list_of_tutos;
-  _DISALLOW_COPY_AND_ASSIGN_(Intern_tutorial_list);
+  _DISALLOW_COPY_AND_ASSIGN_(Tutorial_Handler);
 protected:
-  Intern_tutorial_list(string name,string help,string file)
+  Tutorial_Handler(string name,string help,string file)
   {
     this->name_of_tuto = name;
     this->tuto_help = help;
@@ -86,50 +115,27 @@ protected:
 public:
   
   template <class TutoClass>
-  static Intern_tutorial_list* registerTuto(TutoFactoryImpl<TutoClass>* addTuto)
+  static Tutorial_Handler* registerTuto(TutoFactoryImpl<TutoClass>* addTuto)
   {
-    Intern_tutorial_list* out = addTuto->CreateTest();
-    list_of_tutos.push_back(out);
+    Tutorial_Handler* out = addTuto->CreateTest();
+    P_MUTEX( my_mutex_Tutorial_Handler );
+    vector<Tutorial_Handler*> &local_list_of_tutos =
+      Intern_tutorial_list::getInstance()->list_of_tutos;
+    local_list_of_tutos.push_back(out);
+    V_MUTEX( my_mutex_Tutorial_Handler );
     return out;
   }
 
-  static int print_menu()
-  {
-    cout<<endl<<"//////////////////////////////////////////////////"<<endl;
-    cout<<"Please choose a tutorial (-1 to quit): "<<endl;
-    for( unsigned int it = 0; it < list_of_tutos.size(); ++it)
-    {
-      cout<<it<<") "<<list_of_tutos[it]->name_of_tuto<<endl;
-      cout<<"  "<<list_of_tutos[it]->tuto_help<<endl<<endl;
-    }
-    int rep=-1;
-    cin>>rep;
-    cin.clear(); //clear the error bits for the cin input stream
-    cin.sync(); //synchronize the input buffer, discarding any leftover characters in the buffer 
-    return rep;
-  }
 
-  static void run_tuto(int id_tuto)
-  {
-    if( id_tuto < 0 || id_tuto >= (int)list_of_tutos.size() )
-      cout<<"wrong number, please try again..."<<endl;
-    else
-    {
-      cout<<"Running "<<list_of_tutos[id_tuto]->file_of_tuto<<"..."<<endl;
-      list_of_tutos[id_tuto]->tuto_body();
-    }
-    cout<<endl<<"Please type enter to continue"<<endl;
-    cin.clear(); //clear the error bits for the cin input stream
-    cin.sync(); //synchronize the input buffer, discarding any leftover characters in the buffer 
-    cin.get(); //this should make it pause 
-    cin.clear();
-    cin.sync();
-  }
+  static int print_menu();
+
+  static void run_tuto(int id_tuto);
   
   string name_of_tuto;
   string file_of_tuto;
   string tuto_help;
 };
+
 
 //////////////////////////////////////////////////////////////////////////
 //Only to see how we can create a 3D structure estimation using calibrated cameras
@@ -144,17 +150,17 @@ vector<PointOfView> loadCamerasFromFile(string fileName, int flag_model = LOAD_F
   class_##tuto_name##_Test
 // Helper macro for defining tuto.
 #define NEW_TUTO(t_name, tuto_name, tuto_help)\
-class TUTO_CLASS_NAME_(t_name) : public Intern_tutorial_list {\
+class TUTO_CLASS_NAME_(t_name) : public Tutorial_Handler {\
  public:\
   TUTO_CLASS_NAME_(t_name)(string n,string h,string f)\
-    :Intern_tutorial_list(n,h,f){}\
-  static Intern_tutorial_list* const add_to_vector _ATTRIBUTE_UNUSED_;\
+    :Tutorial_Handler(n,h,f){}\
+  static Tutorial_Handler* const add_to_vector _ATTRIBUTE_UNUSED_;\
  private:\
   _DISALLOW_COPY_AND_ASSIGN_( TUTO_CLASS_NAME_(t_name) );\
   virtual void tuto_body();\
 };\
-Intern_tutorial_list* const TUTO_CLASS_NAME_(t_name)\
-  ::add_to_vector = Intern_tutorial_list\
+Tutorial_Handler* const TUTO_CLASS_NAME_(t_name)\
+  ::add_to_vector = Tutorial_Handler\
     ::registerTuto(new TutoFactoryImpl<TUTO_CLASS_NAME_(t_name)>(tuto_name, tuto_help,\
     __FILE__));\
 void TUTO_CLASS_NAME_(t_name)::tuto_body()

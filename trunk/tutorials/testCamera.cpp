@@ -1,4 +1,5 @@
 
+#include "config.h"
 #include "../src/CameraPinholeDistor.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -13,7 +14,7 @@
 //////////////////////////////////////////////////////////////////////////
 #include "test_data_sets.h"
 
-NEW_TUTO(Camera_dist_tuto, "Learn what you can do with a pinhole distorded camera",
+NEW_TUTO(Cam_creation, "Learn what you can do with a pinhole distorded camera",
   "Using intra parameters, switch between camera / image coordinates.")
 {
   Mat intra=Mat::eye(3, 3, CV_64F);
