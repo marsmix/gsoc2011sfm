@@ -8,6 +8,7 @@ using cv::VideoCapture;
 using std::string;
 using cv::imread;
 using std::ostringstream;
+using std::vector;
 #ifdef HAVE_BOOST
 using boost::filesystem::path;
 #endif
@@ -21,6 +22,7 @@ namespace OpencvSfM{
   MotionProcessor::MotionProcessor(void)
   {
     numFrame_=0;
+    pos_in_loading_process_ = 0;
     wantedWidth_=-1;
     wantedHeight_=-1;
     convertToRGB_=false;
@@ -57,6 +59,14 @@ namespace OpencvSfM{
       return true;
     };
     return false;
+  };
+
+  bool MotionProcessor::setInputSource(vector<string> list_images)
+  {
+    this->type_of_input_=IS_LIST_FILES;
+    nameOfFiles_ = list_images;
+    suffix_ = "Not a dynamic list";
+    return true;
   };
 
   bool MotionProcessor::setInputSource(string nameOfFile,TypeOfMotionProcessor inputType/*=IS_VIDEO*/)
@@ -99,10 +109,10 @@ namespace OpencvSfM{
 
   bool MotionProcessor::setInputSource(string prefix,string suffix,int startNumber/*=0*/)
   {
-    this->sourceName_=prefix;
-    this->suffix_=suffix;
-    this->numFrame_=startNumber;
-    this->type_of_input_=IS_LIST_FILES;
+    this->sourceName_ = prefix;
+    this->suffix_ = suffix;
+    pos_in_loading_process_ = startNumber;
+    this->type_of_input_ = IS_LIST_FILES;
     return true;//always true because the error will occur when user will try to get the frame, not now...
   };
 
@@ -139,17 +149,17 @@ namespace OpencvSfM{
           oss<<this->sourceName_<<this->numFrame_<<this->suffix_;
 
           imgTmp=imread(oss.str().c_str(),convertToRGB_);
+          this->numFrame_++;
 
           unsigned int stop=this->numFrame_+10;
           while(imgTmp.empty()&&stop>this->numFrame_){
-            this->numFrame_++;
             oss.str("");
             oss<<this->sourceName_<<this->numFrame_<<this->suffix_;
             imgTmp=imread(oss.str().c_str(),convertToRGB_);
-          }
-          nameOfFiles_.push_back(oss.str());//add the new file
-          if(! imgTmp.empty())
             this->numFrame_++;
+          }
+          if( ! imgTmp.empty() )
+            nameOfFiles_.push_back( oss.str() );//add the new file
         }
         break;
       case IS_DIRECTORY:

@@ -103,7 +103,7 @@ namespace OpencvSfM{
     */
     virtual cv::Mat getProjectionMatrix() const;
 
-    virtual cv::Mat getRotationMatrix() const
+    inline cv::Mat getRotationMatrix() const
     {
       return rotation_;
     };
@@ -114,7 +114,7 @@ namespace OpencvSfM{
           rotation_.at<double>(i,j) = newRot.at<double>(i,j);
     };
 
-    virtual cv::Mat getTranslationVector() const
+    inline cv::Mat getTranslationVector() const
     {
       return translation_;
     };
@@ -124,6 +124,27 @@ namespace OpencvSfM{
       for(int i=0; i<3; ++i)
         translation_.at<double>(i,0) = newVect.at<double>(i,0);
     };
+    inline void rotationAroundX(double angle) {
+        double c = cos(angle), s = sin(angle);
+        double data[] = {1,  0,  0, 0,  c, -s, 0,  s,  c};
+        cv::Mat R(3,3,CV_64F,data);
+        rotation_ *= R;
+    }
+
+    inline void rotationAroundY(double angle) {
+      double c = cos(angle), s = sin(angle);
+      double data[] = {c, 0, s, 0, 1, 0, -s, 0, c};
+      cv::Mat R(3,3,CV_64F,data);
+      rotation_ *= R;
+    }
+
+    inline void rotationAroundZ(double angle) {
+      double c = cos(angle), s = sin(angle);
+      double data[] = {c, -s,  0, s,  c,  0, 0,  0,  1};
+      cv::Mat R(3,3,CV_64F,data);
+      rotation_ *= R;
+    }
+
   };
 
 }

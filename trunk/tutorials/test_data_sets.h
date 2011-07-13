@@ -12,18 +12,6 @@
 #include <vector>
 #include <string>
 
-#ifdef HAVE_PTHREAD_H
-#include <pthread.h>
-#define CREATE_STATIC_MUTEX(x) extern pthread_mutex_t x
-#define DECLARE_STATIC_MUTEX( my_mutex ) pthread_mutex_t my_mutex = PTHREAD_MUTEX_INITIALIZER
-#define P_MUTEX(x) pthread_mutex_lock(&x);
-#define V_MUTEX(x) pthread_mutex_unlock(&x)
-#else
-#define CREATE_STATIC_MUTEX(x) //static pthread_mutex_t x
-#define DECLARE_STATIC_MUTEX(x) //pthread_mutex_t x =  init
-#define P_MUTEX(x) //pthread_mutex_lock(&x)
-#define V_MUTEX(x) //pthread_mutex_unlock(&x)
-#endif
 
 //Should not use "using namespace" but as we are in
 //tutorial section, this will help readability
@@ -97,7 +85,7 @@ class TutoFactoryImpl : public TutoFactoryBase {
     return new TutoClass(name,help,file); }
 };
 
-CREATE_STATIC_MUTEX( my_mutex_Tutorial_Handler );
+CREATE_EXTERN_MUTEX( my_mutex_Tutorial_Handler );
 
 class Tutorial_Handler
 {
