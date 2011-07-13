@@ -48,6 +48,11 @@ namespace OpencvSfM{
     * For example, if the files are img1.jpg, img2.jpg, ... img125.jpg, suffix_ will be equal to .jpg
     */
     std::string suffix_;
+    /**
+    * When the camera is attached to a list of file, pos_in_loading_process_
+    * will be used to store actual number of image (not always the same than numFrame_).
+    */
+    unsigned int pos_in_loading_process_;
 
     unsigned int numFrame_;///<When the camera is attached to a list of file, numFrame_ will be used to know how many frames we have take.
     int wantedWidth_;///<if below 0, represent the wanted width of Mat returned by getFrame();
@@ -68,14 +73,21 @@ namespace OpencvSfM{
       return type_of_input_ != IS_WEBCAM;
     }
     /**
-    * You can attach this camera to a webcam
+    * You can attach this motion handler to a webcam
     * use this method to set it as the input source!
     * @param idWebCam id of the webcam
     * @return true if input source opened without problems
     */
     bool setInputSource(int idWebCam);
     /**
-    * You can attach this camera to a video file or a single picture.
+    * You can attach this motion handler to a list of picture
+    * use this method to set it as the input source!
+    * @param list_images list of pictures' names
+    * @return true if input source opened without problems
+    */
+    bool setInputSource(std::vector<std::string> list_images);
+    /**
+    * You can attach this motion handler to a video file or a single picture.
     * use this method to set it as the input source!
     * @param nameOfFile name of the media file (picture or avi movie)
     * @param type of input (can be either IS_DIRECTORY, IS_VIDEO or IS_SINGLE_FILE)
@@ -83,7 +95,7 @@ namespace OpencvSfM{
     */
     bool setInputSource(std::string nameOfFile,TypeOfMotionProcessor inputType=IS_SINGLE_FILE);
     /**
-    * You can attach this camera to a list of file.
+    * You can attach this motion handler to a list of file.
     * use this method to set the input source!
     * For example, if the files are img1.jpg, img2.jpg, ... img125.jpg, prefix will be equal to "img", suffix to ".jpg" and startNumber equal to 1
     * @param prefix the part of the files names which stay the same (img)
@@ -93,10 +105,8 @@ namespace OpencvSfM{
     */
     bool setInputSource(std::string prefix,std::string suffix,int startNumber=0);
     /**
-    * use this method if you want to get a field of view from this camera.
-    * Be carreful : this function can return a fake FieldOfView! Indeed, if we are at the end of the video, we can't get an other frame...
-    * @param numFrame if you want to get a previously loaded frame, you can use this param. If below 0, get a new frame...
-    * @return a FoV. If the video is finished, the FoV returned is not usable! Test the validity with the bool FieldOfView::isRealFoV() method.
+    * use this method if you want to get a picture from this motion handler
+    * @return The current frame. If the video is finished, the Mat returned is not usable! Test if the matrix is empty before using it!
     */
     cv::Mat getFrame();
     /**

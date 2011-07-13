@@ -1,5 +1,5 @@
 #include "test_data_sets.h"
-DECLARE_STATIC_MUTEX( my_mutex_Tutorial_Handler );
+DECLARE_MUTEX( my_mutex_Tutorial_Handler );
 
 vector<PointOfView> loadCamerasFromFile(string fileName, int flag_model )
 {
@@ -90,10 +90,6 @@ vector<PointOfView> loadCamerasFromFile(string fileName, int flag_model )
       local_list_of_tutos[id_tuto]->tuto_body();
     }
     cout<<endl<<"Please type enter to continue"<<endl;
-    cin.clear(); //clear the error bits for the cin input stream
-    cin.sync(); //synchronize the input buffer, discarding any leftover characters in the buffer 
-    cin.get(); //this should make it pause 
-    cin.clear();
-    cin.sync();
+    char c = (char)waitKey(0);
   }
 

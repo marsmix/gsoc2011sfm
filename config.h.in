@@ -1,13 +1,28 @@
-//this file will be automatically be configured
-//using CMake.
+//WARNING! All changes made in this file will be lost!
+//this file will be automatically be configured using CMake.
 #ifndef SFM_CONFIG_H_
 #define SFM_CONFIG_H_
 
 
 #define ROOT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/"
-
-#cmakedefine HAVE_PTHREAD_H 
-
 #define FROM_SRC_ROOT(file) ( string(ROOT_DIRECTORY) + file )
+
+#cmakedefine HAVE_QT_OPENGL
+
+
+#cmakedefine HAVE_PTHREAD_H
+#ifdef HAVE_PTHREAD_H
+#define CREATE_STATIC_MUTEX(my_mutex) static pthread_mutex_t my_mutex
+#define CREATE_EXTERN_MUTEX(my_mutex) extern pthread_mutex_t my_mutex
+#define DECLARE_MUTEX( my_mutex ) pthread_mutex_t my_mutex = PTHREAD_MUTEX_INITIALIZER
+#define P_MUTEX(my_mutex) pthread_mutex_lock(&my_mutex);
+#define V_MUTEX(my_mutex) pthread_mutex_unlock(&my_mutex)
+#else
+#define CREATE_STATIC_MUTEX(x) //static pthread_mutex_t x
+#define CREATE_EXTERN_MUTEX(x) //extern pthread_mutex_t x
+#define DECLARE_MUTEX(x) //pthread_mutex_t x =  init
+#define P_MUTEX(x) //pthread_mutex_lock(&x)
+#define V_MUTEX(x) //pthread_mutex_unlock(&x)
+#endif
 
 #endif
