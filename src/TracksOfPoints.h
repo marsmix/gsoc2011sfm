@@ -21,7 +21,7 @@ namespace OpencvSfM{
   * 
   * Discussion: Store index of points or 2D position?
   */
-  class SFM_EXPORTS TrackPoints
+  class SFM_EXPORTS TrackOfPoints
   {
     friend class SequenceAnalyzer;
 
@@ -44,7 +44,7 @@ namespace OpencvSfM{
     operator cv::Vec3d() {
       return *point3D;
     }
-    TrackPoints():track_consistance(0){};
+    TrackOfPoints():track_consistance(0){};
     /**
     * This function add matches to track
     * @param image_src index of source matches image

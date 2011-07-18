@@ -57,7 +57,7 @@ namespace OpencvSfM{
     void computeReconstruction(std::vector<PointOfView>& camReal);
 
   protected:
-    void updateTwoViewMotion(std::vector<TrackPoints>& tracks,
+    void updateTwoViewMotion(std::vector<TrackOfPoints>& tracks,
       std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
       int image1, int image2);
   };

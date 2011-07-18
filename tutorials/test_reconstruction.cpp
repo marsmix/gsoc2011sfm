@@ -65,7 +65,7 @@ NEW_TUTO(Triangulation_tuto, "Learn how you can triangulate 2D points",
 
   cout<<"triangulation of points."<<endl;
   StructureEstimator structure (motion_estim_loaded, myCameras);
-  vector<TrackPoints> tracks;
+  vector<TrackOfPoints> tracks;
   structure.computeStructure(tracks);
   cout<<tracks.size()<<" points found."<<endl;
 

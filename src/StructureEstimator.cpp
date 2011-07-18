@@ -6,20 +6,20 @@ namespace OpencvSfM{
   using std::vector;
   using cv::Ptr;
 
-  void StructureEstimator::computeStructure(vector<TrackPoints>& points3D)
+  void StructureEstimator::computeStructure(vector<TrackOfPoints>& points3D)
   {
-    vector<TrackPoints>& tracks = sequence_.getTracks();
+    vector<TrackOfPoints>& tracks = sequence_.getTracks();
     vector< Ptr< PointsToTrack > > &points_to_track = sequence_.getPoints();
 
     //for each points:
-    vector<TrackPoints>::size_type key_size = tracks.size();
+    vector<TrackOfPoints>::size_type key_size = tracks.size();
     vector<PointOfView>::size_type num_camera = cameras_.size();
     int idImage=-1, idPoint=-1;
-    vector<TrackPoints>::size_type i;
+    vector<TrackOfPoints>::size_type i;
 
     for (i=0; i < key_size; i++)
     {
-      TrackPoints &track = tracks[i];
+      TrackOfPoints &track = tracks[i];
       unsigned int nviews = track.getNbTrack();
 
       CV_DbgAssert(nviews <= cameras_.size());
@@ -35,20 +35,20 @@ namespace OpencvSfM{
     }
   }
   void StructureEstimator::computeTwoView(int img1, int img2,
-    vector<TrackPoints>& points3D)
+    vector<TrackOfPoints>& points3D)
   {
-    vector<TrackPoints>& tracks = sequence_.getTracks();
+    vector<TrackOfPoints>& tracks = sequence_.getTracks();
     vector< Ptr< PointsToTrack > > &points_to_track = sequence_.getPoints();
 
     //for each points:
-    vector<TrackPoints>::size_type key_size = tracks.size();
+    vector<TrackOfPoints>::size_type key_size = tracks.size();
     vector<PointOfView>::size_type num_camera = cameras_.size();
     int idImage=-1, idPoint=-1;
-    vector<TrackPoints>::size_type i;
+    vector<TrackOfPoints>::size_type i;
 
     for (i=0; i < key_size; i++)
     {
-      TrackPoints &track = tracks[i];
+      TrackOfPoints &track = tracks[i];
       if( track.containImage(img1) && track.containImage(img2) )
       {
         unsigned int nviews = track.getNbTrack();

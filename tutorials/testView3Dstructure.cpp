@@ -103,10 +103,10 @@ NEW_TUTO(Triangulation_tests, "Visualization of 3D points (DEBUG ONLY)",
   SequenceAnalyzer motion_estim(points2D,matches_algo,vector<Mat>());
 
   //create tracks:
-  vector<TrackPoints> tracks;
+  vector<TrackOfPoints> tracks;
   for(int i=0; i<npoints; ++i)
   {
-    TrackPoints tp;
+    TrackOfPoints tp;
     for(int j=0;j<nviews;j++)
     {
       tp.addMatch(j,i);

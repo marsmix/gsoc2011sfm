@@ -78,7 +78,7 @@ NEW_TUTO(Proj_Rec, "Projective reconstruction",
   SequenceAnalyzer motion_estim_loaded( images, myPtt );
   fsRead.release();
 
-  vector<TrackPoints> &tracks=motion_estim_loaded.getTracks();
+  vector<TrackOfPoints> &tracks=motion_estim_loaded.getTracks();
   cout<<"numbers of correct tracks loaded:"<<tracks.size()<<endl;
 
   //now for fun show the sequence on images:

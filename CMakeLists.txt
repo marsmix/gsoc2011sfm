@@ -58,7 +58,7 @@ FIND_PACKAGE( OpenCV REQUIRED )
 # Unfortunately boost puts the version number into the
 # actual filename for the libraries, so this variable will certainly be needed
 # in the future when new Boost versions are released.
-SET(Boost_ADDITIONAL_VERSIONS "1.43" "1.43.0" "1.44" "1.44.0" "1.45" "1.45.0" "1.46.1" "1.46.0" "1.46")
+SET(Boost_ADDITIONAL_VERSIONS "1.43" "1.43.0" "1.44" "1.44.0" "1.45" "1.45.0" "1.46.1" "1.46.0" "1.46" "1.47")
 
 find_package( Boost COMPONENTS filesystem system )
 if(Boost_FOUND)
@@ -89,6 +89,17 @@ if(${HAVE_PTHREAD_H})
 endif()
 
 include_directories(${EIGEN_DIR})
+
+find_path(PCL_DIR "PCL"
+	DOC "The path to PCLConfig.cmake")
+	
+find_package(PCL 1.0)
+
+set(SFM_LINKER_LIBS ${SFM_LINKER_LIBS} ${PCL_LIBRARIES})
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
+
 
 # Allow the developer to select if Dynamic or Static libraries are built
 OPTION (BUILD_STATIC_LIBS "Build Static Libraries" OFF)

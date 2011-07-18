@@ -14,7 +14,7 @@
 namespace OpencvSfM{
 
   class SFM_EXPORTS Camera;///<We will need this class, but Camera need our class too...
-  class SFM_EXPORTS TrackPoints;
+  class SFM_EXPORTS TrackOfPoints;
 
   enum paramsToEstimate
   {
@@ -78,7 +78,7 @@ namespace OpencvSfM{
     * @param points 3D points in world coordinates.
     * @return 2D points in pixel image coordinates.
     */
-    virtual std::vector<cv::Vec2d> project3DPointsIntoImage(std::vector<TrackPoints> points) const;
+    virtual std::vector<cv::Vec2d> project3DPointsIntoImage(std::vector<TrackOfPoints> points) const;
     /**
     * This method can convert 3D points from world coordinates to 2D points in pixel image coordinates
     * @param points 3D points in world coordinates.

@@ -44,7 +44,7 @@ namespace OpencvSfM{
         quickSort(outLinks, arr, i, right);
   }
 
-  bool TrackPoints::addMatch(const int image_src, const int point_idx1)
+  bool TrackOfPoints::addMatch(const int image_src, const int point_idx1)
   {
     if( track_consistance<0 )
       return false;
@@ -77,7 +77,7 @@ namespace OpencvSfM{
     return track_consistance>=0;
   }
 
-  bool TrackPoints::containPoint(const int image_src, const int point_idx1)
+  bool TrackOfPoints::containPoint(const int image_src, const int point_idx1)
   {
     //we don't use find here because we want the number instead of iterator...
     vector<unsigned int>::iterator indexImg = images_indexes_.begin();
@@ -96,7 +96,7 @@ namespace OpencvSfM{
     return false;
   }
 
-  DMatch TrackPoints::toDMatch(const int img1,const int img2) const
+  DMatch TrackOfPoints::toDMatch(const int img1,const int img2) const
   {
     DMatch outMatch;
     char nbFound=0;
@@ -126,7 +126,7 @@ namespace OpencvSfM{
     return outMatch;
   };
 
-  void TrackPoints::getMatch(const unsigned int index,
+  void TrackOfPoints::getMatch(const unsigned int index,
     int &idImage, int &idPoint) const
   {
     char nbFound=0;
@@ -137,7 +137,7 @@ namespace OpencvSfM{
     }
   };
 
-  double TrackPoints::errorEstimate(std::vector<PointOfView>& cameras,
+  double TrackOfPoints::errorEstimate(std::vector<PointOfView>& cameras,
     const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
     cv::Vec3d& points3D) const
   {
@@ -157,7 +157,7 @@ namespace OpencvSfM{
     }
     return distance/static_cast<double>(nviews);
   }
-  double TrackPoints::triangulateLinear(vector<PointOfView>& cameras,
+  double TrackOfPoints::triangulateLinear(vector<PointOfView>& cameras,
     const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
     cv::Vec3d& points3D, const vector<bool> &masks)
   {
@@ -214,7 +214,7 @@ namespace OpencvSfM{
     return errorEstimate(cameras, points_to_track, points3D);
   }
 
-  double TrackPoints::triangulateRobust(std::vector<PointOfView>& cameras,
+  double TrackOfPoints::triangulateRobust(std::vector<PointOfView>& cameras,
     const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
     cv::Vec3d& points3D, double reproj_error)
   {
