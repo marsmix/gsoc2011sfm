@@ -114,7 +114,7 @@ namespace OpencvSfM{
     //transform points into pixel coordinates using camera intra parameters:
     return device_->normImageToPixelCoordinates(pointsOut);
   }
-  vector<Vec2d> PointOfView::project3DPointsIntoImage(vector<TrackPoints> points) const
+  vector<Vec2d> PointOfView::project3DPointsIntoImage(vector<TrackOfPoints> points) const
   {
     //As we don't know what type of camera we use (with/without disportion, fisheyes...)
     //we can't use classic projection matrix P = K . [R|t]
@@ -128,7 +128,7 @@ namespace OpencvSfM{
     double* point2DNorm=(double*)mat2DNorm.data;
     
     vector<Vec2d> pointsOut;
-    vector<TrackPoints>::iterator point=points.begin();
+    vector<TrackOfPoints>::iterator point=points.begin();
     while(point!=points.end())
     {
       Vec3d convert_from_track = (*point);

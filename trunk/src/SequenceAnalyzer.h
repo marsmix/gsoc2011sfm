@@ -56,7 +56,7 @@ namespace OpencvSfM{
     * List of each tracks found. A track is a connected set of matching
     * keypoints across multiple images
     */
-    std::vector<TrackPoints> tracks_;
+    std::vector<TrackOfPoints> tracks_;
     /**
     * Graph of images relations (value (i,j) correspond to the numbers
     * of matches between theses two images
@@ -116,7 +116,7 @@ namespace OpencvSfM{
     /**
     * This method can be used to get the tracks
     */
-    inline std::vector<TrackPoints> &getTracks(){return tracks_;};
+    inline std::vector<TrackOfPoints> &getTracks(){return tracks_;};
     /**
     * This method can be used to get the points
     */
@@ -142,11 +142,11 @@ namespace OpencvSfM{
     inline int getNumViews() const
     {
       unsigned int maxImg=0;
-      std::vector<TrackPoints>::size_type key_size = tracks_.size(),
+      std::vector<TrackOfPoints>::size_type key_size = tracks_.size(),
         i=0;
       for (i=0; i < key_size; i++)
       {
-        const TrackPoints &track = tracks_[i];
+        const TrackOfPoints &track = tracks_[i];
         int nviews = track.images_indexes_.size();
         for(int j = 0;j<nviews;++j)
           if(maxImg<track.images_indexes_[j])
@@ -169,7 +169,7 @@ namespace OpencvSfM{
     * This function add new Tracks
     * @param newTracks new Tracks to add
     */
-    void addTracks(std::vector<TrackPoints> &newTracks);
+    void addTracks(std::vector<TrackOfPoints> &newTracks);
     /**
     * This function constructs and feeds the images_graph_
     */

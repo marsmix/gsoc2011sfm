@@ -9,7 +9,7 @@
 
 
 namespace OpencvSfM{
-  class SFM_EXPORTS TrackPoints;
+  class SFM_EXPORTS TrackOfPoints;
 
 /*! \brief This class can be used to store informations about point
   * and features. This is an abstract class: you can't use it directly.
@@ -82,7 +82,7 @@ namespace OpencvSfM{
     * @param matches list of tracks. Only points found in tracks are returned
     * @param pointsVals [out] points found in tracks
     */
-    void getKeyMatches(const std::vector<TrackPoints>& matches, int otherImage,
+    void getKeyMatches(const std::vector<TrackOfPoints>& matches, int otherImage,
       std::vector<cv::Point2f>& pointsVals) const;
     /**
     * this method return the points coordinates of the i^th entry

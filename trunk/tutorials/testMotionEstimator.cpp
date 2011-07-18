@@ -108,7 +108,7 @@ NEW_TUTO(Track_creation, "Learn how you can compute tracks from a list of pictur
 
   motion_estim.computeMatches();
 
-  vector<TrackPoints> &tracks=motion_estim.getTracks();
+  vector<TrackOfPoints> &tracks=motion_estim.getTracks();
   cout<<"numbers of tracks:"<<tracks.size()<<endl;
 
   //now save the tracks:

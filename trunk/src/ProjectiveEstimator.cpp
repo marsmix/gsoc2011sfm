@@ -93,7 +93,7 @@ namespace OpencvSfM{
     //TODO!!!!
   }
 
-  void ProjectiveEstimator::updateTwoViewMotion(vector<TrackPoints>& tracks,
+  void ProjectiveEstimator::updateTwoViewMotion(vector<TrackOfPoints>& tracks,
     vector< Ptr< PointsToTrack > > &points_to_track,
     int image1, int image2)
   {
@@ -105,11 +105,11 @@ namespace OpencvSfM{
     //for each points:
     unsigned int key_size = tracks.size();
     unsigned int i;
-    vector<TrackPoints> matches;
+    vector<TrackOfPoints> matches;
     
     for (i=0; i < key_size; ++i)
     {
-      TrackPoints &track = tracks[i];
+      TrackOfPoints &track = tracks[i];
       if( track.containImage(image1) && track.containImage(image2) )
         matches.push_back(track);
     }
@@ -120,7 +120,7 @@ namespace OpencvSfM{
     vector<cv::Vec2d> pointImg1,pointImg2;
     for (i=0; i < key_size; ++i)
     {
-      TrackPoints &track = matches[i];
+      TrackOfPoints &track = matches[i];
       cv::DMatch match = track.toDMatch(image1, image2);
       
       pointImg1.push_back( cv::Vec2d(point_img1->getKeypoint(match.trainIdx).pt.x,
@@ -194,7 +194,7 @@ namespace OpencvSfM{
 
   void ProjectiveEstimator::computeReconstruction(vector<PointOfView>& camReal)
   {
-    vector<TrackPoints>& tracks = sequence_.getTracks();
+    vector<TrackOfPoints>& tracks = sequence_.getTracks();
     vector< Ptr< PointsToTrack > > &points_to_track = sequence_.getPoints();
     ImagesGraphConnection &images_graph = sequence_.getImgGraph();
     double ransac_threshold = 0.4 * sequence_.getImage(0).rows / 100.0;
@@ -279,7 +279,7 @@ namespace OpencvSfM{
     camReal[img2] = cameras_[img2];
 
     StructureEstimator se(sequence_, camReal);
-    vector<TrackPoints> points3DTrack;
+    vector<TrackOfPoints> points3DTrack;
     se.computeTwoView(img1, img2, points3DTrack);
     vector<cv::Vec3d> points3D;
     for(unsigned int cpt=0;cpt<points3DTrack.size();++cpt)

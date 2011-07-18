@@ -133,16 +133,16 @@ namespace OpencvSfM{
     fs << "}" << "}";
   }
 
-  void PointsToTrack::getKeyMatches(const std::vector<TrackPoints>& matches,
+  void PointsToTrack::getKeyMatches(const std::vector<TrackOfPoints>& matches,
     int otherImage, std::vector<cv::Point2f>& pointsVals) const
   {
     //for each points:
-    vector<TrackPoints>::size_type key_size = matches.size();
-    vector<TrackPoints>::size_type i;
+    vector<TrackOfPoints>::size_type key_size = matches.size();
+    vector<TrackOfPoints>::size_type i;
 
     for (i=0; i < key_size; i++)
     {
-      const TrackPoints &track = matches[i];
+      const TrackOfPoints &track = matches[i];
 
       if(track.containImage(corresponding_image_) &&
         track.containImage(otherImage) )

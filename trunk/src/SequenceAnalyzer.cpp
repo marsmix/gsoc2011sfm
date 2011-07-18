@@ -256,10 +256,10 @@ namespace OpencvSfM{
       DMatch &point_matcher = (*match_it);
 
       bool is_found=false;
-      vector<TrackPoints>::iterator tracks_it = tracks_.begin();
+      vector<TrackOfPoints>::iterator tracks_it = tracks_.begin();
       while ( tracks_it != tracks_.end() && !is_found )
       {
-        TrackPoints& track = (*tracks_it);
+        TrackOfPoints& track = (*tracks_it);
 
         if(track.containPoint(img1,point_matcher.trainIdx))
         {
@@ -272,7 +272,7 @@ namespace OpencvSfM{
       if( !is_found )
       {
         //it's a new point match, create a new track:
-        TrackPoints newTrack;
+        TrackOfPoints newTrack;
         newTrack.addMatch(img1,point_matcher.trainIdx);
         newTrack.addMatch(img2,point_matcher.queryIdx);
         tracks_.push_back(newTrack);
@@ -282,11 +282,11 @@ namespace OpencvSfM{
     }
   }
 
-  void SequenceAnalyzer::addTracks(vector<TrackPoints> &newTracks)
+  void SequenceAnalyzer::addTracks(vector<TrackOfPoints> &newTracks)
   {
 
-    vector<TrackPoints>::iterator match_it = newTracks.begin();
-    vector<TrackPoints>::iterator match_it_end = newTracks.end();
+    vector<TrackOfPoints>::iterator match_it = newTracks.begin();
+    vector<TrackOfPoints>::iterator match_it_end = newTracks.end();
 
     while ( match_it != match_it_end )
     {
@@ -314,8 +314,8 @@ namespace OpencvSfM{
         vector<DMatch> matches_to_print;
         //add to matches_to_print only points of img it and it+1:
 
-        vector<TrackPoints>::iterator match_it = tracks_.begin();
-        vector<TrackPoints>::iterator match_it_end = tracks_.end();
+        vector<TrackOfPoints>::iterator match_it = tracks_.begin();
+        vector<TrackOfPoints>::iterator match_it_end = tracks_.end();
 
         while ( match_it != match_it_end )
         {
@@ -384,7 +384,7 @@ namespace OpencvSfM{
       int nbPoints,track_consistance;
       it_track["nbPoints"] >> nbPoints;
       it_track["track_consistance"] >> track_consistance;
-      TrackPoints track;
+      TrackOfPoints track;
       cv::FileNodeIterator itPoints = it_track["track"].begin(),
         itPoints_end = it_track["track"].end();
       while( itPoints != itPoints_end )
@@ -415,15 +415,15 @@ namespace OpencvSfM{
 
   void SequenceAnalyzer::write( cv::FileStorage& fs, const SequenceAnalyzer& me )
   {
-    vector<TrackPoints>::size_type key_size = me.tracks_.size();
+    vector<TrackOfPoints>::size_type key_size = me.tracks_.size();
     int idImage=-1, idPoint=-1;
 
     fs << "SequenceAnalyzer" << "{";
     fs << "nbPictures" << (int)me.points_to_track_.size();
     fs << "TrackPoints" << "[";
-    for (vector<TrackPoints>::size_type i=0; i < key_size; i++)
+    for (vector<TrackOfPoints>::size_type i=0; i < key_size; i++)
     {
-      const TrackPoints &track = me.tracks_[i];
+      const TrackOfPoints &track = me.tracks_[i];
       unsigned int nbPoints = track.getNbTrack();
       if( nbPoints > 0)
       {
@@ -462,12 +462,12 @@ namespace OpencvSfM{
     images_graph_.initStructure(points_to_track_.size());
     
     //for each points:
-    vector<TrackPoints>::size_type key_size = tracks_.size();
-    vector<TrackPoints>::size_type i;
+    vector<TrackOfPoints>::size_type key_size = tracks_.size();
+    vector<TrackOfPoints>::size_type i;
 
     for (i=0; i < key_size; i++)
     {
-      TrackPoints &track = tracks_[i];
+      TrackOfPoints &track = tracks_[i];
       unsigned int nviews = track.images_indexes_.size();
       
       for(unsigned int cpt=0;cpt<nviews;cpt++)
