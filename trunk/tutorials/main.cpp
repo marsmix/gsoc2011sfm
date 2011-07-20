@@ -3,11 +3,12 @@
 #include "../src/PCL_mapping.h"
 
 using namespace OpencvSfM;
+using namespace OpencvSfM::mapping;
 using namespace cv;
 using namespace pcl;
 int main()
 {
-  Point3D_mapping testPoint;
+  Point3D testPoint;
   cv::Vec3f& testCV = testPoint;
   pcl::PointXYZ& testPCL = testPoint;
 
