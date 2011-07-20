@@ -90,9 +90,7 @@ endif()
 
 include_directories(${EIGEN_DIR})
 
-find_path(PCL_DIR "PCL"
-	DOC "The path to PCLConfig.cmake")
-	
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 find_package(PCL 1.0)
 
 set(SFM_LINKER_LIBS ${SFM_LINKER_LIBS} ${PCL_LIBRARIES})
