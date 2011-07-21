@@ -6,8 +6,10 @@
 #include "../src/PointOfView.h"
 #include "../src/CameraPinhole.h"
 #include "../src/libmv_mapping.h"
-#include <opencv2/calib3d/calib3d.hpp>
+#include "../src/PCL_mapping.h"
 
+#include <opencv2/calib3d/calib3d.hpp>
+#include <pcl/visualization/cloud_viewer.h>
 
 //////////////////////////////////////////////////////////////////////////
 //This file will not be in the final version of API, consider it like a tuto/draft...
@@ -69,33 +71,23 @@ NEW_TUTO(Triangulation_tuto, "Learn how you can triangulate 2D points",
   structure.computeStructure(tracks);
   cout<<tracks.size()<<" points found."<<endl;
 
-  //now for each point of view, we draw the picture and these points projected:
-  itPoV=myCameras.begin();
+  vector<Vec3f> points3D;
+  pcl::PointCloud<pcl::PointXYZ>::Ptr basic_cloud_ptr (new pcl::PointCloud<pcl::PointXYZ>);
+  vector<TrackOfPoints>::iterator itTrack=tracks.begin();
   index_image=0;
-  while (itPoV!=myCameras.end() && index_image<maxImg )
+  while ( itTrack != tracks.end() )
   {
-    Mat imgTmp=images[index_image];//get the current image
-    if(imgTmp.empty())
-      break;//end of sequence: quit!
-    index_image++;
-
-    //create the vector of 3D points viewed by this camera:
-    vector<Vec3d> points3D;
-    //motion_estim_loaded.filterPoints(triangulated,index_image,points3D,points2DOrigine);
-    vector<Vec2d> pixelProjected=itPoV->project3DPointsIntoImage(tracks);
-    //convert Vec2d into KeyPoint:
-    vector<KeyPoint> points2D;
-    for(unsigned int j=0;j<pixelProjected.size();j++)
-      points2D.push_back( KeyPoint( (float)pixelProjected[j][0],
-      (float)pixelProjected[j][1], 10.0 ) );
-
-    Mat imgTmp2;
-    drawKeypoints(imgTmp,points2D,imgTmp2,Scalar(255,255,255));
-    imshow("Points projected...",imgTmp2);
-    cv::waitKey(0);
-    itPoV++;
+    Vec3f p_tmp = (Vec3f)(*itTrack);
+    points3D.push_back( p_tmp );
+    pcl::PointXYZ p;
+    p.x = p_tmp[0]; p.y = p_tmp[1]; p.z = p_tmp[2];
+    basic_cloud_ptr->points.push_back( p );
+    itTrack++;
   }
-  cvDestroyWindow("Points projected...");
-  //now for fun show the sequence on images:
-  //motion_estim_loaded.showTracks(0);
+  
+  pcl::visualization::CloudViewer viewer ("Simple Cloud Viewer");
+  viewer.showCloud (basic_cloud_ptr);
+  while (!viewer.wasStopped ())
+  {
+  }
 }
