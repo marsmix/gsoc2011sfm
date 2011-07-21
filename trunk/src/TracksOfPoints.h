@@ -41,7 +41,11 @@ namespace OpencvSfM{
     operator cv::Ptr<cv::Vec3d>() {
       return point3D;
     }
-    operator cv::Vec3d() {
+
+    template<typename Type, int size>
+    operator cv::Vec<Type,size>() {/*
+      cv::Vec<Type,size> outVal;
+      for(int i)*/
       return *point3D;
     }
     TrackOfPoints():track_consistance(0){};

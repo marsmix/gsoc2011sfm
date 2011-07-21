@@ -90,6 +90,6 @@ vector<PointOfView> loadCamerasFromFile(string fileName, int flag_model )
       local_list_of_tutos[id_tuto]->tuto_body();
     }
     cout<<endl<<"Please type enter to continue"<<endl;
-    char c = (char)waitKey(0);
+    std::cin.ignore( std::numeric_limits <std::streamsize> ::max(), '\n' );
   }
 
