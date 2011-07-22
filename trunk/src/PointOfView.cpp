@@ -19,8 +19,8 @@ namespace OpencvSfM{
   PointOfView::PointOfView(cv::Ptr<Camera> device, Mat rotation /*=Mat::eye(3, 3, CV_64F)*/, Vec3d translation /*=Vec(0.0,0.0,0.0)*/ )
     : projection_matrix_(3, 4, CV_64F)
   {
-    CV_Assert( rotation.rows==3 && rotation.cols==3 );
-    CV_Assert( !device.empty() );
+    CV_DbgAssert( rotation.rows==3 && rotation.cols==3 );
+    CV_DbgAssert( !device.empty() );
 
     this->device_=device;
 

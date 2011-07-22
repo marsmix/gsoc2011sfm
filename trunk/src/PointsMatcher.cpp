@@ -12,7 +12,7 @@ namespace OpencvSfM{
 
   PointsMatcher::PointsMatcher( const Ptr<cv::DescriptorMatcher>& matcher )
   {
-    CV_Assert( !matcher.empty() );
+    CV_DbgAssert( !matcher.empty() );
     matcher_ = matcher;
   }
 
@@ -81,8 +81,8 @@ namespace OpencvSfM{
     vector<KeyPoint> keyPoints=queryPoints->getKeypoints();
     Mat descMat=queryPoints->getDescriptors();
 
-    CV_Assert( !keyPoints.empty() );
-    CV_Assert( !descMat.empty() );
+    CV_DbgAssert( !keyPoints.empty() );
+    CV_DbgAssert( !descMat.empty() );
     
     matcher_->match( descMat, matches, masks );
   }
@@ -98,8 +98,8 @@ namespace OpencvSfM{
     vector<KeyPoint> keyPoints=queryPoints->getKeypoints();
     Mat descMat=queryPoints->getDescriptors();
 
-    CV_Assert( !keyPoints.empty() );
-    CV_Assert( !descMat.empty() );
+    CV_DbgAssert( !keyPoints.empty() );
+    CV_DbgAssert( !descMat.empty() );
 
     matcher_->knnMatch( descMat, matches, knn, masks, compactResult );
   }
@@ -115,8 +115,8 @@ namespace OpencvSfM{
     vector<KeyPoint> keyPoints=queryPoints->getKeypoints();
     Mat descMat=queryPoints->getDescriptors();
 
-    CV_Assert( !keyPoints.empty() );
-    CV_Assert( !descMat.empty() );
+    CV_DbgAssert( !keyPoints.empty() );
+    CV_DbgAssert( !descMat.empty() );
 
     matcher_->radiusMatch( descMat, matches, maxDistance, masks, compactResult );
   }
@@ -144,8 +144,8 @@ namespace OpencvSfM{
     train();
 
     //TODO: for now this function only work with matcher having only one picture
-    CV_Assert( this->pointCollection_.size()==1 );
-    CV_Assert( otherMatcher->pointCollection_.size()==1 );
+    CV_DbgAssert( this->pointCollection_.size()==1 );
+    CV_DbgAssert( otherMatcher->pointCollection_.size()==1 );
 
     const vector<cv::KeyPoint>& src_points = pointCollection_[0]->getKeypoints();
     const vector<cv::KeyPoint>& dest_points = otherMatcher->pointCollection_[0]->
@@ -219,8 +219,8 @@ namespace OpencvSfM{
     train();
 
     //TODO: for now this function only work with matcher having only one picture
-    CV_Assert( this->pointCollection_.size()==1 );
-    CV_Assert( otherMatcher->pointCollection_.size()==1 );
+    CV_DbgAssert( this->pointCollection_.size()==1 );
+    CV_DbgAssert( otherMatcher->pointCollection_.size()==1 );
 
     if(matches.empty())
     {

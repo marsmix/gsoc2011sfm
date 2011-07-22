@@ -11,7 +11,7 @@ namespace OpencvSfM{
 
   CameraPinhole::CameraPinhole(Mat intra_params/*=Mat::eye(3, 3, CV_64F)*/,unsigned char wantedEstimation/*=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM*/)
   {
-    CV_Assert( intra_params.rows==3 && intra_params.cols==3 );
+    CV_DbgAssert( intra_params.rows==3 && intra_params.cols==3 );
 
     intra_params.convertTo(this->intra_params_,CV_64F);
     this->inv_intra_params_ = intra_params.inv();
@@ -34,7 +34,7 @@ namespace OpencvSfM{
   void CameraPinhole::updateIntrinsicMatrix(cv::Mat newParams,unsigned char intraValues/*=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM*/)
   {
 
-    CV_Assert( !newParams.empty() || (newParams.rows==3) || (newParams.cols==3) );
+    CV_DbgAssert( !newParams.empty() || (newParams.rows==3) || (newParams.cols==3) );
     //to be sure that newParams has correct type:
     Mat correctMat;
     newParams.convertTo(correctMat,CV_64F);

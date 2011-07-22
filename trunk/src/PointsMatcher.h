@@ -154,7 +154,7 @@ namespace OpencvSfM{
 
     inline const cv::KeyPoint &getKeypoint(int numKey) const
     {
-      CV_Assert( pointCollection_.size()>0 );
+      CV_DbgAssert( pointCollection_.size()>0 );
       return pointCollection_[0]->getKeypoint(numKey);
     }
 

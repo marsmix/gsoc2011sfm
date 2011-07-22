@@ -174,6 +174,11 @@ namespace OpencvSfM{
     * This function constructs and feeds the images_graph_
     */
     void constructImagesGraph();
+    /**
+    * This function will create a list of 3D points corresponding to
+    * object viewed in the sequence
+    */
+    std::vector< cv::Vec3d > get3DStructure();
   };
 
 }

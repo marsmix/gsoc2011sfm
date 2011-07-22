@@ -12,14 +12,14 @@
 
 #include "test_data_sets.h"
 
-NEW_TUTO(Triangulation_tests, "Visualization of 3D points (DEBUG ONLY)",
+NEW_TUTO(Triangulation_tests, "Compute of 3D points from 2D position and cameras",
   "Using points projections and cameras parameters, try to find the 3D positions.\nThis is useful to test correctness of algorithms."){
 
   int nviews = 5;
   int npoints = 6;
 
   cout<<"first load cameras and points..."<<endl;
-  std::ifstream inPoints(FROM_SRC_ROOT("Points_tests/logPoints.txt").c_str());
+  std::ifstream inPoints(FROM_SRC_ROOT("Medias/Points_tests/logPoints.txt").c_str());
   if( !inPoints.is_open() )
   {
     cout<<"This tuto need a file \"logPoints.txt\" with following syntax:"<<endl;
@@ -117,17 +117,21 @@ NEW_TUTO(Triangulation_tests, "Visualization of 3D points (DEBUG ONLY)",
 
   StructureEstimator structure (motion_estim, cameras);
   tracks.clear();
-  structure.computeStructure(tracks);
+  vector<char> values_OK = structure.computeStructure();
 
+  tracks = motion_estim.getTracks();
   //compute estimation error:
   double estim_error = 0.0;
-  for(unsigned int it = 0; it < points3D.size(); ++it)
+  for(unsigned int it = 0; it < values_OK.size(); ++it)
   {
-    cv::Ptr<cv::Vec3d> p3D = tracks[it];
-    double distX = points3D[it][0] - (*p3D)[0];
-    double distY = points3D[it][1] - (*p3D)[1];
-    double distZ = points3D[it][2] - (*p3D)[2];
-    estim_error += sqrt(distX * distX + distY * distY + distZ * distZ);
+    if( values_OK[it] != 0 )
+    {
+      cv::Vec3d& p3D = tracks[it];
+      double distX = points3D[it][0] - p3D[0];
+      double distY = points3D[it][1] - p3D[1];
+      double distZ = points3D[it][2] - p3D[2];
+      estim_error += sqrt(distX * distX + distY * distY + distZ * distZ);
+    }
   }
 
   cout<<endl<<"Triangulation error: "<<estim_error<<endl<<endl;
