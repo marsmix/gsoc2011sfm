@@ -3,6 +3,7 @@
 #define PCL_MAPPING_H
 
 #include <pcl/point_types.h>
+#include <pcl/point_cloud.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/features2d/features2d.hpp>
 /*
@@ -25,14 +26,14 @@ namespace OpencvSfM{
     
     /**
     * This function can be used to convert an Matx to a (float*).
-    * @param mapped pointer on Point2D or Point3D
+    * @param mapped pointer on Point2D or Point
     * @param t Opencv Matrix to convert
     * @return new array of float values
     */
     template<typename OpencvType>
     float* convert_to_float( const OpencvType& t )
     {
-      CV_Assert( OpencvType::cols == 1 );
+      CV_DbgAssert( OpencvType::cols == 1 );
       //we have to convert data:
       float* out = new float[ OpencvType::rows ];
       for(int i = 0; i < OpencvType::rows; ++i)
@@ -42,7 +43,7 @@ namespace OpencvSfM{
     /**
     * This function can be used to convert float values to double values (or int).
     * The function will create a new buffer, you will be responsible of data release
-    * @param mapped pointer on Point2D or Point3D
+    * @param mapped pointer on Point2D or Point
     * @return new array of new Type values
     */
     template<typename Type>
@@ -60,18 +61,18 @@ namespace OpencvSfM{
     * are done so be careful to use this function on compatible datas.
     * Checks are only done to wanted size / available data size and if
     * data are directly usable or not.
-    * @param mapped pointer on Point2D or Point3D
+    * @param mapped pointer on Point2D or Point
     * @return pointer on mapped new type
     */
     template<typename Type, typename Map_type>
     inline Type* convert_without_cast( Map_type* mapped )
     {
-      CV_Assert( mapped->size_of_data >= sizeof( Type ) / sizeof(float) );
+      CV_DbgAssert( mapped->size_of_data >= sizeof( Type ) / sizeof(float) );
       return reinterpret_cast< Type* >( mapped->data_ );
     }
     /**
     * This function can be used to init all datas of a mapped object
-    * @param mapped pointer on Point2D or Point3D
+    * @param mapped pointer on Point2D or Point
     * @param sizeOfBuf (optional) wanted buffer size
     * @param data (optional) existing buffer to map
     */
@@ -98,7 +99,7 @@ namespace OpencvSfM{
     /**
     * When you want to convert between 2 types having different footprint size,
     * use this function before to create a buffer with enough space
-    * @param mapped pointer on Point2D or Point3D
+    * @param mapped pointer on Point2D or Point
     */
     template<typename Map_type>
     inline void setDistinctMemory( Map_type* mapped,
@@ -120,74 +121,19 @@ namespace OpencvSfM{
     * This function can be used to convert a mapped type
     * to any other supported type. Here we take care of data compatibilities
     * and if needed we create an other buffer to hold data
-    * @param mapped pointer on Point2D or Point3D
+    * @param mapped pointer on Point2D or Point
     * @return pointer on mapped new type
     */
     template<typename LowDataType, typename Type, typename Map_type>
     inline void convert_( Map_type* mapped, Type* out )
     {
-      CV_Assert( mapped->size_of_data >= sizeof( Type ) / sizeof(float) );
+      CV_DbgAssert( mapped->size_of_data >= sizeof( Type ) / sizeof(float) );
       LowDataType* data = convert_to_<LowDataType>( mapped->data_, mapped->size_of_data );
       memcpy(reinterpret_cast< char* >( out ), data, sizeof(Type) );
       delete data;
     }
 
-    struct EIGEN_ALIGN16 Point2D
-    {
-      float *data_;//Max size of points in both library
-      bool should_remove;
-      unsigned char size_of_data;
-      /**
-      * Init data using the max size of points in both library (6 floats)
-      **/
-      Point2D(){ initData(this, 6); };
-
-      /**
-      * Init data using previously allocated buffer (size should be >= 6 floats)
-      * @param data values of point to convert
-      * @param sizeOfBuf in number of float, the size of point
-      **/
-      Point2D(float *data, int sizeOfBuf = 6){ initData(this, sizeOfBuf, data); };
-
-      Point2D(cv::KeyPoint& kp){
-        initData(this, 6, reinterpret_cast< float* >( &kp ) );
-      };
-
-      Point2D(pcl::PointXY& pXY){
-        initData(this, 2, reinterpret_cast< float* >( &pXY ) );
-      };
-      ~Point2D(){ if(should_remove) delete data_; };
-
-      //Conversions operators / to pointer:
-      template<typename Type, int size>
-      inline operator cv::Matx<Type,size,1>*() { CV_Assert( size_of_data >= size );
-      return reinterpret_cast< cv::Matx<Type,size,1>* >(data_);};
-      template<typename Type, int size>
-      inline operator cv::Vec<Type,size>*() { CV_Assert( size_of_data >= size );
-      return reinterpret_cast< cv::Vec<Type,size>* >(data_);};
-      inline operator cv::KeyPoint*() { CV_Assert( size_of_data >= 6 );
-      return reinterpret_cast< cv::KeyPoint* >(data_);};
-
-      inline operator pcl::PointXY*() { CV_Assert( size_of_data >= 2 );
-      return reinterpret_cast< pcl::PointXY* >(data_);};
-
-      //Conversions operators / to reference:
-      template<typename Type, int size>
-      inline operator cv::Matx<Type,size,1>&() { CV_Assert( size_of_data >= size );
-      return * reinterpret_cast< cv::Matx<Type,size,1>* >(data_);};
-      template<typename Type, int size>
-      inline operator cv::Vec<Type,size>&() { CV_Assert( size_of_data >= size );
-      return * reinterpret_cast< cv::Vec<Type,size>* >(data_);};
-      inline operator cv::KeyPoint&() { CV_Assert( size_of_data >= 6 );
-      return * reinterpret_cast< cv::KeyPoint* >(data_);};
-
-      inline operator pcl::PointXY&() { CV_Assert( size_of_data >= 2 );
-      return * reinterpret_cast< pcl::PointXY* >(data_);};
-
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    };
-
-    struct EIGEN_ALIGN16 Point3D
+    struct EIGEN_ALIGN16 Point
     {
       float *data_;//Max size of points in both library
       unsigned char size_of_data;
@@ -196,7 +142,7 @@ namespace OpencvSfM{
       /**
       * Copy constructor (deep copy!)
       **/
-      Point3D(const Point3D& otherP){
+      Point(const Point& otherP){
         initData( this, otherP.size_of_data );
         memcpy( data_, otherP.data_, size_of_data * sizeof(float) );
       };
@@ -204,19 +150,19 @@ namespace OpencvSfM{
       /**
       * Init data using the max size of points in both library (8 floats)
       **/
-      Point3D(){ initData( this ); };
+      Point(){ initData( this ); };
 
       /**
       * Init data using previously allocated buffer
       * @param data values of point to convert
       * @param sizeOfBuf in number of float, the size of point
       **/
-      Point3D(float *data, int sizeOfBuf = 4){
+      Point(float *data, int sizeOfBuf = 4){
         initData( this, sizeOfBuf, data );
       };
 
       template<typename Type, int size>
-      Point3D(cv::Vec<Type,size>& v){
+      Point(cv::Vec<Type,size>& v){
         if( sizeof( Type ) == sizeof( float ) )
           initData( this, v.rows, (float*) v.val );
         else
@@ -227,7 +173,7 @@ namespace OpencvSfM{
       };
 
       template<typename Type, int size>
-      Point3D(cv::Matx<Type,size,1>& v){
+      Point(cv::Matx<Type,size,1>& v){
         if( sizeof( Type::value_type ) == sizeof( float ) )
           initData( this, Type::rows, (float*) v.val );
         else
@@ -236,35 +182,46 @@ namespace OpencvSfM{
           should_remove=true;//convert_to_float create a buffer
         }
       };
+      Point(cv::KeyPoint& kp){
+        initData(this, 6, reinterpret_cast< float* >( &kp ) );
+      };
 
-      Point3D(pcl::PointXYZ& pXYZ){ initData( this, 4, pXYZ.data ); };
-      Point3D(pcl::PointXYZI& pXYZi){ initData( this, 8, pXYZi.data ); };
-      Point3D(pcl::InterestPoint& iP){ initData( this, 8, iP.data ); };
-      Point3D(pcl::PointWithRange& pPWR){ initData( this, 8, pPWR.data ); };
-      Point3D(pcl::PointXYZRGBA& pXYZ1){ initData( this, 8, pXYZ1.data ); };
-      Point3D(pcl::PointXYZRGB& pXYZ2){ initData( this, 8, pXYZ2.data ); };
+      Point(pcl::PointXY& pXY){ 
+        initData(this, 2, reinterpret_cast< float* >( &pXY ) );
+      };
+      Point(pcl::PointXYZ& pXYZ){ initData( this, 4, pXYZ.data ); };
+      Point(pcl::PointXYZI& pXYZi){ initData( this, 8, pXYZi.data ); };
+      Point(pcl::InterestPoint& iP){ initData( this, 8, iP.data ); };
+      Point(pcl::PointWithRange& pPWR){ initData( this, 8, pPWR.data ); };
+      Point(pcl::PointXYZRGBA& pXYZ1){ initData( this, 8, pXYZ1.data ); };
+      Point(pcl::PointXYZRGB& pXYZ2){ initData( this, 8, pXYZ2.data ); };
 
-      ~Point3D(){ if(should_remove) delete data_; };
+      ~Point(){ if(should_remove) delete data_; };
 
 
       //Conversions operators / to reference:
       template<typename Type, int size>
       inline operator cv::Matx<Type,size,1>&() {
-        CV_Assert( sizeof(Type) == sizeof( float ) );
+        CV_DbgAssert( sizeof(Type) == sizeof( float ) );
         return * convert_without_cast< cv::Matx<Type,size,1> >( this );
       };
       template<typename Type, int size>
       inline operator cv::Vec<Type,size>&() {
-        CV_Assert( sizeof(Type) == sizeof( float ) );
+        CV_DbgAssert( sizeof(Type) == sizeof( float ) );
         return * convert_without_cast< cv::Vec<Type,size> >( this );
       };
       template<typename Type>
       inline operator cv::Point3_<Type>&() {
-        CV_Assert( sizeof(Type) == sizeof( float ) );
+        CV_DbgAssert( sizeof(Type) == sizeof( float ) );
         return * convert_without_cast< cv::Point3_<Type> >( this );
       };
+      inline operator cv::KeyPoint&() {
+      return * convert_without_cast< cv::KeyPoint >( this );};
 
 
+      inline operator pcl::PointXY&() {
+        return * convert_without_cast< pcl::PointXY >( this );
+      };
       inline operator pcl::PointXYZ&() {
         return * convert_without_cast< pcl::PointXYZ >( this );
       };
@@ -343,7 +300,7 @@ namespace OpencvSfM{
 
     template<typename TypeFrom, typename TypeTo,
       typename allocatorFrom, typename allocatorTo>
-    void convertVectorFrom_OpenCV(
+    void convert_OpenCV_vector(
       const std::vector<TypeFrom,allocatorFrom>& vectFrom,
       std::vector<TypeTo,allocatorTo>& vectTo)
     {
@@ -368,7 +325,7 @@ namespace OpencvSfM{
 
     template<typename TypeFrom, typename TypeTo,
       typename allocatorFrom, typename allocatorTo>
-    void convertVectorFrom_PCL(
+    void convert_PCL_vector(
       const std::vector<TypeFrom,allocatorFrom>& vectFrom,
       std::vector<TypeTo,allocatorTo>& vectTo)
     {
@@ -431,7 +388,7 @@ namespace OpencvSfM{
     }
 
     template<typename TypeFrom, typename allocatorFrom>
-    void convertPCLVector(
+    void convert_PCL_vector(
       std::vector<TypeFrom,allocatorFrom>& vectFrom,
       cv::Mat& output, bool copyValues = false)
     {
@@ -441,6 +398,29 @@ namespace OpencvSfM{
         CV_32F, (void*)&vectFrom[0]);
       if( copyValues )
         output = output.clone();
+    }
+
+    template<typename TypeFrom, typename allocatorFrom,
+      typename PCL_point>
+    void convert_OpenCV_vector(
+      std::vector<TypeFrom,allocatorFrom>& vectFrom,
+      pcl::PointCloud< PCL_point >& output)
+    {
+      int sizeOfData = sizeof( PCL_point ) / sizeof( float );
+      sizeOfData = MIN( sizeOfData, TypeFrom::rows );
+
+      vector<TypeFrom,allocatorFrom>::iterator itTrack=vectFrom.begin();
+      while ( itTrack != vectFrom.end() )
+      {
+        float* datas = convert_to_float( *itTrack );
+        PCL_point p;
+        for(int i=0; i<sizeOfData; ++i)
+          p.data[i] = datas[i];
+
+        output.points.push_back( p );
+        delete datas;
+        itTrack++;
+      }
     }
   }
 

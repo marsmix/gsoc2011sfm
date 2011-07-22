@@ -6,8 +6,9 @@ namespace OpencvSfM{
   using std::vector;
   using cv::Ptr;
 
-  void StructureEstimator::computeStructure(vector<TrackOfPoints>& points3D)
+  vector<char> StructureEstimator::computeStructure()
   {
+    vector<char> output_mask;
     vector<TrackOfPoints>& tracks = sequence_.getTracks();
     vector< Ptr< PointsToTrack > > &points_to_track = sequence_.getPoints();
 
@@ -29,10 +30,9 @@ namespace OpencvSfM{
       //double distance=track.triangulateLinear( cameras_,points_to_track, point_final );
 
       //this is used to take only correct 3D points:
-      if(distance<max_repro_error_)
-        points3D.push_back(track);
-
+      output_mask.push_back( (distance<max_repro_error_) );
     }
+    return output_mask;
   }
   void StructureEstimator::computeTwoView(int img1, int img2,
     vector<TrackOfPoints>& points3D)
@@ -71,4 +71,5 @@ namespace OpencvSfM{
 
     }
   }
+
 }

@@ -14,8 +14,8 @@ namespace OpencvSfM{
     libmv::Mat3 &E)
   {
     unsigned int nPoints = x1.cols();
-    CV_Assert( nPoints == x2.cols() );
-    CV_Assert( nPoints >= 5 );//need 5 points!
+    CV_DbgAssert( nPoints == x2.cols() );
+    CV_DbgAssert( nPoints >= 5 );//need 5 points!
 
     libmv::vector<libmv::Mat3> Es;
     cv::RNG& rng = cv::theRNG();

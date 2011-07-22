@@ -19,7 +19,7 @@ namespace OpencvSfM{
     descriptor_extractor_(descriptor_extractor)
   {
     //only finite sequences can be used:
-    CV_Assert(input_sequence.isBidirectional());
+    CV_DbgAssert(input_sequence.isBidirectional());
     //go back to the begining:
     input_sequence.setProperty(CV_CAP_PROP_POS_FRAMES,0);
 
@@ -69,7 +69,7 @@ namespace OpencvSfM{
   {
     if(points.empty())
     {
-      CV_Assert( !feature_detector_.empty() &&
+      CV_DbgAssert( !feature_detector_.empty() &&
         !descriptor_extractor_.empty() );
       int nbFrame = points_to_track_.size();
       Ptr<PointsToTrack> ptrPoints_tmp( new PointsToTrackWithImage (
@@ -285,8 +285,8 @@ namespace OpencvSfM{
   void SequenceAnalyzer::addTracks(vector<TrackOfPoints> &newTracks)
   {
 
-    vector<TrackOfPoints>::iterator match_it = newTracks.begin();
-    vector<TrackOfPoints>::iterator match_it_end = newTracks.end();
+    vector<TrackOfPoints>::iterator match_it = newTracks.begin(),
+      match_it_end = newTracks.end();
 
     while ( match_it != match_it_end )
     {
@@ -384,7 +384,17 @@ namespace OpencvSfM{
       int nbPoints,track_consistance;
       it_track["nbPoints"] >> nbPoints;
       it_track["track_consistance"] >> track_consistance;
+      bool has_3d_point = false;
+      it_track["has_3d_position"] >> has_3d_point;
       TrackOfPoints track;
+      if( has_3d_point )
+      {
+        cv::Vec3d point;
+        point[0] = it_track["point3D_triangulated"][0];
+        point[1] = it_track["point3D_triangulated"][1];
+        point[2] = it_track["point3D_triangulated"][2];
+        track.point3D = Ptr<cv::Vec3d>( new cv::Vec3d(point) );
+      }
       cv::FileNodeIterator itPoints = it_track["track"].begin(),
         itPoints_end = it_track["track"].end();
       while( itPoints != itPoints_end )
@@ -429,6 +439,9 @@ namespace OpencvSfM{
       {
         fs << "{" << "nbPoints" << (int)nbPoints;
         fs << "track_consistance" << track.track_consistance;
+        fs << "has_3d_position" << ( !track.point3D.empty() );
+        if( !track.point3D.empty() )
+          fs << "point3D_triangulated" << *track.point3D;
         fs << "track" << "[:";
         for (unsigned int j = 0; j < nbPoints ; j++)
         {
@@ -481,4 +494,16 @@ namespace OpencvSfM{
     }
   }
 
+  vector<cv::Vec3d> SequenceAnalyzer::get3DStructure()
+  {
+    vector<cv::Vec3d> out_vector;
+    vector<TrackOfPoints>::iterator itTrack=tracks_.begin();
+    while ( itTrack != tracks_.end() )
+    {
+      if( !itTrack->point3D.empty() )
+        out_vector.push_back( (cv::Vec3d)(*itTrack) );
+      itTrack++;
+    }
+    return out_vector;
+  }
 }
