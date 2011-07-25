@@ -81,6 +81,12 @@ namespace OpencvSfM{
     */
     virtual cv::Mat getIntraMatrix() const
     {return intra_params_;};
+    /**
+    * This method retrive the focal from Intrinsic matrix.
+    * It's not using pixel reference but using camera reference!
+    * @return focal lenght
+    */
+    virtual double getFocal() const;
   };
 
 };

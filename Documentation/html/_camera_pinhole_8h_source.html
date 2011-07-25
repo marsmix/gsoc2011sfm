@@ -63,41 +63,44 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="preprocessor">#ifndef _GSOC_SFM_CAMERA_PINHOLE_H</span>
 <a name="l00002"></a>00002 <span class="preprocessor"></span><span class="preprocessor">#define _GSOC_SFM_CAMERA_PINHOLE_H 1</span>
 <a name="l00003"></a>00003 <span class="preprocessor"></span>
-<a name="l00004"></a>00004 <span class="comment">//A lot of methods are inspired of LIBMV project (http://code.google.com/p/libmv/)</span>
+<a name="l00004"></a>00004 <span class="comment">//A lot of methods are inspired of LIBMV project (http://code.google.com/p/libmv_core/)</span>
 <a name="l00005"></a>00005 
-<a name="l00006"></a>00006 <span class="preprocessor">#include &quot;opencv2/calib3d/calib3d.hpp&quot;</span>
-<a name="l00007"></a>00007 <span class="preprocessor">#include &quot;Camera.h&quot;</span>
-<a name="l00008"></a>00008 
-<a name="l00009"></a>00009 <span class="keyword">namespace </span>OpencvSfM{
-<a name="l00010"></a>00010   <span class="keyword">enum</span> paramsOfIntraParameters{
-<a name="l00011"></a>00011     FOCAL_PARAM=1,         
-<a name="l00012"></a>00012     SKEW_PARAM=2,          
-<a name="l00013"></a>00013     PRINCIPAL_POINT_PARAM=4
-<a name="l00014"></a>00014   };
-<a name="l00015"></a>00015 
-<a name="l00023"></a><a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html">00023</a>   <span class="keyword">class </span><a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html" title="This class represent the physical device which take the pictures. It is not related to a 3D position ...">CameraPinhole</a>:<span class="keyword">public</span> <a class="code" href="class_opencv_sf_m_1_1_camera.html" title="We will need this class, but PointOfView need our class too...">Camera</a>{
-<a name="l00024"></a>00024   <span class="keyword">protected</span>:
-<a name="l00025"></a><a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ac60a2fb4ca15534d0b361628837f9286">00025</a>     cv::Mat <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ac60a2fb4ca15534d0b361628837f9286" title="store intra parameters(3*3 matrix). This matrix contains focal informations, principal point coordina...">intra_params_</a>;
-<a name="l00026"></a><a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ad6bf92278db0c35e220accd087a05701">00026</a>     cv::Mat <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ad6bf92278db0c35e220accd087a05701" title="This is the inverse transformation of intra_params_. Used to speed up calculus...">inv_intra_params_</a>;
-<a name="l00027"></a>00027 
-<a name="l00033"></a><a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#a024b01688fee19c5c2d592f4060d6063">00033</a>     <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#a024b01688fee19c5c2d592f4060d6063">estimation_needed_</a>;
-<a name="l00034"></a>00034   <span class="keyword">public</span>:
-<a name="l00040"></a>00040     <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#a7951c403bff3a75b6a2decdfa8b685bc">CameraPinhole</a>(cv::Mat intra_params=cv::Mat::eye(3, 3, CV_64F),<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> wantedEstimation=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM);
-<a name="l00050"></a>00050     <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#a7951c403bff3a75b6a2decdfa8b685bc">CameraPinhole</a>(<span class="keyword">const</span> std::vector&lt;std::vector&lt;cv::Point3f&gt; &gt;&amp; objectPoints, <span class="keyword">const</span> std::vector&lt;std::vector&lt;cv::Point2f&gt; &gt;&amp; imagePoints, cv::Size imageSize, <span class="keywordtype">double</span> aspectRatio=1.,<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> wantedEstimation=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM);
-<a name="l00051"></a>00051     ~<a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html" title="This class represent the physical device which take the pictures. It is not related to a 3D position ...">CameraPinhole</a>();
-<a name="l00052"></a>00052 
-<a name="l00058"></a>00058     <span class="keywordtype">void</span> <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#aeecb985ac673ca4d8658ebdbca291dd0">updateIntrinsicMatrix</a>(cv::Mat newParams,<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> intraValues=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM);
-<a name="l00059"></a>00059 
-<a name="l00063"></a>00063     <span class="keyword">virtual</span> std::vector&lt;cv::Vec4d&gt; <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#a694530f3c345a961bad11c28a68703ee">convertFromImageTo3Dray</a>(std::vector&lt;cv::Vec3d&gt; points);
-<a name="l00064"></a>00064     
-<a name="l00070"></a>00070     <span class="keyword">virtual</span> std::vector&lt;cv::Vec2d&gt; <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ac289202ffff97def7c6287cfb3e3040d">pixelToNormImageCoordinates</a>(std::vector&lt;cv::Vec2d&gt; points);
-<a name="l00076"></a>00076     <span class="keyword">virtual</span> std::vector&lt;cv::Vec2d&gt; <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#aa844cae56eaa43784b3420bcddaacdd6">normImageToPixelCoordinates</a>(std::vector&lt;cv::Vec2d&gt; points);
-<a name="l00083"></a>00083     <span class="keyword">virtual</span> cv::Mat <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ad42158ee2722c73c6935a4744c152026">computeProjectionMatrix</a>(<span class="keyword">const</span> cv::Mat &amp;rotation,<span class="keyword">const</span> cv::Vec3d &amp;translation);
-<a name="l00084"></a>00084   };
-<a name="l00085"></a>00085 
-<a name="l00086"></a>00086 };
-<a name="l00087"></a>00087 
-<a name="l00088"></a>00088 <span class="preprocessor">#endif</span>
+<a name="l00006"></a>00006 <span class="preprocessor">#include &quot;macro.h&quot;</span> <span class="comment">//SFM_EXPORTS</span>
+<a name="l00007"></a>00007 <span class="preprocessor">#include &quot;opencv2/calib3d/calib3d.hpp&quot;</span>
+<a name="l00008"></a>00008 <span class="preprocessor">#include &quot;Camera.h&quot;</span>
+<a name="l00009"></a>00009 
+<a name="l00010"></a>00010 <span class="keyword">namespace </span>OpencvSfM{
+<a name="l00011"></a>00011   <span class="keyword">enum</span> paramsOfIntraParameters{
+<a name="l00012"></a>00012     FOCAL_PARAM=1,         
+<a name="l00013"></a>00013     SKEW_PARAM=2,          
+<a name="l00014"></a>00014     PRINCIPAL_POINT_PARAM=4
+<a name="l00015"></a>00015   };
+<a name="l00016"></a>00016 
+<a name="l00024"></a><a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html">00024</a>   <span class="keyword">class </span>SFM_EXPORTS <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html" title="This class represent the physical device which take the pictures. It is not related to a 3D position ...">CameraPinhole</a>:<span class="keyword">public</span> <a class="code" href="class_opencv_sf_m_1_1_camera.html" title="This class represent the physical device which take the pictures. It is not related to a 3D position ...">Camera</a>{
+<a name="l00025"></a>00025   <span class="keyword">protected</span>:
+<a name="l00026"></a><a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ac60a2fb4ca15534d0b361628837f9286">00026</a>     cv::Mat <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ac60a2fb4ca15534d0b361628837f9286" title="store intra parameters(3*3 matrix). This matrix contains focal informations, principal point coordina...">intra_params_</a>;
+<a name="l00027"></a><a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ad6bf92278db0c35e220accd087a05701">00027</a>     cv::Mat <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ad6bf92278db0c35e220accd087a05701" title="This is the inverse transformation of intra_params_. Used to speed up calculus...">inv_intra_params_</a>;
+<a name="l00028"></a>00028 
+<a name="l00034"></a><a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#a024b01688fee19c5c2d592f4060d6063">00034</a>     <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#a024b01688fee19c5c2d592f4060d6063">estimation_needed_</a>;
+<a name="l00035"></a>00035   <span class="keyword">public</span>:
+<a name="l00041"></a>00041     <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html" title="This class represent the physical device which take the pictures. It is not related to a 3D position ...">CameraPinhole</a>(cv::Mat intra_params=cv::Mat::eye(3, 3, CV_64F),<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> wantedEstimation=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM);
+<a name="l00051"></a>00051     <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html" title="This class represent the physical device which take the pictures. It is not related to a 3D position ...">CameraPinhole</a>(<span class="keyword">const</span> std::vector&lt;std::vector&lt;cv::Point3f&gt; &gt;&amp; objectPoints, <span class="keyword">const</span> std::vector&lt;std::vector&lt;cv::Point2f&gt; &gt;&amp; imagePoints, cv::Size imageSize, <span class="keywordtype">double</span> aspectRatio=1.,<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> wantedEstimation=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM);
+<a name="l00052"></a>00052     ~<a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html" title="This class represent the physical device which take the pictures. It is not related to a 3D position ...">CameraPinhole</a>();
+<a name="l00053"></a>00053 
+<a name="l00059"></a>00059     <span class="keywordtype">void</span> updateIntrinsicMatrix(cv::Mat newParams,<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> intraValues=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM);
+<a name="l00060"></a>00060 
+<a name="l00064"></a>00064     <span class="keyword">virtual</span> std::vector&lt;cv::Vec4d&gt; convertFromImageTo3Dray(std::vector&lt;cv::Vec3d&gt; points);
+<a name="l00065"></a>00065     
+<a name="l00071"></a>00071     <span class="keyword">virtual</span> std::vector&lt;cv::Vec2d&gt; pixelToNormImageCoordinates(std::vector&lt;cv::Vec2d&gt; points) <span class="keyword">const</span>;
+<a name="l00077"></a>00077     <span class="keyword">virtual</span> std::vector&lt;cv::Vec2d&gt; normImageToPixelCoordinates(std::vector&lt;cv::Vec2d&gt; points) <span class="keyword">const</span>;
+<a name="l00082"></a><a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#a46eae27e8e2d4f25f1c64fa4d2d9b1eb">00082</a>     <span class="keyword">virtual</span> cv::Mat getIntraMatrix()<span class="keyword"> const</span>
+<a name="l00083"></a>00083 <span class="keyword">    </span>{<span class="keywordflow">return</span> intra_params_;};
+<a name="l00089"></a>00089     <span class="keyword">virtual</span> <span class="keywordtype">double</span> getFocal() <span class="keyword">const</span>;
+<a name="l00090"></a>00090   };
+<a name="l00091"></a>00091 
+<a name="l00092"></a>00092 };
+<a name="l00093"></a>00093 
+<a name="l00094"></a>00094 <span class="preprocessor">#endif</span>
 </pre></div></div>
 </div>
 <!-- window showing the filter options -->
@@ -114,7 +117,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Mon May 30 2011 17:50:29 for GSoC2011SfM by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Mon Jul 25 2011 12:41:00 for GSoC2011SfM by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

@@ -84,7 +84,7 @@ Inheritance diagram for OpencvSfM::PointsToTrackWithImage:</div>
  <div class="center">
   <img src="class_opencv_sf_m_1_1_points_to_track_with_image.png" usemap="#OpencvSfM::PointsToTrackWithImage_map" alt=""/>
   <map id="OpencvSfM::PointsToTrackWithImage_map" name="OpencvSfM::PointsToTrackWithImage_map">
-<area href="class_opencv_sf_m_1_1_points_to_track.html" title="This class can be used to store informations about points and features. This is an abstract class: yo..." alt="OpencvSfM::PointsToTrack" shape="rect" coords="0,0,223,24"/>
+<area href="class_opencv_sf_m_1_1_points_to_track.html" title="This class can be used to store informations about point and features. This is an abstract class: you..." alt="OpencvSfM::PointsToTrack" shape="rect" coords="0,0,223,24"/>
 </map>
  </div></div>
 
@@ -92,12 +92,14 @@ Inheritance diagram for OpencvSfM::PointsToTrackWithImage:</div>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track_with_image.html#a16b5fffabd61a2e728c1d677307d221e">PointsToTrackWithImage</a> (cv::Mat imageToAnalyse, cv::Mat maskOfAnalyse, cv::Ptr&lt; cv::FeatureDetector &gt; feature_detector=0, cv::Ptr&lt; cv::DescriptorExtractor &gt; descriptor_detector=0)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track_with_image.html#a617869848cca4ee8f7933b203eaf8638">PointsToTrackWithImage</a> (cv::Mat imageToAnalyse, cv::Mat maskOfAnalyse, std::string feature_detector, std::string descriptor_detector=&quot;SIFT&quot;)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track_with_image.html#a515aef19b6ebd6a1cf8a945fa9e8cfad">PointsToTrackWithImage</a> (int corresponding_image, cv::Mat imageToAnalyse, cv::Mat maskOfAnalyse, cv::Ptr&lt; cv::FeatureDetector &gt; feature_detector=0, cv::Ptr&lt; cv::DescriptorExtractor &gt; descriptor_detector=0)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track_with_image.html#a79be2dcaea837f4f31b19bac64fd5dc9">PointsToTrackWithImage</a> (int corresponding_image, cv::Mat imageToAnalyse, cv::Mat maskOfAnalyse, std::string feature_detector, std::string descriptor_detector=&quot;SIFT&quot;)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track_with_image.html#a08e85521d6884eec1d113dd81354502f">setFeatureDetector</a> (cv::Ptr&lt; cv::FeatureDetector &gt; feature_detector)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track_with_image.html#a3438e554c9ef0d807ccad6799209bb50">setDescriptorExtractor</a> (cv::Ptr&lt; cv::DescriptorExtractor &gt; descriptor_detector)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track_with_image.html#a4fba046ec6498fcea5b38253d19b80f9">computeKeypoints</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track_with_image.html#aee97104c9c66601e5c51237717cb2522">computeDescriptors</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9ff5742f62dd25f41648bda5476a0597"></a><!-- doxytag: member="OpencvSfM::PointsToTrackWithImage::getImage" ref="a9ff5742f62dd25f41648bda5476a0597" args="()" -->
+cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><b>getImage</b> ()</td></tr>
 <tr><td colspan="2"><h2><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a22779db7344fed472cebc4a00ecef631"></a><!-- doxytag: member="OpencvSfM::PointsToTrackWithImage::feature_detector_" ref="a22779db7344fed472cebc4a00ecef631" args="" -->
@@ -117,15 +119,21 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <div class="textblock"><p>This class can be used to find points and features in pictures using SIFT detector. </p>
 <p>To create a structure from motion, most methods use points to compute the structure. This class focus on the first task in SfM: find points in image which are easy to track... When available, a feature vector for each points is very helpful: the matching will be easier. </p>
 
-<p>Definition at line <a class="el" href="_points_to_track_with_image_8h_source.html#l00014">14</a> of file <a class="el" href="_points_to_track_with_image_8h_source.html">PointsToTrackWithImage.h</a>.</p>
+<p>Definition at line <a class="el" href="_points_to_track_with_image_8h_source.html#l00015">15</a> of file <a class="el" href="_points_to_track_with_image_8h_source.html">PointsToTrackWithImage.h</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a16b5fffabd61a2e728c1d677307d221e"></a><!-- doxytag: member="OpencvSfM::PointsToTrackWithImage::PointsToTrackWithImage" ref="a16b5fffabd61a2e728c1d677307d221e" args="(cv::Mat imageToAnalyse, cv::Mat maskOfAnalyse, cv::Ptr&lt; cv::FeatureDetector &gt; feature_detector=0, cv::Ptr&lt; cv::DescriptorExtractor &gt; descriptor_detector=0)" -->
+<a class="anchor" id="a515aef19b6ebd6a1cf8a945fa9e8cfad"></a><!-- doxytag: member="OpencvSfM::PointsToTrackWithImage::PointsToTrackWithImage" ref="a515aef19b6ebd6a1cf8a945fa9e8cfad" args="(int corresponding_image, cv::Mat imageToAnalyse, cv::Mat maskOfAnalyse, cv::Ptr&lt; cv::FeatureDetector &gt; feature_detector=0, cv::Ptr&lt; cv::DescriptorExtractor &gt; descriptor_detector=0)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">OpencvSfM::PointsToTrackWithImage::PointsToTrackWithImage </td>
           <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>corresponding_image</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">cv::Mat&#160;</td>
           <td class="paramname"><em>imageToAnalyse</em>, </td>
         </tr>
@@ -158,6 +166,7 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>First constructor used to create a list of points to track using a feature and a descriptor algorithm. </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
+    <tr><td class="paramname">corresponding_image</td><td>Global index of image </td></tr>
     <tr><td class="paramname">imageToAnalyse</td><td>Image to use for keypoints and features search </td></tr>
     <tr><td class="paramname">maskOfAnalyse</td><td>Mask used to hide part of image </td></tr>
     <tr><td class="paramname">feature_detector</td><td>Algorithm to use for features detection (see <a href="http://opencv.willowgarage.com/documentation/cpp/common_interfaces_for_feature_detection_and_descriptor_extraction.html#featuredetector">http://opencv.willowgarage.com/documentation/cpp/common_interfaces_for_feature_detection_and_descriptor_extraction.html#featuredetector</a>) </td></tr>
@@ -168,13 +177,19 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 
 </div>
 </div>
-<a class="anchor" id="a617869848cca4ee8f7933b203eaf8638"></a><!-- doxytag: member="OpencvSfM::PointsToTrackWithImage::PointsToTrackWithImage" ref="a617869848cca4ee8f7933b203eaf8638" args="(cv::Mat imageToAnalyse, cv::Mat maskOfAnalyse, std::string feature_detector, std::string descriptor_detector=&quot;SIFT&quot;)" -->
+<a class="anchor" id="a79be2dcaea837f4f31b19bac64fd5dc9"></a><!-- doxytag: member="OpencvSfM::PointsToTrackWithImage::PointsToTrackWithImage" ref="a79be2dcaea837f4f31b19bac64fd5dc9" args="(int corresponding_image, cv::Mat imageToAnalyse, cv::Mat maskOfAnalyse, std::string feature_detector, std::string descriptor_detector=&quot;SIFT&quot;)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">OpencvSfM::PointsToTrackWithImage::PointsToTrackWithImage </td>
           <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>corresponding_image</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">cv::Mat&#160;</td>
           <td class="paramname"><em>imageToAnalyse</em>, </td>
         </tr>
@@ -207,6 +222,7 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>Second constructor used to create a list of points to track using a feature and a descriptor algorithm. </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
+    <tr><td class="paramname">corresponding_image</td><td>Global index of image </td></tr>
     <tr><td class="paramname">imageToAnalyse</td><td>Image to use for keypoints and features search </td></tr>
     <tr><td class="paramname">maskOfAnalyse</td><td>Mask used to hide part of image </td></tr>
     <tr><td class="paramname">feature_detector</td><td>name of the algorithm to use for features detection (see <a href="http://opencv.willowgarage.com/documentation/cpp/common_interfaces_for_feature_detection_and_descriptor_extraction.html#featuredetector">http://opencv.willowgarage.com/documentation/cpp/common_interfaces_for_feature_detection_and_descriptor_extraction.html#featuredetector</a>) </td></tr>
@@ -235,7 +251,7 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 
 <p>Reimplemented from <a class="el" href="class_opencv_sf_m_1_1_points_to_track.html#a1e5ef9b8da87d1b412c348ad813d0267">OpencvSfM::PointsToTrack</a>.</p>
 
-<p>Definition at line <a class="el" href="_points_to_track_with_image_8cpp_source.html#l00045">45</a> of file <a class="el" href="_points_to_track_with_image_8cpp_source.html">PointsToTrackWithImage.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_points_to_track_with_image_8cpp_source.html#l00060">60</a> of file <a class="el" href="_points_to_track_with_image_8cpp_source.html">PointsToTrackWithImage.cpp</a>.</p>
 
 </div>
 </div>
@@ -257,7 +273,7 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 
 <p>Reimplemented from <a class="el" href="class_opencv_sf_m_1_1_points_to_track.html#ac7009164560dac1f4d3283c4bf1181a3">OpencvSfM::PointsToTrack</a>.</p>
 
-<p>Definition at line <a class="el" href="_points_to_track_with_image_8cpp_source.html#l00039">39</a> of file <a class="el" href="_points_to_track_with_image_8cpp_source.html">PointsToTrackWithImage.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_points_to_track_with_image_8cpp_source.html#l00054">54</a> of file <a class="el" href="_points_to_track_with_image_8cpp_source.html">PointsToTrackWithImage.cpp</a>.</p>
 
 </div>
 </div>
@@ -283,7 +299,7 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_points_to_track_with_image_8cpp_source.html#l00028">28</a> of file <a class="el" href="_points_to_track_with_image_8cpp_source.html">PointsToTrackWithImage.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_points_to_track_with_image_8cpp_source.html#l00043">43</a> of file <a class="el" href="_points_to_track_with_image_8cpp_source.html">PointsToTrackWithImage.cpp</a>.</p>
 
 </div>
 </div>
@@ -309,7 +325,7 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_points_to_track_with_image_8cpp_source.html#l00023">23</a> of file <a class="el" href="_points_to_track_with_image_8cpp_source.html">PointsToTrackWithImage.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_points_to_track_with_image_8cpp_source.html#l00038">38</a> of file <a class="el" href="_points_to_track_with_image_8cpp_source.html">PointsToTrackWithImage.cpp</a>.</p>
 
 </div>
 </div>
@@ -332,7 +348,7 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Mon May 30 2011 17:50:33 for GSoC2011SfM by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Mon Jul 25 2011 12:41:00 for GSoC2011SfM by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

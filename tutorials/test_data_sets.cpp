@@ -6,6 +6,10 @@ vector<PointOfView> loadCamerasFromFile(string fileName, int flag_model )
   vector<PointOfView> outVect;
   ifstream pointsDef(fileName.c_str());
   bool isOK=pointsDef.is_open();
+  if ( !isOK ){
+    cout<<"Can't find "<<fileName<<"!\nPlease download the temple"
+      "dataset from http://vision.middlebury.edu/mview/data/"<<endl;
+  }
   //first get the numbers of cameras:
   int nbCameras;
   if(pointsDef>>nbCameras)
@@ -78,18 +82,54 @@ vector<PointOfView> loadCamerasFromFile(string fileName, int flag_model )
     return rep;
   }
 
-  void Tutorial_Handler::run_tuto(int id_tuto)
+  bool Tutorial_Handler::run_tuto(int id_tuto)
   {
     vector<Tutorial_Handler*> local_list_of_tutos =
       Intern_tutorial_list::getInstance()->list_of_tutos;
+    bool run_ok = false;
     if( id_tuto < 0 || id_tuto >= (int)local_list_of_tutos.size() )
       cout<<"wrong number, please try again..."<<endl;
     else
     {
       cout<<"Running "<<local_list_of_tutos[id_tuto]->file_of_tuto<<"..."<<endl;
-      local_list_of_tutos[id_tuto]->tuto_body();
+      try{
+        local_list_of_tutos[id_tuto]->tuto_body();
+        run_ok = true;
+      }catch(cv::Exception& e )
+      {
+        cout<<"Tutorial error..."<<endl;
+      }
     }
     cout<<endl<<"Please type enter to continue"<<endl;
     std::cin.ignore( std::numeric_limits <std::streamsize> ::max(), '\n' );
+    return run_ok;
   }
+
+  bool Tutorial_Handler::ask_to_run_tuto(string name_of_tuto)
+  {
+    vector<Tutorial_Handler*> local_list =
+      Intern_tutorial_list::getInstance()->list_of_tutos;
+    //first get the id of tuto:
+
+    bool run_ok = false;
+    unsigned int id_of_tuto = -1;
+    for(unsigned int it = 0; it < local_list.size(); ++it )
+    {
+      if( local_list[it]->id_of_tuto == name_of_tuto)
+        id_of_tuto = it;
+    }
+    if( id_of_tuto<0 )
+      return false;
+    else
+    {
+      cout<<"Do you want to run "<<local_list[id_of_tuto]->name_of_tuto;
+      cout<<"? (Y/n)"<<endl;
+      char answer;
+      cin>>answer;
+      if( answer!='Y' && answer!='y' )
+        return false;
+      return run_tuto( id_of_tuto );
+    }
+  }
+
 

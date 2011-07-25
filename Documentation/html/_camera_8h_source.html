@@ -63,34 +63,41 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="preprocessor">#ifndef _GSOC_SFM_CAMERA_H</span>
 <a name="l00002"></a>00002 <span class="preprocessor"></span><span class="preprocessor">#define _GSOC_SFM_CAMERA_H 1</span>
 <a name="l00003"></a>00003 <span class="preprocessor"></span>
-<a name="l00004"></a>00004 <span class="preprocessor">#include &quot;opencv2/core/core.hpp&quot;</span>
-<a name="l00005"></a>00005 <span class="preprocessor">#include &quot;PointOfView.h&quot;</span>
-<a name="l00006"></a>00006 <span class="preprocessor">#include &lt;vector&gt;</span>
-<a name="l00007"></a>00007 
-<a name="l00008"></a>00008 <span class="keyword">namespace </span>OpencvSfM{
-<a name="l00009"></a>00009   <span class="keyword">class </span>PointOfView;
-<a name="l00010"></a>00010 
-<a name="l00011"></a>00011 
-<a name="l00047"></a><a class="code" href="class_opencv_sf_m_1_1_camera.html">00047</a>   <span class="keyword">class </span><a class="code" href="class_opencv_sf_m_1_1_camera.html" title="We will need this class, but PointOfView need our class too...">Camera</a>
-<a name="l00048"></a>00048   {
-<a name="l00049"></a>00049     <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="class_opencv_sf_m_1_1_point_of_view.html" title="This class represent the 3D position of the device which take the pictures. The role of the class is ...">PointOfView</a>;<span class="comment">//PointOfView is a good friend of Camera as it&#39;s intimately related!</span>
-<a name="l00050"></a>00050   <span class="keyword">protected</span>:
-<a name="l00051"></a>00051 
-<a name="l00052"></a><a class="code" href="class_opencv_sf_m_1_1_camera.html#a51667a509ef8baa90262e5552017b131">00052</a>     std::vector&lt;PointOfView*&gt; <a class="code" href="class_opencv_sf_m_1_1_camera.html#a51667a509ef8baa90262e5552017b131" title="vector of the differents positions of the camera.">pointsOfView_</a>;
-<a name="l00053"></a>00053   <span class="keyword">public</span>:
-<a name="l00054"></a>00054     <a class="code" href="class_opencv_sf_m_1_1_camera.html" title="We will need this class, but PointOfView need our class too...">Camera</a>();
-<a name="l00055"></a>00055     <span class="keyword">virtual</span> ~<a class="code" href="class_opencv_sf_m_1_1_camera.html" title="We will need this class, but PointOfView need our class too...">Camera</a>(<span class="keywordtype">void</span>);
-<a name="l00056"></a>00056 
-<a name="l00060"></a>00060     <span class="keyword">virtual</span> std::vector&lt;cv::Vec4d&gt; <a class="code" href="class_opencv_sf_m_1_1_camera.html#aa1b338f09e0139185d71bf82e1807cb7">convertFromImageTo3Dray</a>(std::vector&lt;cv::Vec3d&gt; points) =0;<span class="comment">//we don&#39;t know how this transformation can be done, so pure virtual</span>
-<a name="l00061"></a>00061     
-<a name="l00067"></a>00067     <span class="keyword">virtual</span> std::vector&lt;cv::Vec2d&gt; <a class="code" href="class_opencv_sf_m_1_1_camera.html#a9dde477a85f86e076c79d3ce01b5f974">pixelToNormImageCoordinates</a>(std::vector&lt;cv::Vec2d&gt; points) =0;<span class="comment">//we don&#39;t know how this transformation can be done, so pure virtual</span>
-<a name="l00073"></a>00073 <span class="comment"></span>    <span class="keyword">virtual</span> std::vector&lt;cv::Vec2d&gt; <a class="code" href="class_opencv_sf_m_1_1_camera.html#aaea15041e74b4a4246b533aa67d86e4b">normImageToPixelCoordinates</a>(std::vector&lt;cv::Vec2d&gt; points) =0;<span class="comment">//we don&#39;t know how this transformation can be done, so pure virtual</span>
-<a name="l00081"></a>00081 <span class="comment"></span>    <span class="keyword">virtual</span> cv::Mat <a class="code" href="class_opencv_sf_m_1_1_camera.html#af5fa11b3438e4f70a339c101cebbc16d">computeProjectionMatrix</a>(<span class="keyword">const</span> cv::Mat &amp;rotation,<span class="keyword">const</span> cv::Vec3d &amp;translation);
-<a name="l00082"></a>00082   };
-<a name="l00083"></a>00083 
-<a name="l00084"></a>00084 }
-<a name="l00085"></a>00085 
-<a name="l00086"></a>00086 <span class="preprocessor">#endif</span>
+<a name="l00004"></a>00004 <span class="preprocessor">#include &quot;macro.h&quot;</span> <span class="comment">//SFM_EXPORTS</span>
+<a name="l00005"></a>00005 <span class="preprocessor">#include &quot;opencv2/core/core.hpp&quot;</span>
+<a name="l00006"></a>00006 <span class="comment">//#include &quot;../otherProjects/libmv_core/estimator/fundamental_estimator.h&quot;</span>
+<a name="l00007"></a>00007 <span class="preprocessor">#include &quot;PointOfView.h&quot;</span>
+<a name="l00008"></a>00008 <span class="preprocessor">#include &lt;vector&gt;</span>
+<a name="l00009"></a>00009 
+<a name="l00010"></a>00010 <span class="keyword">namespace </span>OpencvSfM{
+<a name="l00011"></a>00011   <span class="keyword">class </span>PointOfView;<span class="comment">//We will need this class, but PointOfView need our class too...</span>
+<a name="l00012"></a>00012 
+<a name="l00013"></a>00013 
+<a name="l00049"></a><a class="code" href="class_opencv_sf_m_1_1_camera.html">00049</a>   <span class="keyword">class </span>SFM_EXPORTS <a class="code" href="class_opencv_sf_m_1_1_camera.html" title="This class represent the physical device which take the pictures. It is not related to a 3D position ...">Camera</a>
+<a name="l00050"></a>00050   {
+<a name="l00051"></a>00051     <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="class_opencv_sf_m_1_1_point_of_view.html" title="This class represent the 3D position of the device which take the pictures. The role of the class is ...">PointOfView</a>;<span class="comment">//PointOfView is a good friend of Camera as it&#39;s intimately related!</span>
+<a name="l00052"></a>00052   <span class="keyword">protected</span>:
+<a name="l00053"></a>00053 
+<a name="l00054"></a><a class="code" href="class_opencv_sf_m_1_1_camera.html#a51667a509ef8baa90262e5552017b131">00054</a>     std::vector&lt;PointOfView*&gt; <a class="code" href="class_opencv_sf_m_1_1_camera.html#a51667a509ef8baa90262e5552017b131" title="vector of the differents positions of the camera.">pointsOfView_</a>;
+<a name="l00055"></a>00055   <span class="keyword">public</span>:
+<a name="l00056"></a>00056     <a class="code" href="class_opencv_sf_m_1_1_camera.html" title="This class represent the physical device which take the pictures. It is not related to a 3D position ...">Camera</a>();
+<a name="l00057"></a>00057     <span class="keyword">virtual</span> ~<a class="code" href="class_opencv_sf_m_1_1_camera.html" title="This class represent the physical device which take the pictures. It is not related to a 3D position ...">Camera</a>(<span class="keywordtype">void</span>);
+<a name="l00058"></a>00058 
+<a name="l00062"></a>00062     <span class="keyword">virtual</span> std::vector&lt;cv::Vec4d&gt; convertFromImageTo3Dray(std::vector&lt;cv::Vec3d&gt; points) =0;<span class="comment">//we don&#39;t know how this transformation can be done, so pure virtual</span>
+<a name="l00063"></a>00063     
+<a name="l00069"></a>00069     <span class="keyword">virtual</span> std::vector&lt;cv::Vec2d&gt; pixelToNormImageCoordinates(
+<a name="l00070"></a>00070       std::vector&lt;cv::Vec2d&gt; points) <span class="keyword">const</span>=0;
+<a name="l00076"></a>00076     <span class="keyword">virtual</span> std::vector&lt;cv::Vec2d&gt; normImageToPixelCoordinates(
+<a name="l00077"></a>00077       std::vector&lt;cv::Vec2d&gt; points) <span class="keyword">const</span>=0;
+<a name="l00082"></a><a class="code" href="class_opencv_sf_m_1_1_camera.html#acdd426e220facad4396da7f09494b406">00082</a>     <span class="keyword">virtual</span> cv::Mat getIntraMatrix()<span class="keyword"> const</span>
+<a name="l00083"></a>00083 <span class="keyword">    </span>{<span class="keywordflow">return</span> cv::Mat::eye(3,3,CV_64FC1);};
+<a name="l00084"></a>00084     
+<a name="l00089"></a>00089     <span class="keyword">virtual</span> <span class="keywordtype">double</span> getFocal() <span class="keyword">const</span>=0;
+<a name="l00090"></a>00090   };
+<a name="l00091"></a>00091 
+<a name="l00092"></a>00092 }
+<a name="l00093"></a>00093 
+<a name="l00094"></a>00094 <span class="preprocessor">#endif</span>
 </pre></div></div>
 </div>
 <!-- window showing the filter options -->
@@ -107,7 +114,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Mon May 30 2011 17:50:29 for GSoC2011SfM by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Mon Jul 25 2011 12:41:00 for GSoC2011SfM by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

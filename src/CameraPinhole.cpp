@@ -83,7 +83,8 @@ namespace OpencvSfM{
       Vec3d pointNorm((*point)[0],(*point)[1],1);
       Mat pointNormImageCoordinate=inv_intra_params_ * Mat(pointNorm);
       double * dataPointImageCoordinate = (double *) pointNormImageCoordinate.data;
-      Vec2d point2D(dataPointImageCoordinate[0]/dataPointImageCoordinate[2],dataPointImageCoordinate[1]/dataPointImageCoordinate[2]);
+      Vec2d point2D(dataPointImageCoordinate[0]/dataPointImageCoordinate[2],
+        dataPointImageCoordinate[1]/dataPointImageCoordinate[2]);
       newCoordinates.push_back(point2D);
       */
 
@@ -114,5 +115,36 @@ namespace OpencvSfM{
       point++;
     }
     return newCoordinates;
+  }
+
+  double CameraPinhole::getFocal() const
+  {
+    Mat x1 = Mat::zeros(3, 1, CV_64F);
+    Mat x2 = Mat::zeros(3, 1, CV_64F);
+    x1.at<double>(0,0) = intra_params_.at<double>(0,2);
+    x1.at<double>(1,0) = intra_params_.at<double>(1,2);
+    x1.at<double>(2,0) = 1.0;
+    x2.at<double>(0,0) = 0;
+    x2.at<double>(1,0) = 0;
+    x2.at<double>(2,0) = 1.0;
+    Mat omega = ( intra_params_ * intra_params_.t() ).inv();
+
+    double upDivision = ((Mat)(x1.t() * omega * x2)).at<double>(0,0);
+    double tmpDown1 = ((Mat)(x1.t() * omega * x1)).at<double>(0,0);
+    double tmpDown2 = ((Mat)(x2.t() * omega * x2)).at<double>(0,0);
+    tmpDown1 = sqrt( tmpDown1 );
+    tmpDown2 = sqrt( tmpDown2 );
+
+    double cosAngle = upDivision / ( tmpDown1 * tmpDown2 );
+    double angle = acos( cosAngle );
+
+    //instead of computing the focal using distance in pixels,
+    //we use the distance in camera's coordinates:
+    double origin_x = inv_intra_params_.at<double>(0,2),
+      origin_y = inv_intra_params_.at<double>(1,2);
+    double distance = sqrt (  origin_x * origin_x + 
+      origin_y * origin_y );
+
+    return origin_y / tan( angle );
   }
 }

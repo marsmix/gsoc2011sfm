@@ -13,6 +13,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "test_data_sets.h"
+#define POINT_METHOD "SIFT"
 
 NEW_TUTO(Track_creation, "Learn how you can compute tracks from a list of pictures",
   "Using features detector and matcher, create a vector of tracks (a track is a list of 2D points from the same 3D point).\nYou will also learn how you can save an object using YAML!")
@@ -44,7 +45,7 @@ NEW_TUTO(Track_creation, "Learn how you can compute tracks from a list of pictur
   vector<Mat> images;
   Mat currentImage=mp.getFrame();
 
-  string pathFileTracks = FROM_SRC_ROOT("Medias/tracks_points_BRIEF/motion_points.yml");
+  string pathFileTracks = FROM_SRC_ROOT("Medias/tracks_points_"POINT_METHOD"/motion_points.yml");
   std::ifstream inPoints(pathFileTracks.c_str());
   if( inPoints.is_open() )
   {
@@ -71,6 +72,8 @@ NEW_TUTO(Track_creation, "Learn how you can compute tracks from a list of pictur
   else
   {
     int nbFrame=0;
+    cout<<"Compute points and description for each frame..."<<endl;
+    cout<<"This can take time so be patient ;)"<<endl;
     while ( !currentImage.empty() )// && nbFrame<50 )
     {
       //if the image is loaded, find the points:
@@ -106,13 +109,17 @@ NEW_TUTO(Track_creation, "Learn how you can compute tracks from a list of pictur
 
   SequenceAnalyzer motion_estim(vec_points_to_track,matches_algo,images);
 
+  pathFileTracks = FROM_SRC_ROOT("Medias/tracks_points_"POINT_METHOD"/motion_tracks1.yml");
+  cout<<"Compute matches between each frames..."<<endl;
+  cout<<"This will take more time than before, but once done"
+    "you will not have to do it again, everything will be saved in:\n"<<
+    pathFileTracks<<"..."<<endl;
   motion_estim.computeMatches();
 
   vector<TrackOfPoints> &tracks=motion_estim.getTracks();
   cout<<"numbers of tracks:"<<tracks.size()<<endl;
 
   //now save the tracks:
-  pathFileTracks = FROM_SRC_ROOT("Medias/tracks_points_BRIEF/motion_tracks1.yml");
   FileStorage fsOutMotion1(pathFileTracks, FileStorage::WRITE);
   if( !fsOutMotion1.isOpened() )
   {
@@ -124,13 +131,14 @@ NEW_TUTO(Track_creation, "Learn how you can compute tracks from a list of pictur
   SequenceAnalyzer::write(fsOutMotion1,motion_estim);
   fsOutMotion1.release();
 
+  cout<<"We will no remove bad points matches..."<<endl;
   motion_estim.keepOnlyCorrectMatches();
 
   tracks=motion_estim.getTracks();
   cout<<"numbers of correct tracks:"<<tracks.size()<<endl;
 
   //now save the tracks:
-  pathFileTracks = FROM_SRC_ROOT("Medias/tracks_points_BRIEF/motion_tracks.yml");
+  pathFileTracks = FROM_SRC_ROOT("Medias/tracks_points_"POINT_METHOD"/motion_tracks.yml");
   FileStorage fsOutMotion(pathFileTracks, FileStorage::WRITE);
   if( !fsOutMotion.isOpened() )
   {

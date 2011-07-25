@@ -8,8 +8,9 @@
 #include "../src/libmv_mapping.h"
 #include "../src/PCL_mapping.h"
 
+#include <boost/thread/thread.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
-#include <pcl/visualization/cloud_viewer.h>
+#include "pcl/visualization/pcl_visualizer.h"
 
 #include <numeric>
 
@@ -27,9 +28,8 @@
 #define POINT_METHOD "SIFT"
 
 NEW_TUTO(Triangulation_tuto, "Learn how you can triangulate 2D points",
-  "Using fully parameterized cameras, we find 2D points in the sequence and then triangulate them. We finally draw them on the sequence.")
+  "Using fully parameterized cameras, we find 2D points in the sequence and then triangulate them.")
 {
-  //universal method to get the current image:
   vector<Mat> images;
 
   SequenceAnalyzer *motion_estim_loaded;
@@ -54,8 +54,10 @@ NEW_TUTO(Triangulation_tuto, "Learn how you can triangulate 2D points",
     test_file_exist.open(pathFileTracks);
     if( !test_file_exist.is_open() )
     {
-      cout<<"please compute points matches using testMotionEstimator.cpp first!"<<endl;
-      return;
+      cout<<"you should run an other tutorial before being able to run this one!"<<endl;
+      bool worked = Tutorial_Handler::ask_to_run_tuto("Track_creation");
+      if( !worked )
+        return;
     }
     test_file_exist.close();
   
@@ -100,16 +102,5 @@ NEW_TUTO(Triangulation_tuto, "Learn how you can triangulate 2D points",
 
     SequenceAnalyzer::write( fsOutMotion, *motion_estim_loaded );
     fsOutMotion.release();
-  }
-
-  vector<Vec3d>& tracks = motion_estim_loaded->get3DStructure();
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr basic_cloud_ptr (new pcl::PointCloud<pcl::PointXYZRGB>);
-
-  OpencvSfM::mapping::convert_OpenCV_vector( tracks, *basic_cloud_ptr );
-  
-  pcl::visualization::CloudViewer viewer ("Simple Cloud Viewer");
-  viewer.showCloud (basic_cloud_ptr);
-  while (!viewer.wasStopped ())
-  {
   }
 }

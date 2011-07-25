@@ -131,6 +131,9 @@ namespace OpencvSfM{
   };
   
   
+  /**
+  * @brief This structure store an image link (two image ids)...
+  */
   typedef struct  
   {
     int imgSrc;

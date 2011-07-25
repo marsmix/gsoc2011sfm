@@ -66,18 +66,408 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   </div>
 </div>
 <div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
+<a href="#pro-static-attribs">Static Protected Attributes</a>  </div>
   <div class="headertitle">
 <div class="title">OpencvSfM::MotionEstimator Class Reference</div>  </div>
 </div>
 <div class="contents">
 <!-- doxytag: class="OpencvSfM::MotionEstimator" -->
+<p>This class tries to match points in the entire sequence. It follow ideas proposed by Noah Snavely: Modeling the World from Internet Photo Collections.  
+ <a href="class_opencv_sf_m_1_1_motion_estimator.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_motion_estimator_8h_source.html">MotionEstimator.h</a>&gt;</code></p>
+
 <p><a href="class_opencv_sf_m_1_1_motion_estimator-members.html">List of all members.</a></p>
 <table class="memberdecls">
+<tr><td colspan="2"><h2><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_motion_estimator.html#abe6cbb0802e42f3b6d5f5124380ebbf3">MotionEstimator</a> (std::vector&lt; cv::Ptr&lt; <a class="el" href="class_opencv_sf_m_1_1_points_to_track.html">PointsToTrack</a> &gt;&gt; &amp;points_to_track, cv::Ptr&lt; <a class="el" href="class_opencv_sf_m_1_1_points_matcher.html">PointsMatcher</a> &gt; match_algorithm)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_motion_estimator.html#aa16e47ed98c474d6c1210b706e17b02e">addNewImagesOfPoints</a> (cv::Ptr&lt; <a class="el" href="class_opencv_sf_m_1_1_points_to_track.html">PointsToTrack</a> &gt; points)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_motion_estimator.html#a85bf74c461a692caed2b73a25e82708b">computeMatches</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_motion_estimator.html#a5bc201f748f6b96b9dbba284846ea0d9">keepOnlyCorrectMatches</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_opencv_sf_m_1_1_track_points.html">TrackPoints</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_motion_estimator.html#a3452f8672b68fee08fa85de9eb500398">getTracks</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_motion_estimator.html#ae782f134167187b2e388751c5aea2874">showTracks</a> (std::vector&lt; cv::Mat &gt; &amp;images, int timeBetweenImg=25)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_motion_estimator.html#a7c2d9ad2c6de01206703d8717942e9d5">triangulateNView</a> (std::vector&lt; <a class="el" href="class_opencv_sf_m_1_1_point_of_view.html">PointOfView</a> &gt; &amp;cameras, std::vector&lt; cv::Vec3d &gt; &amp;points3D)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9b73022eaa95ec49ebe3063322eb6ec9"></a><!-- doxytag: member="OpencvSfM::MotionEstimator::MotionEstimator::triangulateNViewDebug" ref="a9b73022eaa95ec49ebe3063322eb6ec9" args="(std::vector&lt; PointOfView &gt; &amp;cameras, std::vector&lt; cv::Mat &gt; &amp;images, std::vector&lt; cv::Vec3d &gt; &amp;points3D)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>MotionEstimator::triangulateNViewDebug</b> (std::vector&lt; <a class="el" href="class_opencv_sf_m_1_1_point_of_view.html">PointOfView</a> &gt; &amp;cameras, std::vector&lt; cv::Mat &gt; &amp;images, std::vector&lt; cv::Vec3d &gt; &amp;points3D)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4bdf6e768f69a30524a46efc7ee3ea24"></a><!-- doxytag: member="OpencvSfM::MotionEstimator::filterPoints" ref="a4bdf6e768f69a30524a46efc7ee3ea24" args="(std::vector&lt; cv::Vec3d &gt; triangulated, int index_image, std::vector&lt; cv::Vec3d &gt; &amp;outPoints, std::vector&lt; cv::KeyPoint &gt; &amp;points2DOrigine)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>filterPoints</b> (std::vector&lt; cv::Vec3d &gt; triangulated, int index_image, std::vector&lt; cv::Vec3d &gt; &amp;outPoints, std::vector&lt; cv::KeyPoint &gt; &amp;points2DOrigine)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a45ddaf6c01c0ca84b5258faa6683733a"></a><!-- doxytag: member="OpencvSfM::MotionEstimator::getMaxView" ref="a45ddaf6c01c0ca84b5258faa6683733a" args="()" -->
+int&#160;</td><td class="memItemRight" valign="bottom"><b>getMaxView</b> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_motion_estimator.html#a33294de59cf7f51226e2758c244310c5">addMatches</a> (std::vector&lt; cv::DMatch &gt; &amp;newMatches, unsigned int img1, unsigned int img2)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_motion_estimator.html#a63b43728e567ba3afc0243c5b489a6e2">addTracks</a> (std::vector&lt; <a class="el" href="class_opencv_sf_m_1_1_track_points.html">TrackPoints</a> &gt; &amp;newTracks)</td></tr>
+<tr><td colspan="2"><h2><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a93f6432c87d0d89ce3f70f09c2e9bd97"></a><!-- doxytag: member="OpencvSfM::MotionEstimator::read" ref="a93f6432c87d0d89ce3f70f09c2e9bd97" args="(const cv::FileNode &amp;node, MotionEstimator &amp;points)" -->
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>read</b> (const cv::FileNode &amp;node, <a class="el" href="class_opencv_sf_m_1_1_motion_estimator.html">MotionEstimator</a> &amp;points)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa15b340b2dd1d24c6acc4d045e3126aa"></a><!-- doxytag: member="OpencvSfM::MotionEstimator::write" ref="aa15b340b2dd1d24c6acc4d045e3126aa" args="(cv::FileStorage &amp;fs, const MotionEstimator &amp;points)" -->
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> (cv::FileStorage &amp;fs, const <a class="el" href="class_opencv_sf_m_1_1_motion_estimator.html">MotionEstimator</a> &amp;points)</td></tr>
+<tr><td colspan="2"><h2><a name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">std::vector&lt; cv::Ptr<br class="typebreak"/>
+&lt; <a class="el" href="class_opencv_sf_m_1_1_points_to_track.html">PointsToTrack</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_motion_estimator.html#a605d6295fff626f9cc2138cb6552f49c">points_to_track_</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">cv::Ptr&lt; <a class="el" href="class_opencv_sf_m_1_1_points_matcher.html">PointsMatcher</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_motion_estimator.html#a15ec990cfe7eb43ab6a696816b752ffc">match_algorithm_</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">std::vector&lt; cv::Ptr<br class="typebreak"/>
+&lt; <a class="el" href="class_opencv_sf_m_1_1_points_matcher.html">PointsMatcher</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_motion_estimator.html#a882649c77f5a30fa0298a4b98691c557">matches_</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_opencv_sf_m_1_1_track_points.html">TrackPoints</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_motion_estimator.html#a5100f2fb4dbb34bf9caf3b7b954ad94f">tracks_</a></td></tr>
+<tr><td colspan="2"><h2><a name="pro-static-attribs"></a>
+Static Protected Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a62fd2e6a9b6df7f10bf126244049e064"></a><!-- doxytag: member="OpencvSfM::MotionEstimator::mininum_points_matches" ref="a62fd2e6a9b6df7f10bf126244049e064" args="" -->
+static const int&#160;</td><td class="memItemRight" valign="bottom"><b>mininum_points_matches</b> = 20</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0af8052bb8c1f1c521bcc80154bb5590"></a><!-- doxytag: member="OpencvSfM::MotionEstimator::mininum_image_matches" ref="a0af8052bb8c1f1c521bcc80154bb5590" args="" -->
+static const int&#160;</td><td class="memItemRight" valign="bottom"><b>mininum_image_matches</b> = 3</td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
-<div class="textblock">
-<p>Definition at line <a class="el" href="_motion_estimator_8h_source.html#l00005">5</a> of file <a class="el" href="_motion_estimator_8h_source.html">MotionEstimator.h</a>.</p>
-</div><hr/>The documentation for this class was generated from the following files:<ul>
+<div class="textblock"><p>This class tries to match points in the entire sequence. It follow ideas proposed by Noah Snavely: Modeling the World from Internet Photo Collections. </p>
+<p>This class process an input video to first extracts the features, then matches them and keeps them only when there is more than 3 pictures containing the point. </p>
+
+<p>Definition at line <a class="el" href="_motion_estimator_8h_source.html#l00092">92</a> of file <a class="el" href="_motion_estimator_8h_source.html">MotionEstimator.h</a>.</p>
+</div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="abe6cbb0802e42f3b6d5f5124380ebbf3"></a><!-- doxytag: member="OpencvSfM::MotionEstimator::MotionEstimator" ref="abe6cbb0802e42f3b6d5f5124380ebbf3" args="(std::vector&lt; cv::Ptr&lt; PointsToTrack &gt;&gt; &amp;points_to_track, cv::Ptr&lt; PointsMatcher &gt; match_algorithm)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">OpencvSfM::MotionEstimator::MotionEstimator </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; cv::Ptr&lt; <a class="el" href="class_opencv_sf_m_1_1_points_to_track.html">PointsToTrack</a> &gt;&gt; &amp;&#160;</td>
+          <td class="paramname"><em>points_to_track</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">cv::Ptr&lt; <a class="el" href="class_opencv_sf_m_1_1_points_matcher.html">PointsMatcher</a> &gt;&#160;</td>
+          <td class="paramname"><em>match_algorithm</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Constructor taking a vector of points to track and a <a class="el" href="class_opencv_sf_m_1_1_points_matcher.html" title="A class used for matching descriptors that can be described as vectors in a finite-dimensional space...">PointsMatcher</a> algorithm to find matches. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mp</td><td>points_to_track list of points to track with (or not) features </td></tr>
+    <tr><td class="paramname">match_algorithm</td><td>algorithm to match points of each images </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="_motion_estimator_8cpp_source.html#l00124">124</a> of file <a class="el" href="_motion_estimator_8cpp_source.html">MotionEstimator.cpp</a>.</p>
+
+</div>
+</div>
+<hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="a33294de59cf7f51226e2758c244310c5"></a><!-- doxytag: member="OpencvSfM::MotionEstimator::addMatches" ref="a33294de59cf7f51226e2758c244310c5" args="(std::vector&lt; cv::DMatch &gt; &amp;newMatches, unsigned int img1, unsigned int img2)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OpencvSfM::MotionEstimator::addMatches </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; cv::DMatch &gt; &amp;&#160;</td>
+          <td class="paramname"><em>newMatches</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>img1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>img2</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This function add matches to tracks </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">newMatches</td><td>new matches to add </td></tr>
+    <tr><td class="paramname">img1</td><td>index of source matches image </td></tr>
+    <tr><td class="paramname">img2</td><td>index of destination matches image </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="_motion_estimator_8cpp_source.html#l00258">258</a> of file <a class="el" href="_motion_estimator_8cpp_source.html">MotionEstimator.cpp</a>.</p>
+
+<p>Referenced by <a class="el" href="_motion_estimator_8cpp_source.html#l00140">computeMatches()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa16e47ed98c474d6c1210b706e17b02e"></a><!-- doxytag: member="OpencvSfM::MotionEstimator::addNewImagesOfPoints" ref="aa16e47ed98c474d6c1210b706e17b02e" args="(cv::Ptr&lt; PointsToTrack &gt; points)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OpencvSfM::MotionEstimator::addNewImagesOfPoints </td>
+          <td>(</td>
+          <td class="paramtype">cv::Ptr&lt; <a class="el" href="class_opencv_sf_m_1_1_points_to_track.html">PointsToTrack</a> &gt;&#160;</td>
+          <td class="paramname"><em>points</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This method add new points to track. When adding, the matches are not computed, use computeMatches to compute them! </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">points</td><td>extracted points with features vectors. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="_motion_estimator_8cpp_source.html#l00135">135</a> of file <a class="el" href="_motion_estimator_8cpp_source.html">MotionEstimator.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a63b43728e567ba3afc0243c5b489a6e2"></a><!-- doxytag: member="OpencvSfM::MotionEstimator::addTracks" ref="a63b43728e567ba3afc0243c5b489a6e2" args="(std::vector&lt; TrackPoints &gt; &amp;newTracks)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OpencvSfM::MotionEstimator::addTracks </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; <a class="el" href="class_opencv_sf_m_1_1_track_points.html">TrackPoints</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>newTracks</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This function add new Tracks </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">newTracks</td><td>new Tracks to add </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="_motion_estimator_8cpp_source.html#l00296">296</a> of file <a class="el" href="_motion_estimator_8cpp_source.html">MotionEstimator.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a85bf74c461a692caed2b73a25e82708b"></a><!-- doxytag: member="OpencvSfM::MotionEstimator::computeMatches" ref="a85bf74c461a692caed2b73a25e82708b" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OpencvSfM::MotionEstimator::computeMatches </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This method compute the matches between each points of each images. It first compute missing features descriptor, then train each matcher. Finally compute tracks of keypoints (a track is a connected set of matching keypoints across multiple images) </p>
+
+<p>Definition at line <a class="el" href="_motion_estimator_8cpp_source.html#l00140">140</a> of file <a class="el" href="_motion_estimator_8cpp_source.html">MotionEstimator.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a3452f8672b68fee08fa85de9eb500398"></a><!-- doxytag: member="OpencvSfM::MotionEstimator::getTracks" ref="a3452f8672b68fee08fa85de9eb500398" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="class_opencv_sf_m_1_1_track_points.html">TrackPoints</a>&gt;&amp; OpencvSfM::MotionEstimator::getTracks </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This method can be used to get the tracks </p>
+
+<p>Definition at line <a class="el" href="_motion_estimator_8h_source.html#l00147">147</a> of file <a class="el" href="_motion_estimator_8h_source.html">MotionEstimator.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a5bc201f748f6b96b9dbba284846ea0d9"></a><!-- doxytag: member="OpencvSfM::MotionEstimator::keepOnlyCorrectMatches" ref="a5bc201f748f6b96b9dbba284846ea0d9" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OpencvSfM::MotionEstimator::keepOnlyCorrectMatches </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This method keep only tracks with more than mininum_image_matches </p>
+
+<p>Definition at line <a class="el" href="_motion_estimator_8cpp_source.html#l00239">239</a> of file <a class="el" href="_motion_estimator_8cpp_source.html">MotionEstimator.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ae782f134167187b2e388751c5aea2874"></a><!-- doxytag: member="OpencvSfM::MotionEstimator::showTracks" ref="ae782f134167187b2e388751c5aea2874" args="(std::vector&lt; cv::Mat &gt; &amp;images, int timeBetweenImg=25)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OpencvSfM::MotionEstimator::showTracks </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; cv::Mat &gt; &amp;&#160;</td>
+          <td class="paramname"><em>images</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>timeBetweenImg</em> = <code>25</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Use this function to print the sequence of matches </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">images</td><td>list of images where print points </td></tr>
+    <tr><td class="paramname">timeBetweenImg</td><td>see cv::waitKey for the value </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="_motion_estimator_8cpp_source.html#l00310">310</a> of file <a class="el" href="_motion_estimator_8cpp_source.html">MotionEstimator.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a7c2d9ad2c6de01206703d8717942e9d5"></a><!-- doxytag: member="OpencvSfM::MotionEstimator::triangulateNView" ref="a7c2d9ad2c6de01206703d8717942e9d5" args="(std::vector&lt; PointOfView &gt; &amp;cameras, std::vector&lt; cv::Vec3d &gt; &amp;points3D)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void OpencvSfM::MotionEstimator::triangulateNView </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; <a class="el" href="class_opencv_sf_m_1_1_point_of_view.html">PointOfView</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>cameras</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; cv::Vec3d &gt; &amp;&#160;</td>
+          <td class="paramname"><em>points3D</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Project previously 2D points matches using cameras parameters </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">cameras</td><td>Input of cameras matrix with extrinsic parameters </td></tr>
+    <tr><td class="paramname">points3D</td><td>output of points in 3D </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="_motion_estimator_8cpp_source.html#l00464">464</a> of file <a class="el" href="_motion_estimator_8cpp_source.html">MotionEstimator.cpp</a>.</p>
+
+</div>
+</div>
+<hr/><h2>Member Data Documentation</h2>
+<a class="anchor" id="a15ec990cfe7eb43ab6a696816b752ffc"></a><!-- doxytag: member="OpencvSfM::MotionEstimator::match_algorithm_" ref="a15ec990cfe7eb43ab6a696816b752ffc" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">cv::Ptr&lt;<a class="el" href="class_opencv_sf_m_1_1_points_matcher.html">PointsMatcher</a>&gt; <a class="el" href="class_opencv_sf_m_1_1_motion_estimator.html#a15ec990cfe7eb43ab6a696816b752ffc">OpencvSfM::MotionEstimator::match_algorithm_</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>The matcher algorithm we should use to find matches. </p>
+
+<p>Definition at line <a class="el" href="_motion_estimator_8h_source.html#l00104">104</a> of file <a class="el" href="_motion_estimator_8h_source.html">MotionEstimator.h</a>.</p>
+
+<p>Referenced by <a class="el" href="_motion_estimator_8cpp_source.html#l00140">computeMatches()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a882649c77f5a30fa0298a4b98691c557"></a><!-- doxytag: member="OpencvSfM::MotionEstimator::matches_" ref="a882649c77f5a30fa0298a4b98691c557" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;cv::Ptr&lt;<a class="el" href="class_opencv_sf_m_1_1_points_matcher.html">PointsMatcher</a>&gt; &gt; <a class="el" href="class_opencv_sf_m_1_1_motion_estimator.html#a882649c77f5a30fa0298a4b98691c557">OpencvSfM::MotionEstimator::matches_</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>A matcher for each picture. Its role is to find quickly matches between i^th picture and other images. </p>
+
+<p>Definition at line <a class="el" href="_motion_estimator_8h_source.html#l00109">109</a> of file <a class="el" href="_motion_estimator_8h_source.html">MotionEstimator.h</a>.</p>
+
+<p>Referenced by <a class="el" href="_motion_estimator_8cpp_source.html#l00140">computeMatches()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a605d6295fff626f9cc2138cb6552f49c"></a><!-- doxytag: member="OpencvSfM::MotionEstimator::points_to_track_" ref="a605d6295fff626f9cc2138cb6552f49c" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;cv::Ptr&lt;<a class="el" href="class_opencv_sf_m_1_1_points_to_track.html">PointsToTrack</a>&gt; &gt; <a class="el" href="class_opencv_sf_m_1_1_motion_estimator.html#a605d6295fff626f9cc2138cb6552f49c">OpencvSfM::MotionEstimator::points_to_track_</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>One list of points for each picture </p>
+
+<p>Definition at line <a class="el" href="_motion_estimator_8h_source.html#l00100">100</a> of file <a class="el" href="_motion_estimator_8h_source.html">MotionEstimator.h</a>.</p>
+
+<p>Referenced by <a class="el" href="_motion_estimator_8cpp_source.html#l00135">addNewImagesOfPoints()</a>, <a class="el" href="_motion_estimator_8cpp_source.html#l00140">computeMatches()</a>, <a class="el" href="_motion_estimator_8cpp_source.html#l00310">showTracks()</a>, and <a class="el" href="_motion_estimator_8cpp_source.html#l00464">triangulateNView()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a5100f2fb4dbb34bf9caf3b7b954ad94f"></a><!-- doxytag: member="OpencvSfM::MotionEstimator::tracks_" ref="a5100f2fb4dbb34bf9caf3b7b954ad94f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="class_opencv_sf_m_1_1_track_points.html">TrackPoints</a>&gt; <a class="el" href="class_opencv_sf_m_1_1_motion_estimator.html#a5100f2fb4dbb34bf9caf3b7b954ad94f">OpencvSfM::MotionEstimator::tracks_</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>List of each tracks found. A track is a connected set of matching keypoints across multiple images </p>
+
+<p>Definition at line <a class="el" href="_motion_estimator_8h_source.html#l00114">114</a> of file <a class="el" href="_motion_estimator_8h_source.html">MotionEstimator.h</a>.</p>
+
+<p>Referenced by <a class="el" href="_motion_estimator_8cpp_source.html#l00258">addMatches()</a>, <a class="el" href="_motion_estimator_8cpp_source.html#l00296">addTracks()</a>, <a class="el" href="_motion_estimator_8h_source.html#l00147">getTracks()</a>, <a class="el" href="_motion_estimator_8cpp_source.html#l00239">keepOnlyCorrectMatches()</a>, <a class="el" href="_motion_estimator_8cpp_source.html#l00310">showTracks()</a>, and <a class="el" href="_motion_estimator_8cpp_source.html#l00464">triangulateNView()</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following files:<ul>
 <li>D:/Travail/These/Determination caracteristiques camera/GSoC/SfM/src/<a class="el" href="_motion_estimator_8h_source.html">MotionEstimator.h</a></li>
 <li>D:/Travail/These/Determination caracteristiques camera/GSoC/SfM/src/<a class="el" href="_motion_estimator_8cpp_source.html">MotionEstimator.cpp</a></li>
 </ul>
@@ -96,7 +486,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Mon May 30 2011 17:50:30 for GSoC2011SfM by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Jun 24 2011 19:37:34 for GSoC2011SfM by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

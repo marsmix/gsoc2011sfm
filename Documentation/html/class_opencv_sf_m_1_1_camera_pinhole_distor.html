@@ -85,7 +85,7 @@ Inheritance diagram for OpencvSfM::CameraPinholeDistor:</div>
   <img src="class_opencv_sf_m_1_1_camera_pinhole_distor.png" usemap="#OpencvSfM::CameraPinholeDistor_map" alt=""/>
   <map id="OpencvSfM::CameraPinholeDistor_map" name="OpencvSfM::CameraPinholeDistor_map">
 <area href="class_opencv_sf_m_1_1_camera_pinhole.html" title="This class represent the physical device which take the pictures. It is not related to a 3D position ..." alt="OpencvSfM::CameraPinhole" shape="rect" coords="0,56,205,80"/>
-<area href="class_opencv_sf_m_1_1_camera.html" title="We will need this class, but PointOfView need our class too..." alt="OpencvSfM::Camera" shape="rect" coords="0,0,205,24"/>
+<area href="class_opencv_sf_m_1_1_camera.html" title="This class represent the physical device which take the pictures. It is not related to a 3D position ..." alt="OpencvSfM::Camera" shape="rect" coords="0,0,205,24"/>
 </map>
  </div></div>
 
@@ -97,8 +97,8 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_camera_pinhole_distor.html#ab3f32742332ecaab124721e9b259f932">CameraPinholeDistor</a> (const std::vector&lt; std::vector&lt; cv::Point3f &gt; &gt; &amp;objectPoints, const std::vector&lt; std::vector&lt; cv::Point2f &gt; &gt; &amp;imagePoints, cv::Size imageSize, double aspectRatio=1., cv::Vec6d radial_dist=cv::Vec6d(0.0, 0.0, 0.0, 0.0, 0.0, 0.0), unsigned char nbRadialParam=6, cv::Vec2d tangential_dist=cv::Vec2d(0.0, 0.0), unsigned char wantedEstimation=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM|RADIAL_PARAM|TANGEANT_PARAM)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_camera_pinhole_distor.html#aab95df60504b6bda45c11b53f939ad21">updateDistortionParameters</a> (const cv::Vec6d &amp;radial_dist, unsigned char nbRadialParam, const cv::Vec2d &amp;tangential_dist, unsigned char wantedEstimation=RADIAL_PARAM|TANGEANT_PARAM)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; cv::Vec4d &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_camera_pinhole_distor.html#a0fba2c497b42a751e77070885e964e7c">convertFromImageTo3Dray</a> (std::vector&lt; cv::Vec3d &gt; points)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; cv::Vec2d &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_camera_pinhole_distor.html#a506e945a43e874cc6235625c2a9cc064">pixelToNormImageCoordinates</a> (std::vector&lt; cv::Vec2d &gt; points)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; cv::Vec2d &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_camera_pinhole_distor.html#a9d93e59eeff696c413493377cc42bb3d">normImageToPixelCoordinates</a> (std::vector&lt; cv::Vec2d &gt; points)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; cv::Vec2d &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_camera_pinhole_distor.html#a4599ad282967c60bc4e3046067202b56">pixelToNormImageCoordinates</a> (std::vector&lt; cv::Vec2d &gt; points) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; cv::Vec2d &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_camera_pinhole_distor.html#ab2ef67d6d89fc008c5716c7f7a25d012">normImageToPixelCoordinates</a> (std::vector&lt; cv::Vec2d &gt; points) const </td></tr>
 <tr><td colspan="2"><h2><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad3b352db4b127864bcd901e11d7e50dc"></a><!-- doxytag: member="OpencvSfM::CameraPinholeDistor::radial_dist_" ref="ad3b352db4b127864bcd901e11d7e50dc" args="" -->
@@ -126,7 +126,7 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <div class="textblock"><p>This class represent the physical device which take the pictures. It is not related to a 3D position which is the role of the <a class="el" href="class_opencv_sf_m_1_1_point_of_view.html" title="This class represent the 3D position of the device which take the pictures. The role of the class is ...">PointOfView</a> class. The role of the class is to store intra parameters and radial distortion. </p>
 <p>So this class is devoted to the conversion between 3D points (using camera coordinate) and 2D points (using image coordinate) using the methods convertFromImageTo3Dray or convertFrom3DToImage </p>
 
-<p>Definition at line <a class="el" href="_camera_pinhole_distor_8h_source.html#l00023">23</a> of file <a class="el" href="_camera_pinhole_distor_8h_source.html">CameraPinholeDistor.h</a>.</p>
+<p>Definition at line <a class="el" href="_camera_pinhole_distor_8h_source.html#l00024">24</a> of file <a class="el" href="_camera_pinhole_distor_8h_source.html">CameraPinholeDistor.h</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="ad58c8fb16fdbb0eba4345cd3abe47a92"></a><!-- doxytag: member="OpencvSfM::CameraPinholeDistor::CameraPinholeDistor" ref="ad58c8fb16fdbb0eba4345cd3abe47a92" args="(cv::Mat intra_params=cv::Mat::eye(3, 3, CV_64F), cv::Vec6d radial_dist=cv::Vec6d(0.0, 0.0, 0.0, 0.0, 0.0, 0.0), unsigned char nbRadialParam=6, cv::Vec2d tangential_dist=cv::Vec2d(0.0, 0.0), unsigned char wantedEstimation=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM|RADIAL_PARAM|TANGEANT_PARAM)" -->
 <div class="memitem">
@@ -284,7 +284,7 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 
 </div>
 </div>
-<a class="anchor" id="a9d93e59eeff696c413493377cc42bb3d"></a><!-- doxytag: member="OpencvSfM::CameraPinholeDistor::normImageToPixelCoordinates" ref="a9d93e59eeff696c413493377cc42bb3d" args="(std::vector&lt; cv::Vec2d &gt; points)" -->
+<a class="anchor" id="ab2ef67d6d89fc008c5716c7f7a25d012"></a><!-- doxytag: member="OpencvSfM::CameraPinholeDistor::normImageToPixelCoordinates" ref="ab2ef67d6d89fc008c5716c7f7a25d012" args="(std::vector&lt; cv::Vec2d &gt; points) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -293,7 +293,7 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
           <td>(</td>
           <td class="paramtype">std::vector&lt; cv::Vec2d &gt;&#160;</td>
           <td class="paramname"><em>points</em></td><td>)</td>
-          <td><code> [virtual]</code></td>
+          <td> const<code> [virtual]</code></td>
         </tr>
       </table>
 </div>
@@ -305,15 +305,15 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
   </table>
   </dd>
 </dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>2D points in pixel image homogeneous coordinates. </dd></dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>2D points in pixel image coordinates. </dd></dl>
 
-<p>Reimplemented from <a class="el" href="class_opencv_sf_m_1_1_camera_pinhole.html#aa844cae56eaa43784b3420bcddaacdd6">OpencvSfM::CameraPinhole</a>.</p>
+<p>Reimplemented from <a class="el" href="class_opencv_sf_m_1_1_camera_pinhole.html#a96954b793843fd8cf9a568b2c21f3a87">OpencvSfM::CameraPinhole</a>.</p>
 
 <p>Definition at line <a class="el" href="_camera_pinhole_distor_8cpp_source.html#l00074">74</a> of file <a class="el" href="_camera_pinhole_distor_8cpp_source.html">CameraPinholeDistor.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a506e945a43e874cc6235625c2a9cc064"></a><!-- doxytag: member="OpencvSfM::CameraPinholeDistor::pixelToNormImageCoordinates" ref="a506e945a43e874cc6235625c2a9cc064" args="(std::vector&lt; cv::Vec2d &gt; points)" -->
+<a class="anchor" id="a4599ad282967c60bc4e3046067202b56"></a><!-- doxytag: member="OpencvSfM::CameraPinholeDistor::pixelToNormImageCoordinates" ref="a4599ad282967c60bc4e3046067202b56" args="(std::vector&lt; cv::Vec2d &gt; points) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -322,7 +322,7 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
           <td>(</td>
           <td class="paramtype">std::vector&lt; cv::Vec2d &gt;&#160;</td>
           <td class="paramname"><em>points</em></td><td>)</td>
-          <td><code> [virtual]</code></td>
+          <td> const<code> [virtual]</code></td>
         </tr>
       </table>
 </div>
@@ -336,7 +336,7 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>2D points in normalized image homogeneous coordinates. </dd></dl>
 
-<p>Reimplemented from <a class="el" href="class_opencv_sf_m_1_1_camera_pinhole.html#ac289202ffff97def7c6287cfb3e3040d">OpencvSfM::CameraPinhole</a>.</p>
+<p>Reimplemented from <a class="el" href="class_opencv_sf_m_1_1_camera_pinhole.html#a32a5479b19a8a14f392dab21395669f6">OpencvSfM::CameraPinhole</a>.</p>
 
 <p>Definition at line <a class="el" href="_camera_pinhole_8cpp_source.html#l00071">71</a> of file <a class="el" href="_camera_pinhole_8cpp_source.html">CameraPinhole.cpp</a>.</p>
 
@@ -413,7 +413,7 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Mon May 30 2011 17:50:30 for GSoC2011SfM by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Mon Jul 25 2011 12:41:00 for GSoC2011SfM by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>
