@@ -78,21 +78,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00016"></a>00016   {
 <a name="l00017"></a>00017   }
 <a name="l00018"></a>00018 
-<a name="l00019"></a><a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ad42158ee2722c73c6935a4744c152026">00019</a>   Mat <a class="code" href="class_opencv_sf_m_1_1_camera.html#af5fa11b3438e4f70a339c101cebbc16d">Camera::computeProjectionMatrix</a>(<span class="keyword">const</span> Mat &amp;rotation,<span class="keyword">const</span> Vec3d &amp;translation)
-<a name="l00020"></a>00020   {
-<a name="l00021"></a>00021     CV_Assert( !rotation.empty() &amp;&amp; rotation.type()==CV_64F );
-<a name="l00022"></a>00022     <span class="comment">//P = K [R|t]</span>
-<a name="l00023"></a>00023     Mat Rt;
-<a name="l00024"></a>00024     Rt.create(3,4,CV_64F);
-<a name="l00025"></a>00025     <span class="comment">//Copy R into Rt</span>
-<a name="l00026"></a>00026     rotation.copyTo(Rt(Range::all(),Range(0,3)));
-<a name="l00027"></a>00027     <span class="comment">//Copy t into Rt</span>
-<a name="l00028"></a>00028     ((Mat)translation).copyTo(Rt.col(3));
-<a name="l00029"></a>00029 
-<a name="l00030"></a>00030     <span class="comment">//compute K * Rt</span>
-<a name="l00031"></a>00031     <span class="keywordflow">return</span> Rt;
-<a name="l00032"></a>00032   }
-<a name="l00033"></a>00033 }
+<a name="l00019"></a>00019 }
 </pre></div></div>
 </div>
 <!-- window showing the filter options -->
@@ -109,7 +95,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Mon May 30 2011 17:50:29 for GSoC2011SfM by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Mon Jul 25 2011 12:41:00 for GSoC2011SfM by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

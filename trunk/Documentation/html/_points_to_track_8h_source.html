@@ -63,39 +63,61 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="preprocessor">#ifndef _GSOC_SFM_POINTS_TO_TRACK_H</span>
 <a name="l00002"></a>00002 <span class="preprocessor"></span><span class="preprocessor">#define _GSOC_SFM_POINTS_TO_TRACK_H 1</span>
 <a name="l00003"></a>00003 <span class="preprocessor"></span>
-<a name="l00004"></a>00004 <span class="preprocessor">#include &quot;opencv2/features2d/features2d.hpp&quot;</span>
-<a name="l00005"></a>00005 
-<a name="l00006"></a>00006 <span class="preprocessor">#include &lt;vector&gt;</span>
+<a name="l00004"></a>00004 <span class="preprocessor">#include &quot;macro.h&quot;</span> <span class="comment">//SFM_EXPORTS</span>
+<a name="l00005"></a>00005 <span class="preprocessor">#include &quot;opencv2/features2d/features2d.hpp&quot;</span>
+<a name="l00006"></a>00006 <span class="preprocessor">#include &quot;TracksOfPoints.h&quot;</span>
 <a name="l00007"></a>00007 
-<a name="l00008"></a>00008 
-<a name="l00009"></a>00009 <span class="keyword">namespace </span>OpencvSfM{
+<a name="l00008"></a>00008 <span class="preprocessor">#include &lt;vector&gt;</span>
+<a name="l00009"></a>00009 
 <a name="l00010"></a>00010 
-<a name="l00018"></a><a class="code" href="class_opencv_sf_m_1_1_points_to_track.html">00018</a>   <span class="keyword">class </span><a class="code" href="class_opencv_sf_m_1_1_points_to_track.html" title="This class can be used to store informations about points and features. This is an abstract class: yo...">PointsToTrack</a>
-<a name="l00019"></a>00019   {
-<a name="l00020"></a>00020   <span class="keyword">protected</span>:
-<a name="l00021"></a><a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#a08c9523080571e71e30b11a2f8b9c6b9">00021</a>     std::vector&lt;cv::KeyPoint&gt; <a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#a08c9523080571e71e30b11a2f8b9c6b9" title="This attribute will store points coordinates and sometimes orientation and size.">keypoints_</a>;
-<a name="l00022"></a><a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#adcbf3783bdf4a2a1d3e10c4b74224899">00022</a>     cv::Mat <a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#adcbf3783bdf4a2a1d3e10c4b74224899" title="this attribute will store descritors for each points in a matrix with size (n*m), where n is the numb...">descriptors_</a>;
-<a name="l00023"></a>00023   <span class="keyword">public</span>:
-<a name="l00029"></a>00029     <a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#a0974269063e5a7708e1b992480666f87">PointsToTrack</a>(std::vector&lt;cv::KeyPoint&gt; keypoints=std::vector&lt;cv::KeyPoint&gt;(0),cv::Mat descriptors=cv::Mat());
-<a name="l00033"></a>00033     <span class="keyword">virtual</span> <a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#a530e94d0c39358538d907e977263cae0">~PointsToTrack</a>(<span class="keywordtype">void</span>);
-<a name="l00034"></a>00034     
-<a name="l00039"></a>00039     <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#ab672d2d9b350500dde92f0d39c8c2a98">computeKeypointsAndDesc</a>();
-<a name="l00044"></a>00044     <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#ac7009164560dac1f4d3283c4bf1181a3">computeKeypoints</a>();
-<a name="l00048"></a>00048     <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#a1e5ef9b8da87d1b412c348ad813d0267">computeDescriptors</a>();
-<a name="l00055"></a>00055     <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#a6ac0b2e69bb0fa51af529ec395fd0df7">addKeypoints</a>(std::vector&lt;cv::KeyPoint&gt; keypoints,cv::Mat descriptors=cv::Mat(),<span class="keywordtype">bool</span> computeMissingDescriptor=<span class="keyword">false</span>);
-<a name="l00060"></a><a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#ab646203ef4a8955b9540ffc5b78943d4">00060</a>     std::vector&lt;cv::KeyPoint&gt; <a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#ab646203ef4a8955b9540ffc5b78943d4">getKeypoints</a>()<span class="keyword"> const </span>{<span class="keywordflow">return</span> <a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#a08c9523080571e71e30b11a2f8b9c6b9" title="This attribute will store points coordinates and sometimes orientation and size.">keypoints_</a>;};
-<a name="l00065"></a><a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#a4ca955b907dee279030559d255a4e151">00065</a>     cv::Mat <a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#a4ca955b907dee279030559d255a4e151">getDescriptors</a>()<span class="keyword"> const </span>{<span class="keywordflow">return</span> <a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#adcbf3783bdf4a2a1d3e10c4b74224899" title="this attribute will store descritors for each points in a matrix with size (n*m), where n is the numb...">descriptors_</a>;};
-<a name="l00073"></a>00073     <span class="comment">//</span>
-<a name="l00074"></a>00074     <span class="keywordtype">void</span> <a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#adda3cb43ad421e89b8ddfe24f1c30b30">printPointsOnImage</a>(<span class="keyword">const</span> cv::Mat &amp;image, cv::Mat&amp; outImg, <span class="keyword">const</span> cv::Scalar&amp; color=cv::Scalar::all(-1), <span class="keywordtype">int</span> flags=cv::DrawMatchesFlags::DEFAULT) <span class="keyword">const</span>;
-<a name="l00075"></a>00075 
-<a name="l00076"></a>00076     <span class="keywordtype">void</span> read( <span class="keyword">const</span> cv::FileNode&amp; fn );
-<a name="l00077"></a>00077 
-<a name="l00078"></a>00078     <span class="keywordtype">void</span> write (cv::FileStorage&amp; fs) <span class="keyword">const</span>;
-<a name="l00079"></a>00079   };
-<a name="l00080"></a>00080 
-<a name="l00081"></a>00081 }
-<a name="l00082"></a>00082 
-<a name="l00083"></a>00083 <span class="preprocessor">#endif</span>
+<a name="l00011"></a>00011 <span class="keyword">namespace </span>OpencvSfM{
+<a name="l00012"></a>00012   <span class="keyword">class </span>SFM_EXPORTS TrackOfPoints;
+<a name="l00013"></a>00013 
+<a name="l00024"></a><a class="code" href="class_opencv_sf_m_1_1_points_to_track.html">00024</a>   <span class="keyword">class </span>SFM_EXPORTS <a class="code" href="class_opencv_sf_m_1_1_points_to_track.html" title="This class can be used to store informations about point and features. This is an abstract class: you...">PointsToTrack</a>
+<a name="l00025"></a>00025   {
+<a name="l00026"></a>00026   <span class="keyword">protected</span>:
+<a name="l00027"></a><a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#a08c9523080571e71e30b11a2f8b9c6b9">00027</a>     std::vector&lt;cv::KeyPoint&gt; <a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#a08c9523080571e71e30b11a2f8b9c6b9" title="This attribute will store points coordinates and sometimes orientation and size.">keypoints_</a>;
+<a name="l00028"></a><a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#adcbf3783bdf4a2a1d3e10c4b74224899">00028</a>     cv::Mat <a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#adcbf3783bdf4a2a1d3e10c4b74224899" title="this attribute will store descritors for each points in a matrix with size (n*m), where n is the numb...">descriptors_</a>;
+<a name="l00029"></a><a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#aa1ad5a647af1dd6583dbd780e94c089c">00029</a>     <span class="keywordtype">int</span> <a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#aa1ad5a647af1dd6583dbd780e94c089c" title="index of frame when available">corresponding_image_</a>;
+<a name="l00030"></a><a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#abb10da9503a8ac931d9d167149309df3">00030</a>     <span class="keyword">static</span> <span class="keywordtype">int</span> <a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#abb10da9503a8ac931d9d167149309df3" title="total numbers of images!">glob_number_images_</a>;
+<a name="l00031"></a>00031   <span class="keyword">public</span>:
+<a name="l00038"></a>00038     <a class="code" href="class_opencv_sf_m_1_1_points_to_track.html" title="This class can be used to store informations about point and features. This is an abstract class: you...">PointsToTrack</a>(<span class="keywordtype">int</span> corresponding_image=-1, std::vector&lt;cv::KeyPoint&gt; keypoints=
+<a name="l00039"></a>00039       std::vector&lt;cv::KeyPoint&gt;(0), cv::Mat descriptors=cv::Mat());
+<a name="l00043"></a>00043     <span class="keyword">virtual</span> ~<a class="code" href="class_opencv_sf_m_1_1_points_to_track.html" title="This class can be used to store informations about point and features. This is an abstract class: you...">PointsToTrack</a>(<span class="keywordtype">void</span>);
+<a name="l00044"></a>00044     
+<a name="l00051"></a>00051     <span class="keyword">virtual</span> <span class="keywordtype">int</span> computeKeypointsAndDesc(<span class="keywordtype">bool</span> forcing_recalculation=<span class="keyword">false</span>);
+<a name="l00056"></a>00056     <span class="keyword">virtual</span> <span class="keywordtype">int</span> computeKeypoints();
+<a name="l00060"></a>00060     <span class="keyword">virtual</span> <span class="keywordtype">void</span> computeDescriptors();
+<a name="l00067"></a>00067     <span class="keywordtype">void</span> addKeypoints(std::vector&lt;cv::KeyPoint&gt; keypoints,cv::Mat descriptors=cv::Mat(),<span class="keywordtype">bool</span> computeMissingDescriptor=<span class="keyword">false</span>);
+<a name="l00073"></a><a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#a076f28dac2b30dfcdb2097c496adfd9e">00073</a>     <span class="keyword">inline</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> addKeypoint(cv::KeyPoint point)
+<a name="l00074"></a>00074     {keypoints_.push_back(point); <span class="keywordflow">return</span> keypoints_.size()-1;};
+<a name="l00079"></a><a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#ab0ff4754d1e5c734521b5d46aef37c49">00079</a>     <span class="keyword">inline</span> <span class="keyword">const</span> std::vector&lt;cv::KeyPoint&gt;&amp; <a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#ab0ff4754d1e5c734521b5d46aef37c49">getKeypoints</a>()<span class="keyword"> const </span>{<span class="keywordflow">return</span> keypoints_;};
+<a name="l00085"></a>00085     <span class="keywordtype">void</span> getKeyMatches(<span class="keyword">const</span> std::vector&lt;TrackOfPoints&gt;&amp; matches, <span class="keywordtype">int</span> otherImage,
+<a name="l00086"></a>00086       std::vector&lt;cv::Point2f&gt;&amp; pointsVals) <span class="keyword">const</span>;
+<a name="l00092"></a><a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#abb8a5af3e4d1e71900284a9e318bc316">00092</a>     <span class="keyword">inline</span> <span class="keyword">const</span> cv::KeyPoint&amp; getKeypoint(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> index)<span class="keyword"> const</span>
+<a name="l00093"></a>00093 <span class="keyword">    </span>{CV_DbgAssert( index&lt;keypoints_.size()); <span class="keywordflow">return</span> keypoints_[index];};
+<a name="l00098"></a><a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#a4ca955b907dee279030559d255a4e151">00098</a>     cv::Mat <a class="code" href="class_opencv_sf_m_1_1_points_to_track.html#a4ca955b907dee279030559d255a4e151">getDescriptors</a>()<span class="keyword"> const </span>{<span class="keywordflow">return</span> descriptors_;};
+<a name="l00106"></a>00106     <span class="comment">//</span>
+<a name="l00107"></a>00107     <span class="keywordtype">void</span> printPointsOnImage(<span class="keyword">const</span> cv::Mat &amp;image, cv::Mat&amp; outImg, <span class="keyword">const</span> cv::Scalar&amp; color=cv::Scalar::all(-1), <span class="keywordtype">int</span> flags=cv::DrawMatchesFlags::DEFAULT) <span class="keyword">const</span>;
+<a name="l00108"></a>00108 
+<a name="l00109"></a>00109     <span class="keyword">static</span> <span class="keywordtype">void</span> read( <span class="keyword">const</span> cv::FileNode&amp; node, <a class="code" href="class_opencv_sf_m_1_1_points_to_track.html" title="This class can be used to store informations about point and features. This is an abstract class: you...">PointsToTrack</a>&amp; points );
+<a name="l00110"></a>00110 
+<a name="l00111"></a>00111     <span class="keyword">static</span> <span class="keywordtype">void</span> write( cv::FileStorage&amp; fs, <span class="keyword">const</span> <a class="code" href="class_opencv_sf_m_1_1_points_to_track.html" title="This class can be used to store informations about point and features. This is an abstract class: you...">PointsToTrack</a>&amp; points );
+<a name="l00112"></a>00112   };
+<a name="l00113"></a>00113 }
+<a name="l00114"></a>00114 <span class="comment">/*</span>
+<a name="l00116"></a>00116 <span class="comment">static inline void cv::write( cv::FileStorage&amp; fs, const std::string&amp; name,</span>
+<a name="l00117"></a>00117 <span class="comment">  const OpencvSfM::PointsToTrack&amp; points )</span>
+<a name="l00118"></a>00118 <span class="comment">{</span>
+<a name="l00119"></a>00119 <span class="comment">  OpencvSfM::PointsToTrack::write( fs,points );</span>
+<a name="l00120"></a>00120 <span class="comment">};</span>
+<a name="l00122"></a>00122 <span class="comment">static inline void cv::read(const cv::FileNode&amp; node, OpencvSfM::PointsToTrack&amp; points, </span>
+<a name="l00123"></a>00123 <span class="comment">  OpencvSfM::PointsToTrack defaultValue = OpencvSfM::PointsToTrack())</span>
+<a name="l00124"></a>00124 <span class="comment">{</span>
+<a name="l00125"></a>00125 <span class="comment">  OpencvSfM::PointsToTrack::read( node,points );</span>
+<a name="l00126"></a>00126 <span class="comment">}</span>
+<a name="l00127"></a>00127 <span class="comment">*/</span>
+<a name="l00128"></a>00128 <span class="preprocessor">#endif</span>
 </pre></div></div>
 </div>
 <!-- window showing the filter options -->
@@ -112,7 +134,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Mon May 30 2011 17:50:29 for GSoC2011SfM by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Mon Jul 25 2011 12:41:00 for GSoC2011SfM by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

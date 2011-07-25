@@ -133,6 +133,9 @@ namespace OpencvSfM{
       delete data;
     }
 
+    /**
+    * @brief This structure will handle conversions between OpenCV and PCL data
+    */
     struct EIGEN_ALIGN16 Point
     {
       float *data_;//Max size of points in both library
@@ -145,6 +148,30 @@ namespace OpencvSfM{
       Point(const Point& otherP){
         initData( this, otherP.size_of_data );
         memcpy( data_, otherP.data_, size_of_data * sizeof(float) );
+      };
+
+      /**
+      * operator =(deep copy!)
+      **/
+      Point& operator =(const Point& otherP){
+        int dataSize = otherP.size_of_data * sizeof(float);
+        if( otherP.size_of_data > size_of_data)
+        {
+          if(should_remove) delete data_;
+          initData( this, otherP.size_of_data );
+        }
+        else
+        {
+          if( otherP.size_of_data < size_of_data)
+          {//init the range outside the copy:
+            int diff = ( size_of_data - otherP.size_of_data ) *
+              sizeof(float);
+            dataSize = ( ( size_of_data * sizeof(float) ) - diff);
+            memset ( ((char*)data_) + dataSize, 0, diff );
+          }
+        }
+        memcpy( data_, otherP.data_, dataSize );
+        return *this;
       };
 
       /**

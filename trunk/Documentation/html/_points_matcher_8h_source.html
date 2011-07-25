@@ -63,44 +63,72 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="preprocessor">#ifndef _GSOC_SFM_POINTSMATCHED_H</span>
 <a name="l00002"></a>00002 <span class="preprocessor"></span><span class="preprocessor">#define _GSOC_SFM_POINTSMATCHED_H 1</span>
 <a name="l00003"></a>00003 <span class="preprocessor"></span>
-<a name="l00004"></a>00004 <span class="preprocessor">#include &quot;PointsToTrack.h&quot;</span>
+<a name="l00004"></a>00004 <span class="preprocessor">#include &quot;macro.h&quot;</span> <span class="comment">//SFM_EXPORTS</span>
 <a name="l00005"></a>00005 
-<a name="l00006"></a>00006 <span class="preprocessor">#include &quot;opencv2/features2d/features2d.hpp&quot;</span>
-<a name="l00007"></a>00007 <span class="preprocessor">#include &lt;vector&gt;</span>
-<a name="l00008"></a>00008 
-<a name="l00009"></a>00009 <span class="keyword">namespace </span>OpencvSfM{
-<a name="l00012"></a><a class="code" href="class_opencv_sf_m_1_1_points_matcher.html">00012</a>   <span class="keyword">class </span><a class="code" href="class_opencv_sf_m_1_1_points_matcher.html" title="A class used for matching descriptors that can be described as vectors in a finite-dimensional space...">PointsMatcher</a>
-<a name="l00013"></a>00013   {
-<a name="l00014"></a>00014   <span class="keyword">public</span>:
-<a name="l00015"></a>00015     <a class="code" href="class_opencv_sf_m_1_1_points_matcher.html" title="A class used for matching descriptors that can be described as vectors in a finite-dimensional space...">PointsMatcher</a>( <span class="keyword">const</span> cv::Ptr&lt;cv::DescriptorMatcher&gt;&amp; matcher );
-<a name="l00016"></a>00016     <span class="keyword">virtual</span> ~<a class="code" href="class_opencv_sf_m_1_1_points_matcher.html" title="A class used for matching descriptors that can be described as vectors in a finite-dimensional space...">PointsMatcher</a>();
-<a name="l00017"></a>00017 
-<a name="l00018"></a>00018     <span class="keyword">virtual</span> <span class="keywordtype">void</span> add( cv::Ptr&lt;PointsToTrack&gt; pointCollection );
-<a name="l00019"></a>00019 
-<a name="l00020"></a>00020     <span class="keyword">virtual</span> <span class="keywordtype">void</span> clear();
-<a name="l00021"></a>00021 
-<a name="l00022"></a>00022     <span class="keyword">virtual</span> <span class="keywordtype">void</span> train();
-<a name="l00023"></a>00023 
-<a name="l00024"></a>00024     <span class="keyword">virtual</span> <span class="keywordtype">bool</span> isMaskSupported();
-<a name="l00025"></a>00025 
-<a name="l00026"></a>00026     <span class="keyword">virtual</span> <span class="keywordtype">bool</span> empty() <span class="keyword">const</span>;
-<a name="l00027"></a>00027 
-<a name="l00028"></a>00028     <span class="keyword">virtual</span> cv::Ptr&lt;PointsMatcher&gt; clone( <span class="keywordtype">bool</span> emptyTrainData=<span class="keyword">false</span> ) <span class="keyword">const</span>;
-<a name="l00029"></a>00029 
-<a name="l00030"></a>00030     <span class="keyword">virtual</span> <span class="keywordtype">void</span> knnMatch( cv::Ptr&lt;PointsToTrack&gt; queryPoints,std::vector&lt;std::vector&lt;cv::DMatch&gt; &gt;&amp; matches, <span class="keywordtype">int</span> k,
-<a name="l00031"></a>00031       <span class="keyword">const</span> std::vector&lt;cv::Mat&gt;&amp; masks, <span class="keywordtype">bool</span> compactResult );
-<a name="l00032"></a>00032     <span class="keyword">virtual</span> <span class="keywordtype">void</span> radiusMatch( cv::Ptr&lt;PointsToTrack&gt; queryPoints,std::vector&lt;std::vector&lt;cv::DMatch&gt; &gt;&amp; matches, <span class="keywordtype">float</span> maxDistance,
-<a name="l00033"></a>00033       <span class="keyword">const</span> std::vector&lt;cv::Mat&gt;&amp; masks, <span class="keywordtype">bool</span> compactResult );
-<a name="l00034"></a>00034 
-<a name="l00035"></a>00035   <span class="keyword">protected</span>:
-<a name="l00036"></a>00036 
-<a name="l00037"></a>00037     cv::Ptr&lt;cv::DescriptorMatcher&gt; matcher_;
-<a name="l00038"></a>00038     std::vector&lt;cv::Ptr&lt;PointsToTrack&gt;&gt; pointCollection_;
-<a name="l00039"></a>00039   };
-<a name="l00040"></a>00040 
-<a name="l00041"></a>00041 }
-<a name="l00042"></a>00042 
-<a name="l00043"></a>00043 <span class="preprocessor">#endif</span>
+<a name="l00006"></a>00006 <span class="preprocessor">#include &quot;PointsToTrack.h&quot;</span>
+<a name="l00007"></a>00007 
+<a name="l00008"></a>00008 <span class="preprocessor">#include &quot;opencv2/features2d/features2d.hpp&quot;</span>
+<a name="l00009"></a>00009 <span class="preprocessor">#include &lt;vector&gt;</span>
+<a name="l00010"></a>00010 
+<a name="l00011"></a>00011 <span class="keyword">namespace </span>OpencvSfM{
+<a name="l00016"></a><a class="code" href="class_opencv_sf_m_1_1_points_matcher.html">00016</a>   <span class="keyword">class </span>SFM_EXPORTS <a class="code" href="class_opencv_sf_m_1_1_points_matcher.html" title="A class used for matching descriptors that can be described as vectors in a finite-dimensional space...">PointsMatcher</a>
+<a name="l00017"></a>00017   {
+<a name="l00018"></a>00018   <span class="keyword">public</span>:
+<a name="l00023"></a>00023     <a class="code" href="class_opencv_sf_m_1_1_points_matcher.html" title="A class used for matching descriptors that can be described as vectors in a finite-dimensional space...">PointsMatcher</a>( <span class="keyword">const</span> cv::Ptr&lt;cv::DescriptorMatcher&gt;&amp; matcher );
+<a name="l00024"></a>00024 
+<a name="l00025"></a>00025     <a class="code" href="class_opencv_sf_m_1_1_points_matcher.html" title="A class used for matching descriptors that can be described as vectors in a finite-dimensional space...">PointsMatcher</a>(<span class="keyword">const</span> <a class="code" href="class_opencv_sf_m_1_1_points_matcher.html" title="A class used for matching descriptors that can be described as vectors in a finite-dimensional space...">PointsMatcher</a>&amp; copy);
+<a name="l00029"></a>00029     <span class="keyword">virtual</span> ~<a class="code" href="class_opencv_sf_m_1_1_points_matcher.html" title="A class used for matching descriptors that can be described as vectors in a finite-dimensional space...">PointsMatcher</a>();
+<a name="l00034"></a>00034     <span class="keyword">virtual</span> <span class="keywordtype">void</span> add( cv::Ptr&lt;PointsToTrack&gt; pointCollection );
+<a name="l00038"></a>00038     <span class="keyword">virtual</span> <span class="keywordtype">void</span> clear();
+<a name="l00042"></a>00042     <span class="keyword">virtual</span> <span class="keywordtype">void</span> train();
+<a name="l00047"></a>00047     <span class="keyword">virtual</span> <span class="keywordtype">bool</span> isMaskSupported();
+<a name="l00052"></a>00052     <span class="keyword">virtual</span> <span class="keywordtype">bool</span> empty() <span class="keyword">const</span>;
+<a name="l00058"></a>00058     <span class="keyword">virtual</span> cv::Ptr&lt;PointsMatcher&gt; clone( <span class="keywordtype">bool</span> emptyTrainData=<span class="keyword">true</span> ) <span class="keyword">const</span>;
+<a name="l00067"></a>00067     <span class="keyword">virtual</span> <span class="keywordtype">void</span> match( cv::Ptr&lt;PointsToTrack&gt; queryPoints,
+<a name="l00068"></a>00068       std::vector&lt;cv::DMatch&gt;&amp; matches,
+<a name="l00069"></a>00069       <span class="keyword">const</span> std::vector&lt;cv::Mat&gt;&amp; masks = std::vector&lt;cv::Mat&gt;() );
+<a name="l00081"></a>00081     <span class="keyword">virtual</span> <span class="keywordtype">void</span> knnMatch( cv::Ptr&lt;PointsToTrack&gt; queryPoints,
+<a name="l00082"></a>00082       std::vector&lt;std::vector&lt;cv::DMatch&gt; &gt;&amp; matches, <span class="keywordtype">int</span> k,
+<a name="l00083"></a>00083       <span class="keyword">const</span> std::vector&lt;cv::Mat&gt;&amp; masks = std::vector&lt;cv::Mat&gt;(), <span class="keywordtype">bool</span> compactResult = <span class="keyword">true</span> );
+<a name="l00094"></a>00094     <span class="keyword">virtual</span> <span class="keywordtype">void</span> radiusMatch( cv::Ptr&lt;PointsToTrack&gt; queryPoints,std::vector&lt;std::vector&lt;cv::DMatch&gt; &gt;&amp; matches, <span class="keywordtype">float</span> maxDistance,
+<a name="l00095"></a>00095       <span class="keyword">const</span> std::vector&lt;cv::Mat&gt;&amp; masks = std::vector&lt;cv::Mat&gt;(), <span class="keywordtype">bool</span> compactResult = <span class="keyword">true</span> );
+<a name="l00104"></a>00104     <span class="keyword">virtual</span> <span class="keywordtype">void</span> crossMatch( cv::Ptr&lt;PointsMatcher&gt; otherMatcher,
+<a name="l00105"></a>00105       std::vector&lt;cv::DMatch&gt;&amp; matches,
+<a name="l00106"></a>00106       <span class="keyword">const</span> std::vector&lt;cv::Mat&gt;&amp; masks = std::vector&lt;cv::Mat&gt;() );
+<a name="l00115"></a>00115     <span class="keywordtype">void</span> matchWithFundamental( cv::Ptr&lt;PointsMatcher&gt; otherMatcher,
+<a name="l00116"></a>00116       cv::Mat fundamentalMat,
+<a name="l00117"></a>00117       cv::Mat img1,
+<a name="l00118"></a>00118       std::vector&lt;cv::DMatch&gt;&amp; matches,
+<a name="l00119"></a>00119       <span class="keyword">const</span> std::vector&lt;cv::Mat&gt;&amp; masks );
+<a name="l00141"></a>00141     <span class="keyword">static</span> <span class="keywordtype">void</span> drawMatches( <span class="keyword">const</span> cv::Mat&amp; img1,
+<a name="l00142"></a>00142       <span class="keyword">const</span> std::vector&lt;cv::KeyPoint&gt;&amp; keypoints1,
+<a name="l00143"></a>00143       <span class="keyword">const</span> std::vector&lt;cv::KeyPoint&gt;&amp; keypoints2,
+<a name="l00144"></a>00144       <span class="keyword">const</span> std::vector&lt;cv::DMatch&gt;&amp; matches1to2, cv::Mat&amp; outImg,
+<a name="l00145"></a>00145       <span class="keyword">const</span> cv::Scalar&amp; matchColor=cv::Scalar::all(-1),
+<a name="l00146"></a>00146       <span class="keyword">const</span> cv::Scalar&amp; singlePointColor=cv::Scalar::all(-1),
+<a name="l00147"></a>00147       <span class="keyword">const</span> std::vector&lt;char&gt;&amp; matchesMask=std::vector&lt;char&gt;(),
+<a name="l00148"></a>00148       <span class="keywordtype">int</span> flags=cv::DrawMatchesFlags::DEFAULT
+<a name="l00149"></a>00149       );
+<a name="l00150"></a>00150 
+<a name="l00151"></a>00151     <span class="keyword">static</span> <span class="keywordtype">void</span> read( <span class="keyword">const</span> cv::FileNode&amp; node, <a class="code" href="class_opencv_sf_m_1_1_points_matcher.html" title="A class used for matching descriptors that can be described as vectors in a finite-dimensional space...">PointsMatcher</a>&amp; points );
+<a name="l00152"></a>00152 
+<a name="l00153"></a>00153     <span class="keyword">static</span> <span class="keywordtype">void</span> write( cv::FileStorage&amp; fs, <span class="keyword">const</span> <a class="code" href="class_opencv_sf_m_1_1_points_matcher.html" title="A class used for matching descriptors that can be described as vectors in a finite-dimensional space...">PointsMatcher</a>&amp; points );
+<a name="l00154"></a>00154 
+<a name="l00155"></a>00155     <span class="keyword">inline</span> <span class="keyword">const</span> cv::KeyPoint &amp;getKeypoint(<span class="keywordtype">int</span> numKey)<span class="keyword"> const</span>
+<a name="l00156"></a>00156 <span class="keyword">    </span>{
+<a name="l00157"></a>00157       CV_DbgAssert( pointCollection_.size()&gt;0 );
+<a name="l00158"></a>00158       <span class="keywordflow">return</span> pointCollection_[0]-&gt;getKeypoint(numKey);
+<a name="l00159"></a>00159     }
+<a name="l00160"></a>00160 
+<a name="l00161"></a>00161   <span class="keyword">protected</span>:
+<a name="l00162"></a>00162 
+<a name="l00163"></a><a class="code" href="class_opencv_sf_m_1_1_points_matcher.html#a652ba26d167b0ab2dc27e8087ab8d3cf">00163</a>     cv::Ptr&lt;cv::DescriptorMatcher&gt; <a class="code" href="class_opencv_sf_m_1_1_points_matcher.html#a652ba26d167b0ab2dc27e8087ab8d3cf" title="Algorithm used to find matches...">matcher_</a>;
+<a name="l00164"></a><a class="code" href="class_opencv_sf_m_1_1_points_matcher.html#a62062498c4325863469d980c39baebc1">00164</a>     std::vector&lt; cv::Ptr&lt; PointsToTrack &gt; &gt; <a class="code" href="class_opencv_sf_m_1_1_points_matcher.html#a62062498c4325863469d980c39baebc1" title="Vector of points used to compute matches...">pointCollection_</a>;
+<a name="l00165"></a>00165   };
+<a name="l00166"></a>00166 
+<a name="l00167"></a>00167 }
+<a name="l00168"></a>00168 
+<a name="l00169"></a>00169 <span class="preprocessor">#endif</span>
 </pre></div></div>
 </div>
 <!-- window showing the filter options -->
@@ -117,7 +145,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Mon May 30 2011 17:50:29 for GSoC2011SfM by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Mon Jul 25 2011 12:41:00 for GSoC2011SfM by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

@@ -62,57 +62,251 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="contents">
 <div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="preprocessor">#include &quot;PointOfView.h&quot;</span>
 <a name="l00002"></a>00002 
-<a name="l00003"></a>00003 
-<a name="l00004"></a>00004 <span class="keyword">using</span> cv::Mat;
-<a name="l00005"></a>00005 <span class="keyword">using</span> cv::Vec3d;
-<a name="l00006"></a>00006 <span class="keyword">using</span> cv::Vec;
-<a name="l00007"></a>00007 <span class="keyword">using</span> cv::Ptr;
-<a name="l00008"></a>00008 <span class="keyword">using</span> std::vector;
-<a name="l00009"></a>00009 <span class="keyword">using</span> std::string;
-<a name="l00010"></a>00010 <span class="keyword">using</span> cv::imread;
-<a name="l00011"></a>00011 
-<a name="l00012"></a>00012 <span class="keyword">namespace </span>OpencvSfM{
-<a name="l00013"></a>00013 
-<a name="l00014"></a><a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a296c28b5a2c8412a62ae3a7752a2c850">00014</a>   <a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a296c28b5a2c8412a62ae3a7752a2c850">PointOfView::PointOfView</a>(cv::Ptr&lt;Camera&gt; device, Mat rotation <span class="comment">/*=Mat::eye(3, 3, CV_64F)*/</span>, Vec3d translation <span class="comment">/*=Vec(0.0,0.0,0.0)*/</span> )
-<a name="l00015"></a>00015   {
-<a name="l00016"></a>00016     CV_Assert( rotation.rows==3 &amp;&amp; rotation.cols==3 );
-<a name="l00017"></a>00017     CV_Assert( !device.empty() );
+<a name="l00003"></a>00003 <span class="preprocessor">#include &quot;libmv_mapping.h&quot;</span>
+<a name="l00004"></a>00004 <span class="preprocessor">#include &quot;PCL_mapping.h&quot;</span>
+<a name="l00005"></a>00005 <span class="preprocessor">#include &lt;iostream&gt;</span>
+<a name="l00006"></a>00006 <span class="preprocessor">#include &lt;pcl/io/vtk_io.h&gt;</span>
+<a name="l00007"></a>00007 
+<a name="l00008"></a>00008 <span class="keyword">using</span> cv::Mat;
+<a name="l00009"></a>00009 <span class="keyword">using</span> cv::Vec4d;
+<a name="l00010"></a>00010 <span class="keyword">using</span> cv::Vec3d;
+<a name="l00011"></a>00011 <span class="keyword">using</span> cv::Vec2d;
+<a name="l00012"></a>00012 <span class="keyword">using</span> cv::Vec;
+<a name="l00013"></a>00013 <span class="keyword">using</span> cv::Range;
+<a name="l00014"></a>00014 <span class="keyword">using</span> cv::Ptr;
+<a name="l00015"></a>00015 <span class="keyword">using</span> std::vector;
+<a name="l00016"></a>00016 <span class="keyword">using</span> std::string;
+<a name="l00017"></a>00017 <span class="keyword">using</span> cv::imread;
 <a name="l00018"></a>00018 
-<a name="l00019"></a>00019     this-&gt;<a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a83bfd58fd1074d5950dad2be9630dbf8" title="intra parameters and distortion coefs">device_</a>=device;
-<a name="l00020"></a>00020     this-&gt;<a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a4593900dcb330a47fdb5a7a1c4e2ad93" title="Rotation matrix R.">rotation_</a>=rotation;
-<a name="l00021"></a>00021     this-&gt;<a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a9ffbc9dc46273ab30f752c303b5c9848" title="Translation vector t.">translation_</a>=translation;
-<a name="l00022"></a>00022 
-<a name="l00023"></a>00023     this-&gt;<a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a920f9386c300582a19e68908654d169c" title="redundancy but speed improvement">projection_matrix_</a>=device_-&gt;computeProjectionMatrix(rotation,translation);
-<a name="l00024"></a>00024 
-<a name="l00025"></a>00025     this-&gt;<a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#ac644fc5f92709b33a31ee2370365f104" title="This attribut is used to know what we should estimate... If equal to 0, nothing should be estimated...">config_</a>=0;<span class="comment">//everything should be estimated...</span>
+<a name="l00019"></a>00019 <span class="keyword">namespace </span>OpencvSfM{
+<a name="l00020"></a>00020 
+<a name="l00021"></a><a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a296c28b5a2c8412a62ae3a7752a2c850">00021</a>   <a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a296c28b5a2c8412a62ae3a7752a2c850">PointOfView::PointOfView</a>(cv::Ptr&lt;Camera&gt; device, Mat rotation <span class="comment">/*=Mat::eye(3, 3, CV_64F)*/</span>, Vec3d translation <span class="comment">/*=Vec(0.0,0.0,0.0)*/</span> )
+<a name="l00022"></a>00022     : projection_matrix_(3, 4, CV_64F)
+<a name="l00023"></a>00023   {
+<a name="l00024"></a>00024     CV_DbgAssert( rotation.rows==3 &amp;&amp; rotation.cols==3 );
+<a name="l00025"></a>00025     CV_DbgAssert( !device.empty() );
 <a name="l00026"></a>00026 
-<a name="l00027"></a>00027     <span class="comment">//as we are a new point of view related to a device, we should add our address into device_:</span>
-<a name="l00028"></a>00028     device_-&gt;pointsOfView_.push_back(<span class="keyword">this</span>);
-<a name="l00029"></a>00029   };
-<a name="l00030"></a>00030 
-<a name="l00031"></a><a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#aff68fe7602ebc6effa817860cea983f7">00031</a>   <a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#aff68fe7602ebc6effa817860cea983f7">PointOfView::~PointOfView</a>(<span class="keywordtype">void</span>)
-<a name="l00032"></a>00032   {
-<a name="l00033"></a>00033     this-&gt;<a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a83bfd58fd1074d5950dad2be9630dbf8" title="intra parameters and distortion coefs">device_</a>.release();
-<a name="l00034"></a>00034     this-&gt;<a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a4593900dcb330a47fdb5a7a1c4e2ad93" title="Rotation matrix R.">rotation_</a>.release();
-<a name="l00035"></a>00035     <span class="comment">//this-&gt;translation_.release();//release don&#39;t exist...</span>
+<a name="l00027"></a>00027     this-&gt;<a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a83bfd58fd1074d5950dad2be9630dbf8" title="intra parameters and distortion coefs">device_</a>=device;
+<a name="l00028"></a>00028 
+<a name="l00029"></a>00029     this-&gt;<a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a4593900dcb330a47fdb5a7a1c4e2ad93" title="Rotation matrix R (data is stored into projection_matrix_)">rotation_</a>=<a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a920f9386c300582a19e68908654d169c" title="redundancy but speed improvement">projection_matrix_</a>(Range::all(),Range(0,3));
+<a name="l00030"></a>00030     rotation.copyTo( this-&gt;<a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a4593900dcb330a47fdb5a7a1c4e2ad93" title="Rotation matrix R (data is stored into projection_matrix_)">rotation_</a> );
+<a name="l00031"></a>00031 
+<a name="l00032"></a>00032     this-&gt;<a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#acd8ff3683942c1a8afed7b4f266eaa20" title="Translation vector t (Matrix instead of vector because data is stored into projection_matrix_)">translation_</a> = <a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a920f9386c300582a19e68908654d169c" title="redundancy but speed improvement">projection_matrix_</a>(Range::all(),Range(3,4));
+<a name="l00033"></a>00033     Mat(translation).copyTo( this-&gt;<a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#acd8ff3683942c1a8afed7b4f266eaa20" title="Translation vector t (Matrix instead of vector because data is stored into projection_matrix_)">translation_</a> );
+<a name="l00034"></a>00034 
+<a name="l00035"></a>00035     this-&gt;<a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#ac644fc5f92709b33a31ee2370365f104" title="This attribut is used to know what we should estimate... If equal to 0, nothing should be estimated...">config_</a>=0;<span class="comment">//everything should be estimated...</span>
 <a name="l00036"></a>00036 
-<a name="l00037"></a>00037     this-&gt;<a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a920f9386c300582a19e68908654d169c" title="redundancy but speed improvement">projection_matrix_</a>.release();
-<a name="l00038"></a>00038 
-<a name="l00039"></a>00039     <span class="comment">//remove the reference in device_-&gt;pointsOfView_:</span>
-<a name="l00040"></a>00040     vector&lt;PointOfView*&gt;::iterator ourRef=<a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a83bfd58fd1074d5950dad2be9630dbf8" title="intra parameters and distortion coefs">device_</a>-&gt;pointsOfView_.begin();
-<a name="l00041"></a>00041     <span class="keywordtype">bool</span> isFound=<span class="keyword">false</span>;
-<a name="l00042"></a>00042     <span class="keywordflow">while</span>(!isFound &amp;&amp; ourRef != <a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a83bfd58fd1074d5950dad2be9630dbf8" title="intra parameters and distortion coefs">device_</a>-&gt;pointsOfView_.end())
-<a name="l00043"></a>00043     {
-<a name="l00044"></a>00044       <span class="comment">//be aware of NULL pointor:</span>
-<a name="l00045"></a>00045       <span class="keywordflow">if</span>( (*ourRef) == this )
-<a name="l00046"></a>00046       {
-<a name="l00047"></a>00047         isFound=<span class="keyword">true</span>;
-<a name="l00048"></a>00048         (*ourRef)=NULL;
-<a name="l00049"></a>00049       }
-<a name="l00050"></a>00050       ourRef++;
-<a name="l00051"></a>00051     }
-<a name="l00052"></a>00052   }
-<a name="l00053"></a>00053 }
+<a name="l00037"></a>00037     <span class="comment">//as we are a new point of view related to a device, we should add our address into device_:</span>
+<a name="l00038"></a>00038     device_-&gt;pointsOfView_.push_back(<span class="keyword">this</span>);
+<a name="l00039"></a>00039   };
+<a name="l00040"></a>00040 
+<a name="l00041"></a><a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#aff68fe7602ebc6effa817860cea983f7">00041</a>   <a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#aff68fe7602ebc6effa817860cea983f7">PointOfView::~PointOfView</a>(<span class="keywordtype">void</span>)
+<a name="l00042"></a>00042   {
+<a name="l00043"></a>00043     this-&gt;<a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a920f9386c300582a19e68908654d169c" title="redundancy but speed improvement">projection_matrix_</a>.release();
+<a name="l00044"></a>00044 
+<a name="l00045"></a>00045     <span class="comment">//remove the reference in device_-&gt;pointsOfView_:</span>
+<a name="l00046"></a>00046     vector&lt;PointOfView*&gt;::iterator ourRef=<a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a83bfd58fd1074d5950dad2be9630dbf8" title="intra parameters and distortion coefs">device_</a>-&gt;pointsOfView_.begin();
+<a name="l00047"></a>00047     <span class="keywordtype">bool</span> isFound=<span class="keyword">false</span>;
+<a name="l00048"></a>00048     <span class="keywordflow">while</span>(!isFound &amp;&amp; ourRef != <a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a83bfd58fd1074d5950dad2be9630dbf8" title="intra parameters and distortion coefs">device_</a>-&gt;pointsOfView_.end())
+<a name="l00049"></a>00049     {
+<a name="l00050"></a>00050       <span class="comment">//be aware of NULL pointor:</span>
+<a name="l00051"></a>00051       <span class="keywordflow">if</span>( (*ourRef) == this )
+<a name="l00052"></a>00052       {
+<a name="l00053"></a>00053         isFound=<span class="keyword">true</span>;
+<a name="l00054"></a>00054         (*ourRef)=NULL;
+<a name="l00055"></a>00055       }
+<a name="l00056"></a>00056       ourRef++;
+<a name="l00057"></a>00057     }
+<a name="l00058"></a>00058   }
+<a name="l00059"></a>00059 
+<a name="l00060"></a><a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a8b5c548a3a2e4263722e5afb2bae53bb">00060</a>   Vec2d <a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a8b5c548a3a2e4263722e5afb2bae53bb">PointOfView::project3DPointIntoImage</a>(Vec3d point)<span class="keyword"> const</span>
+<a name="l00061"></a>00061 <span class="keyword">  </span>{
+<a name="l00062"></a>00062     <span class="comment">//As we don&#39;t know what type of camera we use (with/without disportion, fisheyes...)</span>
+<a name="l00063"></a>00063     <span class="comment">//we can&#39;t use classic projection matrix P = K . [R|t]</span>
+<a name="l00064"></a>00064     <span class="comment">//Instead, we first compute points transformation into camera&#39;s system and then compute</span>
+<a name="l00065"></a>00065     <span class="comment">//pixel coordinate using camera device function.</span>
+<a name="l00066"></a>00066 
+<a name="l00067"></a>00067     <span class="comment">//As we need Mat object to compute projection, we create temporary objects:</span>
+<a name="l00068"></a>00068     Mat mat3DNorm(4,1,CV_64F);
+<a name="l00069"></a>00069     <span class="keywordtype">double</span>* point3DNorm=(<span class="keywordtype">double</span>*)mat3DNorm.data;
+<a name="l00070"></a>00070     Mat mat2DNorm(3,1,CV_64F);
+<a name="l00071"></a>00071     <span class="keywordtype">double</span>* point2DNorm=(<span class="keywordtype">double</span>*)mat2DNorm.data;
+<a name="l00072"></a>00072 
+<a name="l00073"></a>00073     vector&lt;Vec2d&gt; pointsOut;
+<a name="l00074"></a>00074     point3DNorm[0] = point[0];
+<a name="l00075"></a>00075     point3DNorm[1] = point[1];
+<a name="l00076"></a>00076     point3DNorm[2] = point[2];
+<a name="l00077"></a>00077     point3DNorm[3] = 1;
+<a name="l00078"></a>00078 
+<a name="l00079"></a>00079     <span class="comment">//transform points into camera&#39;s coordinates:</span>
+<a name="l00080"></a>00080     mat2DNorm = ( <a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a920f9386c300582a19e68908654d169c" title="redundancy but speed improvement">projection_matrix_</a> * mat3DNorm);
+<a name="l00081"></a>00081     pointsOut.push_back(Vec2d(point2DNorm[0]/point2DNorm[2],point2DNorm[1]/point2DNorm[2]));
+<a name="l00082"></a>00082 
+<a name="l00083"></a>00083     <span class="comment">//transform points into pixel coordinates using camera intra parameters:</span>
+<a name="l00084"></a>00084     pointsOut = <a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a83bfd58fd1074d5950dad2be9630dbf8" title="intra parameters and distortion coefs">device_</a>-&gt;normImageToPixelCoordinates(pointsOut);
+<a name="l00085"></a>00085     <span class="keywordflow">return</span> pointsOut[0];
+<a name="l00086"></a>00086   }
+<a name="l00087"></a>00087   vector&lt;Vec2d&gt; <a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a3f36f9509f8338f36d0e1d48aba95e1a">PointOfView::project3DPointsIntoImage</a>(vector&lt;Vec3d&gt; points)<span class="keyword"> const</span>
+<a name="l00088"></a>00088 <span class="keyword">  </span>{
+<a name="l00089"></a>00089     <span class="comment">//As we don&#39;t know what type of camera we use (with/without disportion, fisheyes...)</span>
+<a name="l00090"></a>00090     <span class="comment">//we can&#39;t use classic projection matrix P = K . [R|t]</span>
+<a name="l00091"></a>00091     <span class="comment">//Instead, we first compute points transformation into camera&#39;s system and then compute</span>
+<a name="l00092"></a>00092     <span class="comment">//pixel coordinate using camera device function.</span>
+<a name="l00093"></a>00093 
+<a name="l00094"></a>00094     <span class="comment">//As we need Mat object to compute projection, we create temporary objects:</span>
+<a name="l00095"></a>00095     Mat mat3DNorm(4,1,CV_64F);
+<a name="l00096"></a>00096     <span class="keywordtype">double</span>* point3DNorm=(<span class="keywordtype">double</span>*)mat3DNorm.data;
+<a name="l00097"></a>00097     Mat mat2DNorm(3,1,CV_64F);
+<a name="l00098"></a>00098     <span class="keywordtype">double</span>* point2DNorm=(<span class="keywordtype">double</span>*)mat2DNorm.data;
+<a name="l00099"></a>00099     
+<a name="l00100"></a>00100     vector&lt;Vec2d&gt; pointsOut;
+<a name="l00101"></a>00101     vector&lt;Vec3d&gt;::iterator point=points.begin();
+<a name="l00102"></a>00102     <span class="keywordflow">while</span>(point!=points.end())
+<a name="l00103"></a>00103     {
+<a name="l00104"></a>00104       point3DNorm[0] = (*point)[0];
+<a name="l00105"></a>00105       point3DNorm[1] = (*point)[1];
+<a name="l00106"></a>00106       point3DNorm[2] = (*point)[2];
+<a name="l00107"></a>00107       point3DNorm[3] = 1;
+<a name="l00108"></a>00108 
+<a name="l00109"></a>00109       <span class="comment">//transform points into camera&#39;s coordinates:</span>
+<a name="l00110"></a>00110       mat2DNorm = ( <a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a920f9386c300582a19e68908654d169c" title="redundancy but speed improvement">projection_matrix_</a> * mat3DNorm);
+<a name="l00111"></a>00111 
+<a name="l00112"></a>00112       pointsOut.push_back(Vec2d(point2DNorm[0]/point2DNorm[2],point2DNorm[1]/point2DNorm[2]));
+<a name="l00113"></a>00113 
+<a name="l00114"></a>00114       point++;
+<a name="l00115"></a>00115     }
+<a name="l00116"></a>00116     <span class="comment">//transform points into pixel coordinates using camera intra parameters:</span>
+<a name="l00117"></a>00117     <span class="keywordflow">return</span> <a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a83bfd58fd1074d5950dad2be9630dbf8" title="intra parameters and distortion coefs">device_</a>-&gt;normImageToPixelCoordinates(pointsOut);
+<a name="l00118"></a>00118   }
+<a name="l00119"></a>00119   vector&lt;Vec2d&gt; <a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a3f36f9509f8338f36d0e1d48aba95e1a">PointOfView::project3DPointsIntoImage</a>(vector&lt;TrackOfPoints&gt; points)<span class="keyword"> const</span>
+<a name="l00120"></a>00120 <span class="keyword">  </span>{
+<a name="l00121"></a>00121     <span class="comment">//As we don&#39;t know what type of camera we use (with/without disportion, fisheyes...)</span>
+<a name="l00122"></a>00122     <span class="comment">//we can&#39;t use classic projection matrix P = K . [R|t]</span>
+<a name="l00123"></a>00123     <span class="comment">//Instead, we first compute points transformation into camera&#39;s system and then compute</span>
+<a name="l00124"></a>00124     <span class="comment">//pixel coordinate using camera device function.</span>
+<a name="l00125"></a>00125 
+<a name="l00126"></a>00126     <span class="comment">//As we need Mat object to compute projection, we create temporary objects:</span>
+<a name="l00127"></a>00127     Mat mat3DNorm(4,1,CV_64F);
+<a name="l00128"></a>00128     <span class="keywordtype">double</span>* point3DNorm=(<span class="keywordtype">double</span>*)mat3DNorm.data;
+<a name="l00129"></a>00129     Mat mat2DNorm(3,1,CV_64F);
+<a name="l00130"></a>00130     <span class="keywordtype">double</span>* point2DNorm=(<span class="keywordtype">double</span>*)mat2DNorm.data;
+<a name="l00131"></a>00131     
+<a name="l00132"></a>00132     vector&lt;Vec2d&gt; pointsOut;
+<a name="l00133"></a>00133     vector&lt;TrackOfPoints&gt;::iterator point=points.begin();
+<a name="l00134"></a>00134     <span class="keywordflow">while</span>(point!=points.end())
+<a name="l00135"></a>00135     {
+<a name="l00136"></a>00136       Vec3d convert_from_track = (*point);
+<a name="l00137"></a>00137       point3DNorm[0] = convert_from_track[0];
+<a name="l00138"></a>00138       point3DNorm[1] = convert_from_track[1];
+<a name="l00139"></a>00139       point3DNorm[2] = convert_from_track[2];
+<a name="l00140"></a>00140       point3DNorm[3] = 1;
+<a name="l00141"></a>00141 
+<a name="l00142"></a>00142       <span class="comment">//transform points into camera&#39;s coordinates:</span>
+<a name="l00143"></a>00143       mat2DNorm = ( <a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a920f9386c300582a19e68908654d169c" title="redundancy but speed improvement">projection_matrix_</a> * mat3DNorm);
+<a name="l00144"></a>00144 
+<a name="l00145"></a>00145       pointsOut.push_back(Vec2d(point2DNorm[0]/point2DNorm[2],point2DNorm[1]/point2DNorm[2]));
+<a name="l00146"></a>00146 
+<a name="l00147"></a>00147       point++;
+<a name="l00148"></a>00148     }
+<a name="l00149"></a>00149     <span class="comment">//transform points into pixel coordinates using camera intra parameters:</span>
+<a name="l00150"></a>00150     <span class="keywordflow">return</span> <a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a83bfd58fd1074d5950dad2be9630dbf8" title="intra parameters and distortion coefs">device_</a>-&gt;normImageToPixelCoordinates(pointsOut);
+<a name="l00151"></a>00151   }
+<a name="l00152"></a>00152 
+<a name="l00153"></a><a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a88697becf69e7291d7c08dc3eb5e891e">00153</a>   <span class="keywordtype">bool</span> <a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a88697becf69e7291d7c08dc3eb5e891e">PointOfView::pointInFrontOfCamera</a>(cv::Vec4d point)<span class="keyword"> const</span>
+<a name="l00154"></a>00154 <span class="keyword">  </span>{
+<a name="l00155"></a>00155     Mat pointTranspose= (Mat) point;
+<a name="l00156"></a>00156     <span class="keywordtype">double</span> condition_1 = this-&gt;<a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a920f9386c300582a19e68908654d169c" title="redundancy but speed improvement">projection_matrix_</a>.row(2).dot(pointTranspose.t()) * point[3];
+<a name="l00157"></a>00157     <span class="keywordtype">double</span> condition_2 = point[2] * point[3];
+<a name="l00158"></a>00158     <span class="keywordflow">if</span>( condition_1 &gt; 0 &amp;&amp; condition_2 &gt; 0 )
+<a name="l00159"></a>00159       <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00160"></a>00160     <span class="keywordflow">else</span>
+<a name="l00161"></a>00161       <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00162"></a>00162   }
+<a name="l00163"></a><a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a26848a2211358fb86b69fda1376c78c7">00163</a>   cv::Mat <a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a26848a2211358fb86b69fda1376c78c7">PointOfView::getProjectionMatrix</a>()<span class="keyword"> const</span>
+<a name="l00164"></a>00164 <span class="keyword">  </span>{
+<a name="l00165"></a>00165     <span class="keywordflow">return</span> <a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a83bfd58fd1074d5950dad2be9630dbf8" title="intra parameters and distortion coefs">device_</a>-&gt;getIntraMatrix() * <a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a920f9386c300582a19e68908654d169c" title="redundancy but speed improvement">projection_matrix_</a>;
+<a name="l00166"></a>00166   };
+<a name="l00167"></a>00167 
+<a name="l00168"></a>00168   <span class="keywordtype">void</span> PointOfView::addCameraRepresentation(
+<a name="l00169"></a>00169     boost::shared_ptr&lt;pcl::visualization::PCLVisualizer&gt; viewer,
+<a name="l00170"></a>00170     <span class="keywordtype">int</span> image_width, <span class="keywordtype">int</span> image_height, std::string name, <span class="keywordtype">int</span> viewport )
+<a name="l00171"></a>00171   {
+<a name="l00172"></a>00172     <span class="comment">//First get the focal of camera:</span>
+<a name="l00173"></a>00173     <span class="keywordtype">double</span> focal = <a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a83bfd58fd1074d5950dad2be9630dbf8" title="intra parameters and distortion coefs">device_</a>-&gt;getFocal();
+<a name="l00174"></a>00174     <span class="comment">//Now get the corners in camera&#39;s coordinates:</span>
+<a name="l00175"></a>00175     std::vector&lt;cv::Vec2d&gt; corners, real_coord;
+<a name="l00176"></a>00176     corners.push_back( cv::Vec2d( 0, 0 ) );
+<a name="l00177"></a>00177     corners.push_back( cv::Vec2d( image_width, image_height ) );
+<a name="l00178"></a>00178 
+<a name="l00179"></a>00179     real_coord = <a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a83bfd58fd1074d5950dad2be9630dbf8" title="intra parameters and distortion coefs">device_</a>-&gt;pixelToNormImageCoordinates( corners );
+<a name="l00180"></a>00180 
+<a name="l00181"></a>00181     <span class="comment">//create the mesh:</span>
+<a name="l00182"></a>00182     std::vector&lt;Vec3d&gt; camera_mesh;
+<a name="l00183"></a>00183     camera_mesh.push_back( Vec3d(
+<a name="l00184"></a>00184       real_coord[0][0], real_coord[0][1], 0) );<span class="comment">//bottom left corner</span>
+<a name="l00185"></a>00185     camera_mesh.push_back( Vec3d(
+<a name="l00186"></a>00186       real_coord[1][0], real_coord[0][1], 0) );<span class="comment">//bottom right corner</span>
+<a name="l00187"></a>00187     camera_mesh.push_back( Vec3d(
+<a name="l00188"></a>00188       real_coord[1][0], real_coord[1][1], 0) );<span class="comment">//top right corner</span>
+<a name="l00189"></a>00189     camera_mesh.push_back( Vec3d(
+<a name="l00190"></a>00190     real_coord[0][0], real_coord[1][1], 0) );<span class="comment">//top left corner</span>
+<a name="l00191"></a>00191     camera_mesh.push_back( Vec3d(
+<a name="l00192"></a>00192       0, 0, focal ) );<span class="comment">//camera&#39;s origin</span>
+<a name="l00193"></a>00193 
+<a name="l00194"></a>00194     <span class="comment">//move theses points to the world coordinates:</span>
+<a name="l00195"></a>00195     <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; camera_mesh.size(); ++i)
+<a name="l00196"></a>00196     {
+<a name="l00197"></a>00197       <span class="comment">//translate to the correct location:</span>
+<a name="l00198"></a>00198       camera_mesh[i] = (Mat) ((Mat)(camera_mesh[i]) - <a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#acd8ff3683942c1a8afed7b4f266eaa20" title="Translation vector t (Matrix instead of vector because data is stored into projection_matrix_)">translation_</a>);
+<a name="l00199"></a>00199       <span class="comment">//rotate the ith point:</span>
+<a name="l00200"></a>00200       camera_mesh[i] = (Mat) ((Mat)(camera_mesh[i]).t() * <a class="code" href="class_opencv_sf_m_1_1_point_of_view.html#a4593900dcb330a47fdb5a7a1c4e2ad93" title="Rotation matrix R (data is stored into projection_matrix_)">rotation_</a> );
+<a name="l00201"></a>00201     }
+<a name="l00202"></a>00202     pcl::PointCloud&lt;pcl::PointXYZ&gt;::Ptr camera_cloud (
+<a name="l00203"></a>00203       <span class="keyword">new</span> pcl::PointCloud&lt;pcl::PointXYZ&gt;);
+<a name="l00204"></a>00204     mapping::convert_OpenCV_vector( camera_mesh, *camera_cloud );
+<a name="l00205"></a>00205 
+<a name="l00206"></a>00206     <span class="comment">//now create the mesh himself:</span>
+<a name="l00207"></a>00207     std::vector&lt;pcl::Vertices&gt; vertices;
+<a name="l00208"></a>00208     pcl::Vertices vertice;
+<a name="l00209"></a>00209     vertice.vertices.push_back(0);
+<a name="l00210"></a>00210     vertice.vertices.push_back(1);
+<a name="l00211"></a>00211     vertice.vertices.push_back(2);
+<a name="l00212"></a>00212     vertice.vertices.push_back(3);
+<a name="l00213"></a>00213     vertices.push_back( vertice ); vertice.vertices.clear();
+<a name="l00214"></a>00214     vertice.vertices.push_back(0);
+<a name="l00215"></a>00215     vertice.vertices.push_back(1);
+<a name="l00216"></a>00216     vertice.vertices.push_back(4);
+<a name="l00217"></a>00217     vertices.push_back( vertice ); vertice.vertices.clear();
+<a name="l00218"></a>00218     vertice.vertices.push_back(1);
+<a name="l00219"></a>00219     vertice.vertices.push_back(2);
+<a name="l00220"></a>00220     vertice.vertices.push_back(4);
+<a name="l00221"></a>00221     vertices.push_back( vertice ); vertice.vertices.clear();
+<a name="l00222"></a>00222     vertice.vertices.push_back(2);
+<a name="l00223"></a>00223     vertice.vertices.push_back(3);
+<a name="l00224"></a>00224     vertice.vertices.push_back(4);
+<a name="l00225"></a>00225     vertices.push_back( vertice ); vertice.vertices.clear();
+<a name="l00226"></a>00226     vertice.vertices.push_back(3);
+<a name="l00227"></a>00227     vertice.vertices.push_back(0);
+<a name="l00228"></a>00228     vertice.vertices.push_back(4);
+<a name="l00229"></a>00229     vertices.push_back( vertice ); vertice.vertices.clear();
+<a name="l00230"></a>00230 
+<a name="l00231"></a>00231     pcl::PolygonMesh triangles;
+<a name="l00232"></a>00232     sensor_msgs::PointCloud2 msg;
+<a name="l00233"></a>00233     pcl::toROSMsg( *camera_cloud, msg);
+<a name="l00234"></a>00234     triangles.cloud = msg;
+<a name="l00235"></a>00235     triangles.polygons = vertices;
+<a name="l00236"></a>00236 
+<a name="l00237"></a>00237     <span class="comment">//pcl::io::saveVTKFile (&quot;mesh.vtk&quot;, triangles);</span>
+<a name="l00238"></a>00238     <span class="comment">//now add mesh to the viewer:</span>
+<a name="l00239"></a>00239     viewer-&gt;addPolygonMesh&lt;pcl::PointXYZ&gt;(camera_cloud, vertices, name, viewport);
+<a name="l00240"></a>00240     <span class="comment">//viewer-&gt;setShapeRenderingProperties(</span>
+<a name="l00241"></a>00241     <span class="comment">//  pcl::visualization::PCL_VISUALIZER_LINE_WIDTH, 5, name);</span>
+<a name="l00242"></a>00242 
+<a name="l00243"></a>00243     viewer-&gt;addPointCloud&lt;pcl::PointXYZ&gt;(camera_cloud, name);
+<a name="l00244"></a>00244     viewer-&gt;setPointCloudRenderingProperties (
+<a name="l00245"></a>00245       pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 5, name);
+<a name="l00246"></a>00246   }
+<a name="l00247"></a>00247 }
 </pre></div></div>
 </div>
 <!-- window showing the filter options -->
@@ -129,7 +323,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Mon May 30 2011 17:50:29 for GSoC2011SfM by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Mon Jul 25 2011 12:41:00 for GSoC2011SfM by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

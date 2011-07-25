@@ -73,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00011"></a>00011 
 <a name="l00012"></a>00012   <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#a7951c403bff3a75b6a2decdfa8b685bc">CameraPinhole::CameraPinhole</a>(Mat intra_params<span class="comment">/*=Mat::eye(3, 3, CV_64F)*/</span>,<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> wantedEstimation<span class="comment">/*=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM*/</span>)
 <a name="l00013"></a>00013   {
-<a name="l00014"></a>00014     CV_Assert( intra_params.rows==3 &amp;&amp; intra_params.cols==3 );
+<a name="l00014"></a>00014     CV_DbgAssert( intra_params.rows==3 &amp;&amp; intra_params.cols==3 );
 <a name="l00015"></a>00015 
 <a name="l00016"></a>00016     intra_params.convertTo(this-&gt;<a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ac60a2fb4ca15534d0b361628837f9286" title="store intra parameters(3*3 matrix). This matrix contains focal informations, principal point coordina...">intra_params_</a>,CV_64F);
 <a name="l00017"></a>00017     this-&gt;<a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ad6bf92278db0c35e220accd087a05701" title="This is the inverse transformation of intra_params_. Used to speed up calculus...">inv_intra_params_</a> = intra_params.inv();
@@ -96,7 +96,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00034"></a><a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#aeecb985ac673ca4d8658ebdbca291dd0">00034</a>   <span class="keywordtype">void</span> <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#aeecb985ac673ca4d8658ebdbca291dd0">CameraPinhole::updateIntrinsicMatrix</a>(cv::Mat newParams,<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> intraValues<span class="comment">/*=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM*/</span>)
 <a name="l00035"></a>00035   {
 <a name="l00036"></a>00036 
-<a name="l00037"></a>00037     CV_Assert( !newParams.empty() || (newParams.rows==3) || (newParams.cols==3) );
+<a name="l00037"></a>00037     CV_DbgAssert( !newParams.empty() || (newParams.rows==3) || (newParams.cols==3) );
 <a name="l00038"></a>00038     <span class="comment">//to be sure that newParams has correct type:</span>
 <a name="l00039"></a>00039     Mat correctMat;
 <a name="l00040"></a>00040     newParams.convertTo(correctMat,CV_64F);
@@ -130,8 +130,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00068"></a>00068     <span class="keywordflow">return</span> vector&lt;Vec4d&gt;();
 <a name="l00069"></a>00069   }
 <a name="l00070"></a>00070 
-<a name="l00071"></a><a class="code" href="class_opencv_sf_m_1_1_camera_pinhole_distor.html#a506e945a43e874cc6235625c2a9cc064">00071</a>   vector&lt;Vec2d&gt; <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ac289202ffff97def7c6287cfb3e3040d">CameraPinhole::pixelToNormImageCoordinates</a>(vector&lt;Vec2d&gt; points)
-<a name="l00072"></a>00072   {
+<a name="l00071"></a><a class="code" href="class_opencv_sf_m_1_1_camera_pinhole_distor.html#a4599ad282967c60bc4e3046067202b56">00071</a>   vector&lt;Vec2d&gt; <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#a32a5479b19a8a14f392dab21395669f6">CameraPinhole::pixelToNormImageCoordinates</a>(vector&lt;Vec2d&gt; points)<span class="keyword"> const</span>
+<a name="l00072"></a>00072 <span class="keyword">  </span>{
 <a name="l00073"></a>00073     vector&lt;Vec2d&gt; newCoordinates;
 <a name="l00074"></a>00074     <span class="keywordtype">double</span>* ptrIntraParam=(<span class="keywordtype">double</span>*)<a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ad6bf92278db0c35e220accd087a05701" title="This is the inverse transformation of intra_params_. Used to speed up calculus...">inv_intra_params_</a>.data;
 <a name="l00075"></a>00075     <span class="comment">//for each 2D point, use inv_intra to compute 2D point:</span>
@@ -143,47 +143,69 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00083"></a>00083 <span class="comment">      Vec3d pointNorm((*point)[0],(*point)[1],1);</span>
 <a name="l00084"></a>00084 <span class="comment">      Mat pointNormImageCoordinate=inv_intra_params_ * Mat(pointNorm);</span>
 <a name="l00085"></a>00085 <span class="comment">      double * dataPointImageCoordinate = (double *) pointNormImageCoordinate.data;</span>
-<a name="l00086"></a>00086 <span class="comment">      Vec2d point2D(dataPointImageCoordinate[0]/dataPointImageCoordinate[2],dataPointImageCoordinate[1]/dataPointImageCoordinate[2]);</span>
-<a name="l00087"></a>00087 <span class="comment">      newCoordinates.push_back(point2D);</span>
-<a name="l00088"></a>00088 <span class="comment">      */</span>
-<a name="l00089"></a>00089 
-<a name="l00091"></a>00091       <span class="comment">//But this is faster (as intra matrix has only 5 values) :</span>
-<a name="l00092"></a>00092       newCoordinates.push_back(Vec2d(ptrIntraParam[0] * (*point)[0] + ptrIntraParam[1] * (*point)[1] + ptrIntraParam[2],
-<a name="l00093"></a>00093         ptrIntraParam[4] * (*point)[1] + ptrIntraParam[5]));
-<a name="l00094"></a>00094 
-<a name="l00095"></a>00095       point++;
-<a name="l00096"></a>00096     }
-<a name="l00097"></a>00097     <span class="keywordflow">return</span> newCoordinates;
-<a name="l00098"></a>00098   }
-<a name="l00099"></a>00099 
-<a name="l00100"></a><a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#aa844cae56eaa43784b3420bcddaacdd6">00100</a>   vector&lt;Vec2d&gt; <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#aa844cae56eaa43784b3420bcddaacdd6">CameraPinhole::normImageToPixelCoordinates</a>(std::vector&lt;cv::Vec2d&gt; points)
-<a name="l00101"></a>00101   {
-<a name="l00102"></a>00102     vector&lt;Vec2d&gt; newCoordinates;
-<a name="l00103"></a>00103     <span class="comment">//for each 2D point, use intra params to compute 2D point:</span>
-<a name="l00104"></a>00104     <span class="keywordtype">double</span>* ptrIntraParam=(<span class="keywordtype">double</span>*)<a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ac60a2fb4ca15534d0b361628837f9286" title="store intra parameters(3*3 matrix). This matrix contains focal informations, principal point coordina...">intra_params_</a>.data;
-<a name="l00105"></a>00105 
-<a name="l00106"></a>00106     vector&lt;Vec2d&gt;::iterator point=points.begin();
-<a name="l00107"></a>00107     <span class="keywordflow">while</span>(point!=points.end())
-<a name="l00108"></a>00108     {
-<a name="l00110"></a>00110       <span class="comment">//Same as pixelToNormImageCoordinates, faster than using matrix multiplication:</span>
-<a name="l00111"></a>00111       newCoordinates.push_back(Vec2d(ptrIntraParam[0] * (*point)[0] + ptrIntraParam[1] * (*point)[1] + ptrIntraParam[2],
-<a name="l00112"></a>00112         ptrIntraParam[4] * (*point)[1] + ptrIntraParam[5]));
-<a name="l00113"></a>00113 
-<a name="l00114"></a>00114       point++;
-<a name="l00115"></a>00115     }
-<a name="l00116"></a>00116     <span class="keywordflow">return</span> newCoordinates;
-<a name="l00117"></a>00117   }
-<a name="l00118"></a>00118 
-<a name="l00119"></a>00119   Mat <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ad42158ee2722c73c6935a4744c152026">CameraPinhole::computeProjectionMatrix</a>(<span class="keyword">const</span> Mat &amp;rotation,<span class="keyword">const</span> Vec3d &amp;translation)
-<a name="l00120"></a>00120   {
-<a name="l00121"></a>00121     <span class="comment">//P = K [R|t]</span>
-<a name="l00122"></a>00122     <span class="comment">//Get [R|t]:</span>
-<a name="l00123"></a>00123     Mat Rt=<a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ad42158ee2722c73c6935a4744c152026">Camera::computeProjectionMatrix</a>(rotation,translation);
-<a name="l00124"></a>00124 
-<a name="l00125"></a>00125     <span class="comment">//compute K * Rt</span>
-<a name="l00126"></a>00126     <span class="keywordflow">return</span> this-&gt;<a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ac60a2fb4ca15534d0b361628837f9286" title="store intra parameters(3*3 matrix). This matrix contains focal informations, principal point coordina...">intra_params_</a> * Rt;
-<a name="l00127"></a>00127   }
-<a name="l00128"></a>00128 }
+<a name="l00086"></a>00086 <span class="comment">      Vec2d point2D(dataPointImageCoordinate[0]/dataPointImageCoordinate[2],</span>
+<a name="l00087"></a>00087 <span class="comment">        dataPointImageCoordinate[1]/dataPointImageCoordinate[2]);</span>
+<a name="l00088"></a>00088 <span class="comment">      newCoordinates.push_back(point2D);</span>
+<a name="l00089"></a>00089 <span class="comment">      */</span>
+<a name="l00090"></a>00090 
+<a name="l00092"></a>00092       <span class="comment">//But this is faster (as intra matrix has only 5 values) :</span>
+<a name="l00093"></a>00093       newCoordinates.push_back(Vec2d(ptrIntraParam[0] * (*point)[0] + ptrIntraParam[1] * (*point)[1] + ptrIntraParam[2],
+<a name="l00094"></a>00094         ptrIntraParam[4] * (*point)[1] + ptrIntraParam[5]));
+<a name="l00095"></a>00095 
+<a name="l00096"></a>00096       point++;
+<a name="l00097"></a>00097     }
+<a name="l00098"></a>00098     <span class="keywordflow">return</span> newCoordinates;
+<a name="l00099"></a>00099   }
+<a name="l00100"></a>00100 
+<a name="l00101"></a><a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#a96954b793843fd8cf9a568b2c21f3a87">00101</a>   vector&lt;Vec2d&gt; <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#a96954b793843fd8cf9a568b2c21f3a87">CameraPinhole::normImageToPixelCoordinates</a>(std::vector&lt;cv::Vec2d&gt; points)<span class="keyword"> const</span>
+<a name="l00102"></a>00102 <span class="keyword">  </span>{
+<a name="l00103"></a>00103     vector&lt;Vec2d&gt; newCoordinates;
+<a name="l00104"></a>00104     <span class="comment">//for each 2D point, use intra params to compute 2D point:</span>
+<a name="l00105"></a>00105     <span class="keywordtype">double</span>* ptrIntraParam=(<span class="keywordtype">double</span>*)<a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ac60a2fb4ca15534d0b361628837f9286" title="store intra parameters(3*3 matrix). This matrix contains focal informations, principal point coordina...">intra_params_</a>.data;
+<a name="l00106"></a>00106 
+<a name="l00107"></a>00107     vector&lt;Vec2d&gt;::iterator point=points.begin();
+<a name="l00108"></a>00108     <span class="keywordflow">while</span>(point!=points.end())
+<a name="l00109"></a>00109     {
+<a name="l00111"></a>00111       <span class="comment">//Same as pixelToNormImageCoordinates, faster than using matrix multiplication:</span>
+<a name="l00112"></a>00112       newCoordinates.push_back(Vec2d(ptrIntraParam[0] * (*point)[0] + ptrIntraParam[1] * (*point)[1] + ptrIntraParam[2],
+<a name="l00113"></a>00113         ptrIntraParam[4] * (*point)[1] + ptrIntraParam[5]));
+<a name="l00114"></a>00114 
+<a name="l00115"></a>00115       point++;
+<a name="l00116"></a>00116     }
+<a name="l00117"></a>00117     <span class="keywordflow">return</span> newCoordinates;
+<a name="l00118"></a>00118   }
+<a name="l00119"></a>00119 
+<a name="l00120"></a><a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#a281b877e525be46fa33cffceed33267b">00120</a>   <span class="keywordtype">double</span> <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#a281b877e525be46fa33cffceed33267b">CameraPinhole::getFocal</a>()<span class="keyword"> const</span>
+<a name="l00121"></a>00121 <span class="keyword">  </span>{
+<a name="l00122"></a>00122     Mat x1 = Mat::zeros(3, 1, CV_64F);
+<a name="l00123"></a>00123     Mat x2 = Mat::zeros(3, 1, CV_64F);
+<a name="l00124"></a>00124     x1.at&lt;<span class="keywordtype">double</span>&gt;(0,0) = <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ac60a2fb4ca15534d0b361628837f9286" title="store intra parameters(3*3 matrix). This matrix contains focal informations, principal point coordina...">intra_params_</a>.at&lt;<span class="keywordtype">double</span>&gt;(0,2);
+<a name="l00125"></a>00125     x1.at&lt;<span class="keywordtype">double</span>&gt;(1,0) = <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ac60a2fb4ca15534d0b361628837f9286" title="store intra parameters(3*3 matrix). This matrix contains focal informations, principal point coordina...">intra_params_</a>.at&lt;<span class="keywordtype">double</span>&gt;(1,2);
+<a name="l00126"></a>00126     x1.at&lt;<span class="keywordtype">double</span>&gt;(2,0) = 1.0;
+<a name="l00127"></a>00127     x2.at&lt;<span class="keywordtype">double</span>&gt;(0,0) = 0;
+<a name="l00128"></a>00128     x2.at&lt;<span class="keywordtype">double</span>&gt;(1,0) = 0;
+<a name="l00129"></a>00129     x2.at&lt;<span class="keywordtype">double</span>&gt;(2,0) = 1.0;
+<a name="l00130"></a>00130     Mat omega = ( <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ac60a2fb4ca15534d0b361628837f9286" title="store intra parameters(3*3 matrix). This matrix contains focal informations, principal point coordina...">intra_params_</a> * <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ac60a2fb4ca15534d0b361628837f9286" title="store intra parameters(3*3 matrix). This matrix contains focal informations, principal point coordina...">intra_params_</a>.t() ).inv();
+<a name="l00131"></a>00131 
+<a name="l00132"></a>00132     <span class="keywordtype">double</span> upDivision = ((Mat)(x1.t() * omega * x2)).at&lt;<span class="keywordtype">double</span>&gt;(0,0);
+<a name="l00133"></a>00133     <span class="keywordtype">double</span> tmpDown1 = ((Mat)(x1.t() * omega * x1)).at&lt;<span class="keywordtype">double</span>&gt;(0,0);
+<a name="l00134"></a>00134     <span class="keywordtype">double</span> tmpDown2 = ((Mat)(x2.t() * omega * x2)).at&lt;<span class="keywordtype">double</span>&gt;(0,0);
+<a name="l00135"></a>00135     tmpDown1 = sqrt( tmpDown1 );
+<a name="l00136"></a>00136     tmpDown2 = sqrt( tmpDown2 );
+<a name="l00137"></a>00137 
+<a name="l00138"></a>00138     <span class="keywordtype">double</span> cosAngle = upDivision / ( tmpDown1 * tmpDown2 );
+<a name="l00139"></a>00139     <span class="keywordtype">double</span> angle = acos( cosAngle );
+<a name="l00140"></a>00140 
+<a name="l00141"></a>00141     <span class="comment">//instead of computing the focal using distance in pixels,</span>
+<a name="l00142"></a>00142     <span class="comment">//we use the distance in camera&#39;s coordinates:</span>
+<a name="l00143"></a>00143     <span class="keywordtype">double</span> origin_x = <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ad6bf92278db0c35e220accd087a05701" title="This is the inverse transformation of intra_params_. Used to speed up calculus...">inv_intra_params_</a>.at&lt;<span class="keywordtype">double</span>&gt;(0,2),
+<a name="l00144"></a>00144       origin_y = <a class="code" href="class_opencv_sf_m_1_1_camera_pinhole.html#ad6bf92278db0c35e220accd087a05701" title="This is the inverse transformation of intra_params_. Used to speed up calculus...">inv_intra_params_</a>.at&lt;<span class="keywordtype">double</span>&gt;(1,2);
+<a name="l00145"></a>00145     <span class="keywordtype">double</span> distance = sqrt (  origin_x * origin_x + 
+<a name="l00146"></a>00146       origin_y * origin_y );
+<a name="l00147"></a>00147 
+<a name="l00148"></a>00148     <span class="keywordflow">return</span> origin_y / tan( angle );
+<a name="l00149"></a>00149   }
+<a name="l00150"></a>00150 }
 </pre></div></div>
 </div>
 <!-- window showing the filter options -->
@@ -200,7 +222,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Mon May 30 2011 17:50:29 for GSoC2011SfM by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Mon Jul 25 2011 12:41:00 for GSoC2011SfM by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

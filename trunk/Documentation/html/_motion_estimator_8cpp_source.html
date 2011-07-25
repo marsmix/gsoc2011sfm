@@ -62,17 +62,690 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="contents">
 <div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="preprocessor">#include &quot;MotionEstimator.h&quot;</span>
 <a name="l00002"></a>00002 
-<a name="l00003"></a>00003 
-<a name="l00004"></a>00004 <span class="keyword">namespace </span>OpencvSfM{
-<a name="l00005"></a>00005   MotionEstimator::MotionEstimator(<span class="keywordtype">void</span>)
-<a name="l00006"></a>00006   {
-<a name="l00007"></a>00007   }
-<a name="l00008"></a>00008 
-<a name="l00009"></a>00009 
-<a name="l00010"></a>00010   MotionEstimator::~MotionEstimator(<span class="keywordtype">void</span>)
-<a name="l00011"></a>00011   {
-<a name="l00012"></a>00012   }
-<a name="l00013"></a>00013 }
+<a name="l00003"></a>00003 <span class="preprocessor">#include &lt;iostream&gt;</span>
+<a name="l00004"></a>00004 <span class="preprocessor">#include &lt;sstream&gt;</span>
+<a name="l00005"></a>00005 <span class="keyword">using</span> cv::Ptr;
+<a name="l00006"></a>00006 <span class="keyword">using</span> cv::Mat;
+<a name="l00007"></a>00007 <span class="keyword">using</span> cv::DMatch;
+<a name="l00008"></a>00008 <span class="keyword">using</span> cv::KeyPoint;
+<a name="l00009"></a>00009 <span class="keyword">using</span> std::vector;
+<a name="l00010"></a>00010 <span class="keyword">using</span> cv::Point3d;
+<a name="l00011"></a>00011 
+<a name="l00012"></a>00012 <span class="keyword">namespace </span>OpencvSfM{
+<a name="l00013"></a>00013 
+<a name="l00014"></a>00014 
+<a name="l00015"></a><a class="code" href="class_opencv_sf_m_1_1_track_points.html#a81d7c9f3aba1a3a7eddfa4c9c9501037">00015</a>   <span class="keywordtype">bool</span> <a class="code" href="class_opencv_sf_m_1_1_track_points.html#a81d7c9f3aba1a3a7eddfa4c9c9501037">TrackPoints::addMatch</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> image_src, <span class="keyword">const</span> <span class="keywordtype">int</span> point_idx1)
+<a name="l00016"></a>00016   {
+<a name="l00017"></a>00017     <span class="keywordflow">if</span>( <a class="code" href="class_opencv_sf_m_1_1_track_points.html#afb28751bcf95922c8dea9555b9b8b4dc">track_consistance</a>&lt;0 )
+<a name="l00018"></a>00018       <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00019"></a>00019 
+<a name="l00020"></a>00020     <span class="comment">//If a track contains more than one keypoint in the same image but</span>
+<a name="l00021"></a>00021     <span class="comment">//a different keypoint, it is deemed inconsistent.</span>
+<a name="l00022"></a>00022     vector&lt;unsigned int&gt;::iterator indexImg = images_indexes_.begin();
+<a name="l00023"></a>00023     vector&lt;unsigned int&gt;::iterator end_iter = images_indexes_.end();
+<a name="l00024"></a>00024     <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> index=0;
+<a name="l00025"></a>00025     <span class="keywordflow">while</span>(indexImg != end_iter)
+<a name="l00026"></a>00026     {
+<a name="l00027"></a>00027       <span class="keywordflow">if</span> ( *indexImg == image_src )
+<a name="l00028"></a>00028       {
+<a name="l00029"></a>00029         <span class="keywordflow">if</span>( point_indexes_[index] == point_idx1 )
+<a name="l00030"></a>00030         {
+<a name="l00031"></a>00031           <span class="keywordflow">if</span>( <a class="code" href="class_opencv_sf_m_1_1_track_points.html#afb28751bcf95922c8dea9555b9b8b4dc">track_consistance</a>&gt;=0 )
+<a name="l00032"></a>00032             <a class="code" href="class_opencv_sf_m_1_1_track_points.html#afb28751bcf95922c8dea9555b9b8b4dc">track_consistance</a>++;
+<a name="l00033"></a>00033         }
+<a name="l00034"></a>00034         <span class="keywordflow">else</span>
+<a name="l00035"></a>00035           <a class="code" href="class_opencv_sf_m_1_1_track_points.html#afb28751bcf95922c8dea9555b9b8b4dc">track_consistance</a>=-1;
+<a name="l00036"></a>00036 
+<a name="l00037"></a>00037         <span class="keywordflow">return</span> <a class="code" href="class_opencv_sf_m_1_1_track_points.html#afb28751bcf95922c8dea9555b9b8b4dc">track_consistance</a>&gt;=0;
+<a name="l00038"></a>00038       }
+<a name="l00039"></a>00039       index++;
+<a name="l00040"></a>00040       indexImg++;
+<a name="l00041"></a>00041     }
+<a name="l00042"></a>00042 
+<a name="l00043"></a>00043     images_indexes_.push_back(image_src);
+<a name="l00044"></a>00044     point_indexes_.push_back(point_idx1);
+<a name="l00045"></a>00045     <span class="keywordflow">return</span> <a class="code" href="class_opencv_sf_m_1_1_track_points.html#afb28751bcf95922c8dea9555b9b8b4dc">track_consistance</a>&gt;=0;
+<a name="l00046"></a>00046   }
+<a name="l00047"></a>00047 
+<a name="l00048"></a><a class="code" href="class_opencv_sf_m_1_1_track_points.html#a4cb8aeb5e84db10a79831f06e456da48">00048</a>   <span class="keywordtype">bool</span> <a class="code" href="class_opencv_sf_m_1_1_track_points.html#a4cb8aeb5e84db10a79831f06e456da48">TrackPoints::containImage</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> image_wanted)
+<a name="l00049"></a>00049   {
+<a name="l00050"></a>00050     <span class="keywordflow">if</span>(std::find(images_indexes_.begin(),images_indexes_.end(),image_wanted) ==
+<a name="l00051"></a>00051       images_indexes_.end())
+<a name="l00052"></a>00052       <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00053"></a>00053     <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00054"></a>00054   }
+<a name="l00055"></a>00055 
+<a name="l00056"></a><a class="code" href="class_opencv_sf_m_1_1_track_points.html#ae3cb6075a9f75008ce0df9a831df59f2">00056</a>   <span class="keywordtype">bool</span> <a class="code" href="class_opencv_sf_m_1_1_track_points.html#ae3cb6075a9f75008ce0df9a831df59f2">TrackPoints::containPoint</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> image_src, <span class="keyword">const</span> <span class="keywordtype">int</span> point_idx1)
+<a name="l00057"></a>00057   {
+<a name="l00058"></a>00058     <span class="comment">//we don&#39;t use find here because we want the number instead of iterator...</span>
+<a name="l00059"></a>00059     vector&lt;unsigned int&gt;::iterator indexImg = images_indexes_.begin();
+<a name="l00060"></a>00060     vector&lt;unsigned int&gt;::iterator end_iter = images_indexes_.end();
+<a name="l00061"></a>00061     <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> index=0;
+<a name="l00062"></a>00062     <span class="keywordflow">while</span>(indexImg != end_iter)
+<a name="l00063"></a>00063     {
+<a name="l00064"></a>00064       <span class="keywordflow">if</span> ( *indexImg == image_src )
+<a name="l00065"></a>00065       {
+<a name="l00066"></a>00066         <span class="keywordflow">if</span>( point_indexes_[index] == point_idx1 )
+<a name="l00067"></a>00067           <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00068"></a>00068       }
+<a name="l00069"></a>00069       index++;
+<a name="l00070"></a>00070       indexImg++;
+<a name="l00071"></a>00071     }
+<a name="l00072"></a>00072     <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00073"></a>00073   }
+<a name="l00074"></a>00074 
+<a name="l00075"></a><a class="code" href="class_opencv_sf_m_1_1_track_points.html#afb7bcc282382cee052858f041571e6c6">00075</a>   DMatch <a class="code" href="class_opencv_sf_m_1_1_track_points.html#afb7bcc282382cee052858f041571e6c6">TrackPoints::toDMatch</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> img1,<span class="keyword">const</span> <span class="keywordtype">int</span> img2)<span class="keyword"> const</span>
+<a name="l00076"></a>00076 <span class="keyword">  </span>{
+<a name="l00077"></a>00077     DMatch outMatch;
+<a name="l00078"></a>00078     <span class="keywordtype">char</span> nbFound=0;
+<a name="l00079"></a>00079     <span class="comment">//we don&#39;t use find here because we want the number instead of iterator...</span>
+<a name="l00080"></a>00080     vector&lt;unsigned int&gt;::const_iterator indexImg = images_indexes_.begin();
+<a name="l00081"></a>00081     vector&lt;unsigned int&gt;::const_iterator end_iter = images_indexes_.end();
+<a name="l00082"></a>00082     <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> index=0;
+<a name="l00083"></a>00083     <span class="keywordflow">while</span>(indexImg != end_iter)
+<a name="l00084"></a>00084     {
+<a name="l00085"></a>00085       <span class="keywordflow">if</span> ( *indexImg == img1 )
+<a name="l00086"></a>00086       {
+<a name="l00087"></a>00087         nbFound++;
+<a name="l00088"></a>00088         outMatch.queryIdx = point_indexes_[index];
+<a name="l00089"></a>00089         <span class="keywordflow">if</span>(nbFound==2)
+<a name="l00090"></a>00090           <span class="keywordflow">return</span> outMatch;
+<a name="l00091"></a>00091       }
+<a name="l00092"></a>00092       <span class="keywordflow">if</span> ( *indexImg == img2 )
+<a name="l00093"></a>00093       {
+<a name="l00094"></a>00094         nbFound++;
+<a name="l00095"></a>00095         outMatch.trainIdx = point_indexes_[index];
+<a name="l00096"></a>00096         <span class="keywordflow">if</span>(nbFound==2)
+<a name="l00097"></a>00097           <span class="keywordflow">return</span> outMatch;
+<a name="l00098"></a>00098       }
+<a name="l00099"></a>00099       index++;
+<a name="l00100"></a>00100       indexImg++;
+<a name="l00101"></a>00101     }
+<a name="l00102"></a>00102     <span class="keywordflow">return</span> outMatch;
+<a name="l00103"></a>00103   };
+<a name="l00104"></a>00104 
+<a name="l00105"></a><a class="code" href="class_opencv_sf_m_1_1_track_points.html#a0b8b54db9e01124b204700838696d55c">00105</a>   <span class="keywordtype">void</span> <a class="code" href="class_opencv_sf_m_1_1_track_points.html#a0b8b54db9e01124b204700838696d55c">TrackPoints::getMatch</a>(<span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> index,
+<a name="l00106"></a>00106     <span class="keywordtype">int</span> &amp;idImage, <span class="keywordtype">int</span> &amp;idPoint)<span class="keyword"> const</span>
+<a name="l00107"></a>00107 <span class="keyword">  </span>{
+<a name="l00108"></a>00108     <span class="keywordtype">char</span> nbFound=0;
+<a name="l00109"></a>00109     <span class="keywordflow">if</span>( index &lt; images_indexes_.size() )
+<a name="l00110"></a>00110     {
+<a name="l00111"></a>00111       idImage = images_indexes_[index];
+<a name="l00112"></a>00112       idPoint = point_indexes_[index];
+<a name="l00113"></a>00113     }
+<a name="l00114"></a>00114   };
+<a name="l00115"></a><a class="code" href="class_opencv_sf_m_1_1_track_points.html#acfe4facfa96a35d7200cad7899c6e040">00115</a>   <span class="keywordtype">int</span> <a class="code" href="class_opencv_sf_m_1_1_track_points.html#acfe4facfa96a35d7200cad7899c6e040">TrackPoints::getIndexPoint</a>(<span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> image)<span class="keyword"> const</span>
+<a name="l00116"></a>00116 <span class="keyword">  </span>{
+<a name="l00117"></a>00117     vector&lt;unsigned int&gt;::const_iterator result =
+<a name="l00118"></a>00118       std::find(images_indexes_.begin(),images_indexes_.end(),image);
+<a name="l00119"></a>00119     <span class="keywordflow">if</span>( result == images_indexes_.end())
+<a name="l00120"></a>00120       <span class="keywordflow">return</span> -1;
+<a name="l00121"></a>00121     <span class="keywordflow">return</span> point_indexes_[ result - images_indexes_.begin() ];
+<a name="l00122"></a>00122   };
+<a name="l00123"></a>00123   
+<a name="l00124"></a><a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#abe6cbb0802e42f3b6d5f5124380ebbf3">00124</a>   <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#abe6cbb0802e42f3b6d5f5124380ebbf3">MotionEstimator::MotionEstimator</a>(vector&lt;Ptr&lt;PointsToTrack&gt;&gt; &amp;points_to_track,
+<a name="l00125"></a>00125     Ptr&lt;PointsMatcher&gt; match_algorithm)
+<a name="l00126"></a>00126     :points_to_track_(points_to_track),match_algorithm_(match_algorithm)
+<a name="l00127"></a>00127   {
+<a name="l00128"></a>00128   }
+<a name="l00129"></a>00129 
+<a name="l00130"></a>00130 
+<a name="l00131"></a>00131   MotionEstimator::~MotionEstimator(<span class="keywordtype">void</span>)
+<a name="l00132"></a>00132   {
+<a name="l00133"></a>00133   }
+<a name="l00134"></a>00134 
+<a name="l00135"></a><a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#aa16e47ed98c474d6c1210b706e17b02e">00135</a>   <span class="keywordtype">void</span> <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#aa16e47ed98c474d6c1210b706e17b02e">MotionEstimator::addNewImagesOfPoints</a>(Ptr&lt;PointsToTrack&gt; points)
+<a name="l00136"></a>00136   {
+<a name="l00137"></a>00137     <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a605d6295fff626f9cc2138cb6552f49c">points_to_track_</a>.push_back(points);
+<a name="l00138"></a>00138   }
+<a name="l00139"></a>00139 
+<a name="l00140"></a><a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a85bf74c461a692caed2b73a25e82708b">00140</a>   <span class="keywordtype">void</span> <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a85bf74c461a692caed2b73a25e82708b">MotionEstimator::computeMatches</a>()
+<a name="l00141"></a>00141   {
+<a name="l00142"></a>00142     <span class="comment">//First compute missing features descriptors:</span>
+<a name="l00143"></a>00143     vector&lt;Ptr&lt;PointsToTrack&gt;&gt;::iterator it=<a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a605d6295fff626f9cc2138cb6552f49c">points_to_track_</a>.begin();
+<a name="l00144"></a>00144     vector&lt;Ptr&lt;PointsToTrack&gt;&gt;::iterator end_iter = <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a605d6295fff626f9cc2138cb6552f49c">points_to_track_</a>.end();
+<a name="l00145"></a>00145     <span class="keywordflow">while</span> (it != end_iter)
+<a name="l00146"></a>00146     {
+<a name="l00147"></a>00147       Ptr&lt;PointsToTrack&gt; points_to_track_i=(*it);
+<a name="l00148"></a>00148 
+<a name="l00149"></a>00149       points_to_track_i-&gt;computeKeypointsAndDesc(<span class="keyword">false</span>);
+<a name="l00150"></a>00150 
+<a name="l00151"></a>00151       it++;
+<a name="l00152"></a>00152     }
+<a name="l00153"></a>00153 
+<a name="l00154"></a>00154     <span class="comment">//here, all keypoints and descriptors are computed.</span>
+<a name="l00155"></a>00155     <span class="comment">//Now create and train matcher:</span>
+<a name="l00156"></a>00156     it=<a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a605d6295fff626f9cc2138cb6552f49c">points_to_track_</a>.begin();
+<a name="l00157"></a>00157     <span class="comment">//We skip previous matcher already computed:</span>
+<a name="l00158"></a>00158     it+=<a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a882649c77f5a30fa0298a4b98691c557">matches_</a>.size();
+<a name="l00159"></a>00159     <span class="keywordflow">while</span> (it != end_iter)
+<a name="l00160"></a>00160     {
+<a name="l00161"></a>00161       Ptr&lt;PointsToTrack&gt; points_to_track_i = (*it);
+<a name="l00162"></a>00162       Ptr&lt;PointsMatcher&gt; point_matcher = <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a15ec990cfe7eb43ab6a696816b752ffc">match_algorithm_</a>-&gt;clone(<span class="keyword">true</span>);
+<a name="l00163"></a>00163       point_matcher-&gt;add( points_to_track_i );
+<a name="l00164"></a>00164       point_matcher-&gt;train();
+<a name="l00165"></a>00165       <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a882649c77f5a30fa0298a4b98691c557">matches_</a>.push_back( point_matcher );
+<a name="l00166"></a>00166 
+<a name="l00167"></a>00167       it++;
+<a name="l00168"></a>00168     }
+<a name="l00169"></a>00169 
+<a name="l00170"></a>00170     <span class="comment">//Now we are ready to match each picture with other:</span>
+<a name="l00171"></a>00171     vector&lt;Mat&gt; masks;
+<a name="l00172"></a>00172     vector&lt;Ptr&lt;PointsMatcher&gt;&gt;::iterator matches_it=<a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a882649c77f5a30fa0298a4b98691c557">matches_</a>.begin();
+<a name="l00173"></a>00173     vector&lt;Ptr&lt;PointsMatcher&gt;&gt;::iterator end_matches_it=<a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a882649c77f5a30fa0298a4b98691c557">matches_</a>.end();
+<a name="l00174"></a>00174     <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i=0,j=0;
+<a name="l00175"></a>00175     <span class="keywordflow">while</span> (matches_it != end_matches_it)
+<a name="l00176"></a>00176     {
+<a name="l00177"></a>00177       Ptr&lt;PointsMatcher&gt; point_matcher = (*matches_it);
+<a name="l00178"></a>00178 
+<a name="l00179"></a>00179       <span class="comment">//the folowing vector is computed only the first time</span>
+<a name="l00180"></a>00180 
+<a name="l00181"></a>00181       vector&lt;Ptr&lt;PointsMatcher&gt;&gt;::iterator matches_it1 = matches_it+1;
+<a name="l00182"></a>00182       j=i+1;
+<a name="l00183"></a>00183       <span class="keywordflow">while</span> (matches_it1 != end_matches_it)
+<a name="l00184"></a>00184       {
+<a name="l00185"></a>00185         Ptr&lt;PointsMatcher&gt; point_matcher1 = (*matches_it1);
+<a name="l00186"></a>00186         vector&lt;DMatch&gt; matches_i_j;
+<a name="l00187"></a>00187 
+<a name="l00188"></a>00188         point_matcher-&gt;crossMatch(point_matcher1,matches_i_j,masks);
+<a name="l00190"></a>00190 <span class="comment">//For now we use fundamental function from OpenCV but soon use libmv !</span>
+<a name="l00191"></a>00191 
+<a name="l00192"></a>00192 
+<a name="l00193"></a>00193         <span class="comment">//First compute points matches:</span>
+<a name="l00194"></a>00194         <span class="keywordtype">int</span> size_match=matches_i_j.size();
+<a name="l00195"></a>00195         Mat srcP(1,size_match,CV_32FC2);
+<a name="l00196"></a>00196         Mat destP(1,size_match,CV_32FC2);
+<a name="l00197"></a>00197         vector&lt;uchar&gt; status;
+<a name="l00198"></a>00198 
+<a name="l00199"></a>00199         <span class="comment">//vector&lt;KeyPoint&gt; points1 = point_matcher-&gt;;</span>
+<a name="l00200"></a>00200         <span class="keywordflow">for</span>( <span class="keywordtype">int</span> cpt = 0; cpt &lt; size_match; ++cpt ){
+<a name="l00201"></a>00201           <span class="keyword">const</span> KeyPoint &amp;key1 = point_matcher1-&gt;getKeypoint(
+<a name="l00202"></a>00202             matches_i_j[cpt].queryIdx);
+<a name="l00203"></a>00203           <span class="keyword">const</span> KeyPoint &amp;key2 = point_matcher-&gt;getKeypoint(
+<a name="l00204"></a>00204             matches_i_j[cpt].trainIdx);
+<a name="l00205"></a>00205           srcP.at&lt;<span class="keywordtype">float</span>[2]&gt;(0,cpt)[0] = key1.pt.x;
+<a name="l00206"></a>00206           srcP.at&lt;<span class="keywordtype">float</span>[2]&gt;(0,cpt)[1] = key1.pt.y;
+<a name="l00207"></a>00207           destP.at&lt;<span class="keywordtype">float</span>[2]&gt;(0,cpt)[0] = key2.pt.x;
+<a name="l00208"></a>00208           destP.at&lt;<span class="keywordtype">float</span>[2]&gt;(0,cpt)[1] = key2.pt.y;
+<a name="l00209"></a>00209           status.push_back(1);
+<a name="l00210"></a>00210         }
+<a name="l00211"></a>00211 
+<a name="l00212"></a>00212         Mat fundam = cv::findFundamentalMat(srcP, destP, status, cv::FM_RANSAC);
+<a name="l00213"></a>00213 
+<a name="l00214"></a>00214         <span class="comment">//refine the mathing :</span>
+<a name="l00215"></a>00215         <span class="keywordflow">for</span>( <span class="keywordtype">int</span> cpt = 0; cpt &lt; size_match; ++cpt ){
+<a name="l00216"></a>00216           <span class="keywordflow">if</span>( status[cpt] == 0 )
+<a name="l00217"></a>00217           {
+<a name="l00218"></a>00218             status[cpt] = status[--size_match];
+<a name="l00219"></a>00219             status.pop_back();
+<a name="l00220"></a>00220             matches_i_j[cpt--] = matches_i_j[size_match];
+<a name="l00221"></a>00221             matches_i_j.pop_back();
+<a name="l00222"></a>00222           }
+<a name="l00223"></a>00223         }
+<a name="l00224"></a>00224 
+<a name="l00225"></a>00225 
+<a name="l00227"></a>00227         <span class="keywordflow">if</span>(matches_i_j.size()&gt;mininum_points_matches)
+<a name="l00228"></a>00228           <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a33294de59cf7f51226e2758c244310c5">addMatches</a>(matches_i_j,i,j);
+<a name="l00229"></a>00229         
+<a name="l00230"></a>00230         std::clog&lt;&lt;<span class="stringliteral">&quot;find matches between &quot;</span>&lt;&lt;i&lt;&lt;<span class="stringliteral">&quot; &quot;</span>&lt;&lt;j&lt;&lt;std::endl;
+<a name="l00231"></a>00231         j++;
+<a name="l00232"></a>00232         matches_it1++;
+<a name="l00233"></a>00233       }
+<a name="l00234"></a>00234       i++;
+<a name="l00235"></a>00235       matches_it++;
+<a name="l00236"></a>00236     }
+<a name="l00237"></a>00237   }
+<a name="l00238"></a>00238 
+<a name="l00239"></a><a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a5bc201f748f6b96b9dbba284846ea0d9">00239</a>   <span class="keywordtype">void</span> <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a5bc201f748f6b96b9dbba284846ea0d9">MotionEstimator::keepOnlyCorrectMatches</a>()
+<a name="l00240"></a>00240   {
+<a name="l00241"></a>00241     <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> tracks_size = <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a5100f2fb4dbb34bf9caf3b7b954ad94f">tracks_</a>.size();
+<a name="l00242"></a>00242     <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> index=0;
+<a name="l00243"></a>00243 
+<a name="l00244"></a>00244     <span class="keywordflow">while</span> ( index &lt; tracks_size )
+<a name="l00245"></a>00245     {
+<a name="l00246"></a>00246       <span class="keywordflow">if</span>( <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a5100f2fb4dbb34bf9caf3b7b954ad94f">tracks_</a>[index].getNbTrack() &lt;= mininum_image_matches)
+<a name="l00247"></a>00247       {
+<a name="l00248"></a>00248         <span class="comment">//problem with this track, too small to be consistent</span>
+<a name="l00249"></a>00249         tracks_size--;
+<a name="l00250"></a>00250         <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a5100f2fb4dbb34bf9caf3b7b954ad94f">tracks_</a>[index]=<a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a5100f2fb4dbb34bf9caf3b7b954ad94f">tracks_</a>[tracks_size];
+<a name="l00251"></a>00251         <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a5100f2fb4dbb34bf9caf3b7b954ad94f">tracks_</a>.pop_back();
+<a name="l00252"></a>00252         index--;
+<a name="l00253"></a>00253       }
+<a name="l00254"></a>00254       index++;
+<a name="l00255"></a>00255     }
+<a name="l00256"></a>00256   }
+<a name="l00257"></a>00257 
+<a name="l00258"></a><a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a33294de59cf7f51226e2758c244310c5">00258</a>   <span class="keywordtype">void</span> <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a33294de59cf7f51226e2758c244310c5">MotionEstimator::addMatches</a>(vector&lt;DMatch&gt; &amp;newMatches,
+<a name="l00259"></a>00259     <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> img1, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> img2)
+<a name="l00260"></a>00260   {
+<a name="l00261"></a>00261     <span class="comment">//add to tracks_ the new matches:</span>
+<a name="l00262"></a>00262 
+<a name="l00263"></a>00263     vector&lt;DMatch&gt;::iterator match_it = newMatches.begin();
+<a name="l00264"></a>00264     vector&lt;DMatch&gt;::iterator match_it_end = newMatches.end();
+<a name="l00265"></a>00265 
+<a name="l00266"></a>00266     <span class="keywordflow">while</span> ( match_it != match_it_end )
+<a name="l00267"></a>00267     {
+<a name="l00268"></a>00268       DMatch &amp;point_matcher = (*match_it);
+<a name="l00269"></a>00269 
+<a name="l00270"></a>00270       <span class="keywordtype">bool</span> is_found=<span class="keyword">false</span>;
+<a name="l00271"></a>00271       vector&lt;TrackPoints&gt;::iterator tracks_it = <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a5100f2fb4dbb34bf9caf3b7b954ad94f">tracks_</a>.begin();
+<a name="l00272"></a>00272       <span class="keywordflow">while</span> ( tracks_it != <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a5100f2fb4dbb34bf9caf3b7b954ad94f">tracks_</a>.end() &amp;&amp; !is_found )
+<a name="l00273"></a>00273       {
+<a name="l00274"></a>00274         <a class="code" href="class_opencv_sf_m_1_1_track_points.html" title="This class store the track of keypoints. A track is a connected set of matching keypoints across mult...">TrackPoints</a>&amp; track = (*tracks_it);
+<a name="l00275"></a>00275 
+<a name="l00276"></a>00276         <span class="keywordflow">if</span>(track.<a class="code" href="class_opencv_sf_m_1_1_track_points.html#ae3cb6075a9f75008ce0df9a831df59f2">containPoint</a>(img1,point_matcher.trainIdx))
+<a name="l00277"></a>00277         {
+<a name="l00278"></a>00278           track.<a class="code" href="class_opencv_sf_m_1_1_track_points.html#a81d7c9f3aba1a3a7eddfa4c9c9501037">addMatch</a>(img2,point_matcher.queryIdx);
+<a name="l00279"></a>00279           is_found=<span class="keyword">true</span>;
+<a name="l00280"></a>00280         }
+<a name="l00281"></a>00281         <span class="keywordflow">else</span>
+<a name="l00282"></a>00282           tracks_it++;
+<a name="l00283"></a>00283       }
+<a name="l00284"></a>00284       <span class="keywordflow">if</span>( !is_found )
+<a name="l00285"></a>00285       {
+<a name="l00286"></a>00286         <span class="comment">//it&#39;s a new point match, create a new track:</span>
+<a name="l00287"></a>00287         <a class="code" href="class_opencv_sf_m_1_1_track_points.html" title="This class store the track of keypoints. A track is a connected set of matching keypoints across mult...">TrackPoints</a> newTrack;
+<a name="l00288"></a>00288         newTrack.<a class="code" href="class_opencv_sf_m_1_1_track_points.html#a81d7c9f3aba1a3a7eddfa4c9c9501037">addMatch</a>(img1,point_matcher.trainIdx);
+<a name="l00289"></a>00289         newTrack.<a class="code" href="class_opencv_sf_m_1_1_track_points.html#a81d7c9f3aba1a3a7eddfa4c9c9501037">addMatch</a>(img2,point_matcher.queryIdx);
+<a name="l00290"></a>00290         <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a5100f2fb4dbb34bf9caf3b7b954ad94f">tracks_</a>.push_back(newTrack);
+<a name="l00291"></a>00291       }
+<a name="l00292"></a>00292 
+<a name="l00293"></a>00293       match_it++;
+<a name="l00294"></a>00294     }
+<a name="l00295"></a>00295   }
+<a name="l00296"></a><a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a63b43728e567ba3afc0243c5b489a6e2">00296</a>   <span class="keywordtype">void</span> <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a63b43728e567ba3afc0243c5b489a6e2">MotionEstimator::addTracks</a>(vector&lt;TrackPoints&gt; &amp;newTracks)
+<a name="l00297"></a>00297   {
+<a name="l00298"></a>00298 
+<a name="l00299"></a>00299     vector&lt;TrackPoints&gt;::iterator match_it = newTracks.begin();
+<a name="l00300"></a>00300     vector&lt;TrackPoints&gt;::iterator match_it_end = newTracks.end();
+<a name="l00301"></a>00301 
+<a name="l00302"></a>00302     <span class="keywordflow">while</span> ( match_it != match_it_end )
+<a name="l00303"></a>00303     {
+<a name="l00304"></a>00304       <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a5100f2fb4dbb34bf9caf3b7b954ad94f">tracks_</a>.push_back(*match_it);
+<a name="l00305"></a>00305 
+<a name="l00306"></a>00306       match_it++;
+<a name="l00307"></a>00307     }
+<a name="l00308"></a>00308   }
+<a name="l00309"></a>00309 
+<a name="l00310"></a><a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#ae782f134167187b2e388751c5aea2874">00310</a>   <span class="keywordtype">void</span> <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#ae782f134167187b2e388751c5aea2874">MotionEstimator::showTracks</a>(vector&lt;Mat&gt;&amp; images,
+<a name="l00311"></a>00311     <span class="keywordtype">int</span> timeBetweenImg)
+<a name="l00312"></a>00312   {
+<a name="l00313"></a>00313 
+<a name="l00314"></a>00314     <span class="comment">//First compute missing features descriptors:</span>
+<a name="l00315"></a>00315     <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> it=0;
+<a name="l00316"></a>00316     <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> end_iter = <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a605d6295fff626f9cc2138cb6552f49c">points_to_track_</a>.size() - 1 ;
+<a name="l00317"></a>00317     <span class="keywordflow">if</span>(images.size() - 1 &lt; end_iter)
+<a name="l00318"></a>00318       end_iter = images.size() - 1;
+<a name="l00319"></a>00319     <span class="keywordflow">while</span> (it &lt; end_iter)
+<a name="l00320"></a>00320     {
+<a name="l00321"></a>00321       vector&lt;DMatch&gt; matches_to_print;
+<a name="l00322"></a>00322       <span class="comment">//add to matches_to_print only points of img it and it+1:</span>
+<a name="l00323"></a>00323 
+<a name="l00324"></a>00324       vector&lt;TrackPoints&gt;::iterator match_it = <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a5100f2fb4dbb34bf9caf3b7b954ad94f">tracks_</a>.begin();
+<a name="l00325"></a>00325       vector&lt;TrackPoints&gt;::iterator match_it_end = <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a5100f2fb4dbb34bf9caf3b7b954ad94f">tracks_</a>.end();
+<a name="l00326"></a>00326 
+<a name="l00327"></a>00327       <span class="keywordflow">while</span> ( match_it != match_it_end )
+<a name="l00328"></a>00328       {
+<a name="l00329"></a>00329         <span class="keywordflow">if</span>( match_it-&gt;containImage(it) &amp;&amp;
+<a name="l00330"></a>00330           match_it-&gt;containImage(it+1) )
+<a name="l00331"></a>00331         {
+<a name="l00332"></a>00332           matches_to_print.push_back(match_it-&gt;toDMatch(it,it+1));
+<a name="l00333"></a>00333         }
+<a name="l00334"></a>00334         match_it++;
+<a name="l00335"></a>00335       }
+<a name="l00336"></a>00336 
+<a name="l00337"></a>00337       Mat firstImg=images[ it ];
+<a name="l00338"></a>00338       Mat outImg;
+<a name="l00339"></a>00339 
+<a name="l00340"></a>00340       <a class="code" href="class_opencv_sf_m_1_1_points_matcher.html#aa3ddc09d6225a4c167760f17c2999ae3">PointsMatcher::drawMatches</a>(firstImg, <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a605d6295fff626f9cc2138cb6552f49c">points_to_track_</a>[it]-&gt;getKeypoints(),
+<a name="l00341"></a>00341         <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a605d6295fff626f9cc2138cb6552f49c">points_to_track_</a>[ it + 1 ]-&gt;getKeypoints(),
+<a name="l00342"></a>00342         matches_to_print, outImg,
+<a name="l00343"></a>00343         cv::Scalar::all(-1), cv::Scalar::all(-1), vector&lt;char&gt;(),
+<a name="l00344"></a>00344         cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
+<a name="l00345"></a>00345 
+<a name="l00346"></a>00346       imshow(<span class="stringliteral">&quot;showTracks&quot;</span>,outImg);
+<a name="l00347"></a>00347       cv::waitKey(timeBetweenImg);
+<a name="l00348"></a>00348 
+<a name="l00349"></a>00349       it++;
+<a name="l00350"></a>00350     }
+<a name="l00351"></a>00351   }
+<a name="l00352"></a>00352 
+<a name="l00353"></a>00353   <span class="keywordtype">void</span> MotionEstimator::read( <span class="keyword">const</span> cv::FileNode&amp; node, <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html" title="This class tries to match points in the entire sequence. It follow ideas proposed by Noah Snavely: Mo...">MotionEstimator</a>&amp; me )
+<a name="l00354"></a>00354   {
+<a name="l00355"></a>00355     std::string myName=node.name();
+<a name="l00356"></a>00356     <span class="keywordflow">if</span>( myName != <span class="stringliteral">&quot;MotionEstimator&quot;</span>)
+<a name="l00357"></a>00357       <span class="keywordflow">return</span>;<span class="comment">//this node is not for us...</span>
+<a name="l00358"></a>00358 
+<a name="l00359"></a>00359     <span class="keywordflow">if</span>( node.empty() || !node.isMap() )
+<a name="l00360"></a>00360       CV_Error( CV_StsError, <span class="stringliteral">&quot;MotionEstimator FileNode is not correct!&quot;</span> );
+<a name="l00361"></a>00361 
+<a name="l00362"></a>00362     <span class="keywordtype">int</span> nb_pictures = (int) node[<span class="stringliteral">&quot;nbPictures&quot;</span>];
+<a name="l00363"></a>00363     <span class="comment">//initialisation of various vector (empty)</span>
+<a name="l00364"></a>00364     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;nb_pictures; i++)
+<a name="l00365"></a>00365     {
+<a name="l00366"></a>00366       Ptr&lt;PointsToTrack&gt; ptt = Ptr&lt;PointsToTrack&gt;(<span class="keyword">new</span> <a class="code" href="class_opencv_sf_m_1_1_points_to_track.html" title="This class can be used to store informations about point and features. This is an abstract class: you...">PointsToTrack</a>());
+<a name="l00367"></a>00367       me.<a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a605d6295fff626f9cc2138cb6552f49c">points_to_track_</a>.push_back(ptt);
+<a name="l00368"></a>00368 
+<a name="l00369"></a>00369       Ptr&lt;PointsMatcher&gt; p_m = Ptr&lt;PointsMatcher&gt;(<span class="keyword">new</span> <a class="code" href="class_opencv_sf_m_1_1_points_matcher.html" title="A class used for matching descriptors that can be described as vectors in a finite-dimensional space...">PointsMatcher</a>(
+<a name="l00370"></a>00370         *me.<a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a15ec990cfe7eb43ab6a696816b752ffc">match_algorithm_</a> ));
+<a name="l00371"></a>00371       p_m-&gt;add(ptt);
+<a name="l00372"></a>00372 
+<a name="l00373"></a>00373       me.<a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a882649c77f5a30fa0298a4b98691c557">matches_</a>.push_back(p_m);
+<a name="l00374"></a>00374     }
+<a name="l00375"></a>00375 
+<a name="l00376"></a>00376     cv::FileNode&amp; node_TrackPoints = node[<span class="stringliteral">&quot;TrackPoints&quot;</span>];
+<a name="l00377"></a>00377 
+<a name="l00378"></a>00378     <span class="comment">//tracks are stored in the following form:</span>
+<a name="l00379"></a>00379     <span class="comment">//list of track where a track is stored like this:</span>
+<a name="l00380"></a>00380     <span class="comment">// nbPoints idImage1 point1  idImage2 point2 ...</span>
+<a name="l00381"></a>00381     <span class="keywordflow">if</span>( node_TrackPoints.empty() || !node_TrackPoints.isSeq() )
+<a name="l00382"></a>00382       CV_Error( CV_StsError, <span class="stringliteral">&quot;MotionEstimator FileNode is not correct!&quot;</span> );
+<a name="l00383"></a>00383     cv::FileNodeIterator it = node_TrackPoints.begin(),
+<a name="l00384"></a>00384       it_end = node_TrackPoints.end();
+<a name="l00385"></a>00385     <span class="keywordflow">while</span>( it != it_end )
+<a name="l00386"></a>00386     {
+<a name="l00387"></a>00387       cv::FileNode it_track = (*it)[0];
+<a name="l00388"></a>00388       <span class="keywordtype">int</span> nbPoints,track_consistance;
+<a name="l00389"></a>00389       it_track[<span class="stringliteral">&quot;nbPoints&quot;</span>] &gt;&gt; nbPoints;
+<a name="l00390"></a>00390       it_track[<span class="stringliteral">&quot;track_consistance&quot;</span>] &gt;&gt; track_consistance;
+<a name="l00391"></a>00391       TrackPoints track;
+<a name="l00392"></a>00392       cv::FileNodeIterator itPoints = it_track[<span class="stringliteral">&quot;track&quot;</span>].begin(),
+<a name="l00393"></a>00393         itPoints_end = it_track[<span class="stringliteral">&quot;track&quot;</span>].end();
+<a name="l00394"></a>00394       <span class="keywordflow">while</span>( itPoints != itPoints_end )
+<a name="l00395"></a>00395       {
+<a name="l00396"></a>00396         <span class="keywordtype">int</span> idImage;
+<a name="l00397"></a>00397         cv::KeyPoint kpt;
+<a name="l00398"></a>00398         idImage = (*itPoints)[0];
+<a name="l00399"></a>00399         itPoints++;
+<a name="l00400"></a>00400         kpt.pt.x = (*itPoints)[0];
+<a name="l00401"></a>00401         kpt.pt.y = (*itPoints)[1];
+<a name="l00402"></a>00402         kpt.size = (*itPoints)[2];
+<a name="l00403"></a>00403         kpt.angle = (*itPoints)[3];
+<a name="l00404"></a>00404         kpt.response = (*itPoints)[4];
+<a name="l00405"></a>00405         kpt.octave = (*itPoints)[5];
+<a name="l00406"></a>00406         kpt.class_id = (*itPoints)[6];
+<a name="l00407"></a>00407 
+<a name="l00408"></a>00408         <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> point_index = me.<a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a605d6295fff626f9cc2138cb6552f49c">points_to_track_</a>[idImage]-&gt;
+<a name="l00409"></a>00409           addKeypoint( kpt );
+<a name="l00410"></a>00410         track.addMatch(idImage,point_index);
+<a name="l00411"></a>00411 
+<a name="l00412"></a>00412         itPoints++;
+<a name="l00413"></a>00413       }
+<a name="l00414"></a>00414       track.track_consistance = track_consistance;
+<a name="l00415"></a>00415       me.<a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a5100f2fb4dbb34bf9caf3b7b954ad94f">tracks_</a>.push_back(track);
+<a name="l00416"></a>00416       it++;
+<a name="l00417"></a>00417     }
+<a name="l00418"></a>00418   }
+<a name="l00419"></a>00419 
+<a name="l00420"></a>00420   <span class="keywordtype">void</span> MotionEstimator::write( cv::FileStorage&amp; fs, <span class="keyword">const</span> MotionEstimator&amp; me )
+<a name="l00421"></a>00421   {
+<a name="l00422"></a>00422     vector&lt;TrackPoints&gt;::size_type key_size = me.tracks_.size();
+<a name="l00423"></a>00423     <span class="keywordtype">int</span> idImage=-1, idPoint=-1;
+<a name="l00424"></a>00424 
+<a name="l00425"></a>00425     fs &lt;&lt; <span class="stringliteral">&quot;MotionEstimator&quot;</span> &lt;&lt; <span class="stringliteral">&quot;{&quot;</span>;
+<a name="l00426"></a>00426     fs &lt;&lt; <span class="stringliteral">&quot;nbPictures&quot;</span> &lt;&lt; (int)me.points_to_track_.size();
+<a name="l00427"></a>00427     fs &lt;&lt; <span class="stringliteral">&quot;TrackPoints&quot;</span> &lt;&lt; <span class="stringliteral">&quot;[&quot;</span>;
+<a name="l00428"></a>00428     <span class="keywordflow">for</span> (vector&lt;TrackPoints&gt;::size_type i=0; i &lt; key_size; i++)
+<a name="l00429"></a>00429     {
+<a name="l00430"></a>00430       <span class="keyword">const</span> TrackPoints &amp;track = me.tracks_[i];
+<a name="l00431"></a>00431       <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> nbPoints = track.getNbTrack();
+<a name="l00432"></a>00432       <span class="keywordflow">if</span>( nbPoints &gt; 0)
+<a name="l00433"></a>00433       {
+<a name="l00434"></a>00434         fs &lt;&lt; <span class="stringliteral">&quot;{&quot;</span> &lt;&lt; <span class="stringliteral">&quot;nbPoints&quot;</span> &lt;&lt; (int)nbPoints;
+<a name="l00435"></a>00435         fs &lt;&lt; <span class="stringliteral">&quot;track_consistance&quot;</span> &lt;&lt; track.track_consistance;
+<a name="l00436"></a>00436         fs &lt;&lt; <span class="stringliteral">&quot;track&quot;</span> &lt;&lt; <span class="stringliteral">&quot;[:&quot;</span>;
+<a name="l00437"></a>00437         <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> j = 0; j &lt; nbPoints ; j++)
+<a name="l00438"></a>00438         {
+<a name="l00439"></a>00439           idImage = track.images_indexes_[j];
+<a name="l00440"></a>00440           idPoint = track.point_indexes_[j];
+<a name="l00441"></a>00441           <span class="keywordflow">if</span>( idImage&gt;=0 &amp;&amp; idPoint&gt;=0 )
+<a name="l00442"></a>00442           {
+<a name="l00443"></a>00443             fs &lt;&lt; idImage;
+<a name="l00444"></a>00444             fs  &lt;&lt; <span class="stringliteral">&quot;[:&quot;</span>;
+<a name="l00445"></a>00445 
+<a name="l00446"></a>00446             <span class="keyword">const</span> cv::KeyPoint kpt = me.points_to_track_[idImage]-&gt;
+<a name="l00447"></a>00447               getKeypoints()[idPoint];
+<a name="l00448"></a>00448             cv::write(fs, kpt.pt.x);
+<a name="l00449"></a>00449             cv::write(fs, kpt.pt.y);
+<a name="l00450"></a>00450             cv::write(fs, kpt.size);
+<a name="l00451"></a>00451             cv::write(fs, kpt.angle);
+<a name="l00452"></a>00452             cv::write(fs, kpt.response);
+<a name="l00453"></a>00453             cv::write(fs, kpt.octave);
+<a name="l00454"></a>00454             cv::write(fs, kpt.class_id);
+<a name="l00455"></a>00455             fs &lt;&lt; <span class="stringliteral">&quot;]&quot;</span> ;
+<a name="l00456"></a>00456           }
+<a name="l00457"></a>00457         }
+<a name="l00458"></a>00458         fs &lt;&lt; <span class="stringliteral">&quot;]&quot;</span> &lt;&lt; <span class="stringliteral">&quot;}&quot;</span> ;
+<a name="l00459"></a>00459       }
+<a name="l00460"></a>00460     }
+<a name="l00461"></a>00461     fs &lt;&lt; <span class="stringliteral">&quot;]&quot;</span> &lt;&lt; <span class="stringliteral">&quot;}&quot;</span>;
+<a name="l00462"></a>00462   }
+<a name="l00463"></a>00463 
+<a name="l00464"></a><a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a7c2d9ad2c6de01206703d8717942e9d5">00464</a>   <span class="keywordtype">void</span> <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a7c2d9ad2c6de01206703d8717942e9d5">MotionEstimator::triangulateNView</a>(vector&lt;PointOfView&gt;&amp; cameras,
+<a name="l00465"></a>00465     vector&lt;cv::Vec3d&gt;&amp; points3D)
+<a name="l00466"></a>00466   {
+<a name="l00467"></a>00467     <span class="comment">//for each points:</span>
+<a name="l00468"></a>00468     vector&lt;TrackPoints&gt;::size_type key_size = <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a5100f2fb4dbb34bf9caf3b7b954ad94f">tracks_</a>.size();
+<a name="l00469"></a>00469     vector&lt;PointOfView&gt;::size_type num_camera = cameras.size();
+<a name="l00470"></a>00470     <span class="keywordtype">int</span> idImage=-1, idPoint=-1;
+<a name="l00471"></a>00471 
+<a name="l00472"></a>00472     libmv::vector&lt;libmv::Mat34&gt; Ps(key_size);
+<a name="l00473"></a>00473     vector&lt;TrackPoints&gt;::size_type i;
+<a name="l00474"></a>00474     <span class="keywordflow">for</span> (i=0; i &lt; num_camera; i++)
+<a name="l00475"></a>00475     {
+<a name="l00476"></a>00476       Mat projTmp = cameras[i].getProjectionMatrix();
+<a name="l00477"></a>00477       Eigen::Map&lt;libmv::Mat43&gt; eigen_tmp((<span class="keywordtype">double</span>*)projTmp.data);
+<a name="l00478"></a>00478       Ps[i] = eigen_tmp.transpose();
+<a name="l00479"></a>00479     }
+<a name="l00480"></a>00480 
+<a name="l00481"></a>00481     <span class="keywordflow">for</span> (i=0; i &lt; key_size; i++)
+<a name="l00482"></a>00482     {
+<a name="l00483"></a>00483       <span class="keyword">const</span> <a class="code" href="class_opencv_sf_m_1_1_track_points.html" title="This class store the track of keypoints. A track is a connected set of matching keypoints across mult...">TrackPoints</a> &amp;track = <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a5100f2fb4dbb34bf9caf3b7b954ad94f">tracks_</a>[i];
+<a name="l00484"></a>00484       <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> nviews = track.images_indexes_.size();
+<a name="l00485"></a>00485 
+<a name="l00486"></a>00486       <span class="comment">/*</span>
+<a name="l00487"></a>00487 <span class="comment">      libmv::vector&lt;libmv::Mat34&gt; Ps_tmp(nviews);</span>
+<a name="l00488"></a>00488 <span class="comment">      for (j = 0; j &lt; nviews; ++j) {</span>
+<a name="l00489"></a>00489 <span class="comment">        int num_camera=track.images_indexes_[j];</span>
+<a name="l00490"></a>00490 <span class="comment">        Ps_tmp[j] = Ps[num_camera];</span>
+<a name="l00491"></a>00491 <span class="comment">      }</span>
+<a name="l00492"></a>00492 <span class="comment">      // Collect the image of point i in each frame.</span>
+<a name="l00493"></a>00493 <span class="comment">      int maxImg=0;</span>
+<a name="l00494"></a>00494 <span class="comment">      for(j = 0;j&lt;nviews;++j)</span>
+<a name="l00495"></a>00495 <span class="comment">        if(maxImg&lt;track.images_indexes_[j])</span>
+<a name="l00496"></a>00496 <span class="comment">          maxImg=track.images_indexes_[j];</span>
+<a name="l00497"></a>00497 <span class="comment"></span>
+<a name="l00498"></a>00498 <span class="comment">      libmv::Mat2X xs(2, nviews);</span>
+<a name="l00499"></a>00499 <span class="comment">      for (j = 0; j &lt; nviews; ++j) {</span>
+<a name="l00500"></a>00500 <span class="comment">        int num_camera=track.images_indexes_[j];</span>
+<a name="l00501"></a>00501 <span class="comment">        int num_point=track.point_indexes_[j];</span>
+<a name="l00502"></a>00502 <span class="comment">        cv::Ptr&lt;PointsToTrack&gt; points2D = points_to_track_[ num_camera ];</span>
+<a name="l00503"></a>00503 <span class="comment">        const KeyPoint&amp; p=points2D-&gt;getKeypoint(num_point);</span>
+<a name="l00504"></a>00504 <span class="comment">        xs.col(j)[0] = p.pt.x;</span>
+<a name="l00505"></a>00505 <span class="comment">        xs.col(j)[1] = p.pt.y;</span>
+<a name="l00506"></a>00506 <span class="comment">      }</span>
+<a name="l00507"></a>00507 <span class="comment">      libmv::Vec4 X;</span>
+<a name="l00508"></a>00508 <span class="comment">      libmv::NViewTriangulate(xs, Ps_tmp, &amp;X);</span>
+<a name="l00509"></a>00509 <span class="comment"></span>
+<a name="l00510"></a>00510 <span class="comment">      double scal_factor=X(3);</span>
+<a name="l00511"></a>00511 <span class="comment">      points3D.push_back(cv::Vec3d(</span>
+<a name="l00512"></a>00512 <span class="comment">        X(0)/scal_factor,</span>
+<a name="l00513"></a>00513 <span class="comment">        X(1)/scal_factor,</span>
+<a name="l00514"></a>00514 <span class="comment">        X(2)/scal_factor));</span>
+<a name="l00515"></a>00515 <span class="comment">      */</span>
+<a name="l00516"></a>00516 
+<a name="l00517"></a>00517       <span class="comment">//extracted from libmv:</span>
+<a name="l00518"></a>00518       
+<a name="l00519"></a>00519       <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> maxImg=0;
+<a name="l00520"></a>00520       <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> cpt=0;cpt&lt;nviews;cpt++)
+<a name="l00521"></a>00521         <span class="keywordflow">if</span>(maxImg&lt;track.images_indexes_[cpt])
+<a name="l00522"></a>00522           maxImg=track.images_indexes_[cpt];
+<a name="l00523"></a>00523       CV_Assert(nviews &lt; cameras.size());
+<a name="l00524"></a>00524 
+<a name="l00525"></a>00525       Mat design = Mat::zeros(3*nviews, 4 + nviews,CV_64FC1);
+<a name="l00526"></a>00526       <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; nviews; i++) {
+<a name="l00527"></a>00527         <span class="keywordtype">int</span> num_camera=track.images_indexes_[i];
+<a name="l00528"></a>00528         <span class="keywordtype">int</span> num_point=track.point_indexes_[i];
+<a name="l00529"></a>00529         cv::Ptr&lt;PointsToTrack&gt; points2D = <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a605d6295fff626f9cc2138cb6552f49c">points_to_track_</a>[ num_camera ];
+<a name="l00530"></a>00530         <span class="keyword">const</span> KeyPoint&amp; p=points2D-&gt;getKeypoint(num_point);
+<a name="l00531"></a>00531 
+<a name="l00532"></a>00532         design(cv::Range(3*i,3*i+3), cv::Range(0,4)) = 
+<a name="l00533"></a>00533           -cameras[num_camera].getProjectionMatrix();
+<a name="l00534"></a>00534         design.at&lt;<span class="keywordtype">double</span>&gt;(3*i + 0, 4 + i) = p.pt.x;
+<a name="l00535"></a>00535         design.at&lt;<span class="keywordtype">double</span>&gt;(3*i + 1, 4 + i) = p.pt.y;
+<a name="l00536"></a>00536         design.at&lt;<span class="keywordtype">double</span>&gt;(3*i + 2, 4 + i) = 1.0;
+<a name="l00537"></a>00537       }
+<a name="l00538"></a>00538       Mat X_and_alphas;
+<a name="l00539"></a>00539       cv::SVD::solveZ(design, X_and_alphas);
+<a name="l00540"></a>00540       
+<a name="l00541"></a>00541       <span class="keywordtype">double</span> scal_factor=X_and_alphas.at&lt;<span class="keywordtype">double</span>&gt;(3,0);
+<a name="l00542"></a>00542 
+<a name="l00543"></a>00543       cv::Vec3d point_final(
+<a name="l00544"></a>00544         X_and_alphas.at&lt;<span class="keywordtype">double</span>&gt;(0,0)/scal_factor,
+<a name="l00545"></a>00545         X_and_alphas.at&lt;<span class="keywordtype">double</span>&gt;(1,0)/scal_factor,
+<a name="l00546"></a>00546         X_and_alphas.at&lt;<span class="keywordtype">double</span>&gt;(2,0)/scal_factor);
+<a name="l00547"></a>00547 
+<a name="l00548"></a>00548       <span class="keywordtype">double</span> distance=0;
+<a name="l00549"></a>00549       <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> cpt = 0; cpt &lt; nviews; cpt++) {
+<a name="l00550"></a>00550         <span class="keywordtype">int</span> num_camera=track.images_indexes_[cpt];
+<a name="l00551"></a>00551         <span class="keywordtype">int</span> num_point=track.point_indexes_[cpt];
+<a name="l00552"></a>00552         cv::Ptr&lt;PointsToTrack&gt; points2D = <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a605d6295fff626f9cc2138cb6552f49c">points_to_track_</a>[ num_camera ];
+<a name="l00553"></a>00553 
+<a name="l00554"></a>00554         <span class="keyword">const</span> KeyPoint&amp; p=points2D-&gt;getKeypoint(num_point);
+<a name="l00555"></a>00555         cv::Vec2d projP = cameras[num_camera].project3DPointIntoImage(point_final);
+<a name="l00556"></a>00556 
+<a name="l00557"></a>00557         <span class="comment">//compute back-projection</span>
+<a name="l00558"></a>00558         distance += ((p.pt.x-projP[0])*(p.pt.x-projP[0]) + 
+<a name="l00559"></a>00559           (p.pt.y-projP[1])*(p.pt.y-projP[1]) );
+<a name="l00560"></a>00560       }
+<a name="l00561"></a>00561       <span class="comment">//this is used to take only correct 3D points:</span>
+<a name="l00562"></a>00562       <span class="keywordflow">if</span>(distance&lt;100 * nviews)
+<a name="l00563"></a>00563         points3D.push_back(point_final);
+<a name="l00564"></a>00564         
+<a name="l00565"></a>00565     }
+<a name="l00566"></a>00566   }
+<a name="l00567"></a>00567 
+<a name="l00568"></a>00568   <span class="keywordtype">void</span> MotionEstimator::triangulateNViewDebug(vector&lt;PointOfView&gt;&amp; cameras,
+<a name="l00569"></a>00569     vector&lt;Mat&gt;&amp; images,
+<a name="l00570"></a>00570     vector&lt;cv::Vec3d&gt;&amp; points3D)
+<a name="l00571"></a>00571   {
+<a name="l00572"></a>00572     std::ofstream OutPoints(<span class="stringliteral">&quot;logPoints1.txt&quot;</span>);
+<a name="l00573"></a>00573     <span class="comment">//for each points:</span>
+<a name="l00574"></a>00574     vector&lt;TrackPoints&gt;::size_type key_size = <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a5100f2fb4dbb34bf9caf3b7b954ad94f">tracks_</a>.size();
+<a name="l00575"></a>00575     vector&lt;PointOfView&gt;::size_type num_camera = cameras.size();
+<a name="l00576"></a>00576     <span class="keywordtype">int</span> idImage=-1, idPoint=-1;
+<a name="l00577"></a>00577 
+<a name="l00578"></a>00578     libmv::vector&lt;libmv::Mat34&gt; Ps(key_size);
+<a name="l00579"></a>00579     vector&lt;TrackPoints&gt;::size_type i;
+<a name="l00580"></a>00580     <span class="keywordflow">for</span> (i=0; i &lt; num_camera; i++)
+<a name="l00581"></a>00581     {
+<a name="l00582"></a>00582       Mat projTmp = cameras[i].getProjectionMatrix();
+<a name="l00583"></a>00583       <span class="keywordtype">double</span>* dataTmp=(<span class="keywordtype">double</span>*)projTmp.data;
+<a name="l00584"></a>00584       Eigen::Map&lt;libmv::Mat43&gt; eigen_tmp(dataTmp);
+<a name="l00585"></a>00585       Ps[i] = eigen_tmp.transpose();
+<a name="l00586"></a>00586     }
+<a name="l00587"></a>00587 
+<a name="l00588"></a>00588     <span class="keywordflow">for</span> (i=0; i &lt; key_size; i++)
+<a name="l00589"></a>00589     {
+<a name="l00590"></a>00590       <span class="keyword">const</span> TrackPoints &amp;track = <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a5100f2fb4dbb34bf9caf3b7b954ad94f">tracks_</a>[i];
+<a name="l00591"></a>00591       <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> nviews = track.images_indexes_.size();
+<a name="l00592"></a>00592 
+<a name="l00593"></a>00593       <span class="comment">//extracted from libmv:</span>
+<a name="l00594"></a>00594 
+<a name="l00595"></a>00595       <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> maxImg=0;
+<a name="l00596"></a>00596       <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> cpt;
+<a name="l00597"></a>00597       <span class="keywordflow">for</span>(cpt=0;cpt&lt;nviews;cpt++)
+<a name="l00598"></a>00598         <span class="keywordflow">if</span>(maxImg&lt;track.images_indexes_[cpt])
+<a name="l00599"></a>00599           maxImg=track.images_indexes_[cpt];
+<a name="l00600"></a>00600       CV_Assert(nviews &lt;= cameras.size());
+<a name="l00601"></a>00601 
+<a name="l00602"></a>00602       Mat design = Mat::zeros(3*nviews, 4 + nviews,CV_64FC1);
+<a name="l00603"></a>00603       <span class="keywordflow">for</span> (cpt = 0; cpt &lt; nviews; cpt++) {
+<a name="l00604"></a>00604         <span class="keywordtype">int</span> num_camera=track.images_indexes_[cpt];
+<a name="l00605"></a>00605         <span class="keywordtype">int</span> num_point=track.point_indexes_[cpt];
+<a name="l00606"></a>00606         cv::Ptr&lt;PointsToTrack&gt; points2D = <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a605d6295fff626f9cc2138cb6552f49c">points_to_track_</a>[ num_camera ];
+<a name="l00607"></a>00607 
+<a name="l00608"></a>00608         <span class="keyword">const</span> KeyPoint&amp; p=points2D-&gt;getKeypoint(num_point);
+<a name="l00609"></a>00609 
+<a name="l00610"></a>00610         design(cv::Range(3*cpt,3*cpt+3), cv::Range(0,4)) = 
+<a name="l00611"></a>00611           - cameras[num_camera].getProjectionMatrix();
+<a name="l00612"></a>00612         design.at&lt;<span class="keywordtype">double</span>&gt;(3*cpt + 0, 4 + cpt) = p.pt.x;
+<a name="l00613"></a>00613         design.at&lt;<span class="keywordtype">double</span>&gt;(3*cpt + 1, 4 + cpt) = p.pt.y;
+<a name="l00614"></a>00614         design.at&lt;<span class="keywordtype">double</span>&gt;(3*cpt + 2, 4 + cpt) = 1.0;
+<a name="l00615"></a>00615       }
+<a name="l00616"></a>00616       Mat X_and_alphas;
+<a name="l00617"></a>00617       cv::SVD::solveZ(design, X_and_alphas);
+<a name="l00618"></a>00618 
+<a name="l00619"></a>00619       <span class="keywordtype">double</span> scal_factor=X_and_alphas.at&lt;<span class="keywordtype">double</span>&gt;(3,0);
+<a name="l00620"></a>00620 
+<a name="l00621"></a>00621       cv::Vec3d point_final(
+<a name="l00622"></a>00622         X_and_alphas.at&lt;<span class="keywordtype">double</span>&gt;(0,0)/scal_factor,
+<a name="l00623"></a>00623         X_and_alphas.at&lt;<span class="keywordtype">double</span>&gt;(1,0)/scal_factor,
+<a name="l00624"></a>00624         X_and_alphas.at&lt;<span class="keywordtype">double</span>&gt;(2,0)/scal_factor);
+<a name="l00625"></a>00625 
+<a name="l00626"></a>00626       OutPoints&lt;&lt;point_final[0]&lt;&lt;<span class="stringliteral">&quot; &quot;</span>&lt;&lt;point_final[1]&lt;&lt;<span class="stringliteral">&quot; &quot;</span>&lt;&lt;point_final[2]&lt;&lt;std::endl;
+<a name="l00627"></a>00627       OutPoints&lt;&lt;<span class="stringliteral">&quot;2D Points&quot;</span>&lt;&lt;std::endl;
+<a name="l00628"></a>00628       <span class="keywordtype">double</span> distance=0;
+<a name="l00629"></a>00629 
+<a name="l00630"></a>00630       <span class="keywordflow">for</span> (cpt = 0; cpt &lt; nviews; cpt++) {
+<a name="l00631"></a>00631         <span class="keywordtype">int</span> num_camera=track.images_indexes_[cpt];
+<a name="l00632"></a>00632         <span class="keywordtype">int</span> num_point=track.point_indexes_[cpt];
+<a name="l00633"></a>00633         cv::Ptr&lt;PointsToTrack&gt; points2D = <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a605d6295fff626f9cc2138cb6552f49c">points_to_track_</a>[ num_camera ];
+<a name="l00634"></a>00634 
+<a name="l00635"></a>00635         <span class="keyword">const</span> KeyPoint&amp; p=points2D-&gt;getKeypoint(num_point);
+<a name="l00636"></a>00636         cv::Vec2d projP = cameras[num_camera].project3DPointIntoImage(point_final);
+<a name="l00637"></a>00637 
+<a name="l00638"></a>00638         <span class="comment">//show the points:</span>
+<a name="l00639"></a>00639 
+<a name="l00640"></a>00640         cv::Scalar color = cv::Scalar( (256), (256), (256) );
+<a name="l00641"></a>00641 
+<a name="l00642"></a>00642         cv::Point center1( cvRound(p.pt.x), cvRound(p.pt.y) );
+<a name="l00643"></a>00643         cv::Point center2( cvRound(projP[0]), cvRound(projP[1]) );
+<a name="l00644"></a>00644         OutPoints&lt;&lt;p.pt.x&lt;&lt;<span class="stringliteral">&quot; &quot;</span>&lt;&lt;p.pt.y&lt;&lt;<span class="stringliteral">&quot; -&gt; &quot;</span>;
+<a name="l00645"></a>00645         OutPoints&lt;&lt;projP[0]&lt;&lt;<span class="stringliteral">&quot; &quot;</span>&lt;&lt;projP[1]&lt;&lt;std::endl;
+<a name="l00646"></a>00646         distance += ((p.pt.x-projP[0])*(p.pt.x-projP[0]) + 
+<a name="l00647"></a>00647           (p.pt.y-projP[1])*(p.pt.y-projP[1]) );
+<a name="l00648"></a>00648 
+<a name="l00649"></a>00649         Mat imgTmp=images[num_camera].clone();
+<a name="l00650"></a>00650         cv::circle( imgTmp, center1, 3, color, 1, CV_AA );
+<a name="l00651"></a>00651         cv::circle( imgTmp, center2, 3, color, 2, CV_AA );
+<a name="l00652"></a>00652         cv::line( imgTmp, center1, center2, color);
+<a name="l00653"></a>00653         std::stringstream windows_name(<span class="stringliteral">&quot;Point &quot;</span>);
+<a name="l00654"></a>00654         windows_name&lt;&lt;cpt;
+<a name="l00655"></a>00655         <span class="comment">//cv::imshow(windows_name.str().c_str(),imgTmp);</span>
+<a name="l00656"></a>00656       }
+<a name="l00657"></a>00657       <span class="keywordflow">if</span>(distance&lt;100 * nviews){
+<a name="l00658"></a>00658         std::cout&lt;&lt;distance&lt;&lt; <span class="stringliteral">&quot; in &quot;</span>&lt;&lt;nviews&lt;&lt;std::endl;
+<a name="l00659"></a>00659         points3D.push_back(point_final);
+<a name="l00660"></a>00660       }
+<a name="l00661"></a>00661       <span class="comment">//cv::waitKey(0);</span>
+<a name="l00662"></a>00662     }
+<a name="l00663"></a>00663     OutPoints.close();
+<a name="l00664"></a>00664 }
+<a name="l00665"></a>00665 
+<a name="l00666"></a>00666   <span class="keywordtype">void</span> MotionEstimator::filterPoints( std::vector&lt;cv::Vec3d&gt; triangulated,
+<a name="l00667"></a>00667     <span class="keywordtype">int</span> index_image, std::vector&lt;cv::Vec3d&gt;&amp; outPoints,
+<a name="l00668"></a>00668     std::vector&lt;cv::KeyPoint&gt;&amp; points2DOrigine)
+<a name="l00669"></a>00669   {
+<a name="l00670"></a>00670     <span class="keywordflow">if</span>(triangulated.size()==0)
+<a name="l00671"></a>00671       <span class="keywordflow">return</span>;
+<a name="l00672"></a>00672     <span class="comment">//for each points:</span>
+<a name="l00673"></a>00673     vector&lt;TrackPoints&gt;::size_type key_size = <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a5100f2fb4dbb34bf9caf3b7b954ad94f">tracks_</a>.size();
+<a name="l00674"></a>00674     vector&lt;KeyPoint&gt; keyp = <a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a605d6295fff626f9cc2138cb6552f49c">points_to_track_</a>[index_image]-&gt;
+<a name="l00675"></a>00675       getKeypoints();
+<a name="l00676"></a>00676     vector&lt;TrackPoints&gt;::size_type i;
+<a name="l00677"></a>00677     <span class="keywordflow">for</span> (i=0; i &lt; key_size; i++)
+<a name="l00678"></a>00678     {
+<a name="l00679"></a>00679       <span class="keywordtype">int</span> point=<a class="code" href="class_opencv_sf_m_1_1_motion_estimator.html#a5100f2fb4dbb34bf9caf3b7b954ad94f">tracks_</a>[i].getIndexPoint(index_image);
+<a name="l00680"></a>00680       <span class="keywordflow">if</span>(point&gt;=0)
+<a name="l00681"></a>00681       {
+<a name="l00682"></a>00682         outPoints.push_back(triangulated[i]);
+<a name="l00683"></a>00683         <span class="keyword">const</span> cv::KeyPoint kpt = keyp[point];
+<a name="l00684"></a>00684         points2DOrigine.push_back( kpt );
+<a name="l00685"></a>00685       }
+<a name="l00686"></a>00686     }
+<a name="l00687"></a>00687   }
+<a name="l00688"></a>00688 }
 </pre></div></div>
 </div>
 <!-- window showing the filter options -->
@@ -89,7 +762,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Mon May 30 2011 17:50:29 for GSoC2011SfM by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Jun 24 2011 19:37:31 for GSoC2011SfM by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

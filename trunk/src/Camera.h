@@ -8,7 +8,7 @@
 #include <vector>
 
 namespace OpencvSfM{
-  class PointOfView;///<We will need this class, but PointOfView need our class too...
+  class PointOfView;//We will need this class, but PointOfView need our class too...
 
 
   /*! \brief This class represent the physical device which take the pictures. 
@@ -81,6 +81,12 @@ namespace OpencvSfM{
     */
     virtual cv::Mat getIntraMatrix() const
     {return cv::Mat::eye(3,3,CV_64FC1);};
+    
+    /**
+    * This method is useful to get the focal from Intrinsic matrix:
+    * @return focal lenght
+    */
+    virtual double getFocal() const=0;
   };
 
 }

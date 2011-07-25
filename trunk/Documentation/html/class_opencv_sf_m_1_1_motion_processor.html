@@ -83,7 +83,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_motion_processor.html#a30629fa0a0f3f9a941a97a27c618e22a">isBidirectional</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_motion_processor.html#a7a14674a19924a56943e9887f0895dee">setInputSource</a> (int idWebCam)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_motion_processor.html#a297d734c62329988c34c06ef007c0532">setInputSource</a> (std::vector&lt; std::string &gt; list_images)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_motion_processor.html#ae590078740f3cbdd3f32f403f0044c2e">setInputSource</a> (std::string nameOfFile, TypeOfMotionProcessor inputType=IS_SINGLE_FILE)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_motion_processor.html#a3afbdfe67a99a1484e7c64d5f7a2c3b2">setInputSource</a> (std::string prefix, std::string suffix, int startNumber=0)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_motion_processor.html#a2314d6d47c9318b1dc61515ce20cf819">getFrame</a> ()</td></tr>
@@ -102,6 +104,7 @@ std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bott
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">If the motion processor use directory as input, we store here the names of files. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_motion_processor.html#a9bb3fdc8916e6d6c00a7a81408a6bbfd">sourceName_</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_motion_processor.html#abbf053cdaf47914a5fe9d5c918d81358">suffix_</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_motion_processor.html#ae4e50c101f03493306dce261283bdbb3">pos_in_loading_process_</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab63e8294f6fdd2491b2bb06788278bfe"></a><!-- doxytag: member="OpencvSfM::MotionProcessor::numFrame_" ref="ab63e8294f6fdd2491b2bb06788278bfe" args="" -->
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_motion_processor.html#ab63e8294f6fdd2491b2bb06788278bfe">numFrame_</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">When the camera is attached to a list of file, numFrame_ will be used to know how many frames we have take. <br/></td></tr>
@@ -119,7 +122,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <div class="textblock"><p>This class try to create a commun interface for files loading. Indeed, if you want to use webcam, avi file of list of files, you will have to do some annoying processing, like iterate the different files of the directory. With <a class="el" href="class_opencv_sf_m_1_1_motion_processor.html" title="This class try to create a commun interface for files loading. Indeed, if you want to use webcam...">MotionProcessor</a>, you can now use a folder of image the same way you use a webcam or a video file. </p>
 <p>The class is still in development as the way to open folder is not really clear... The easy way would be to use "dirent.h" header, but the easy thing is not always the best thing... </p>
 
-<p>Definition at line <a class="el" href="_motion_processor_8h_source.html#l00030">30</a> of file <a class="el" href="_motion_processor_8h_source.html">MotionProcessor.h</a>.</p>
+<p>Definition at line <a class="el" href="_motion_processor_8h_source.html#l00035">35</a> of file <a class="el" href="_motion_processor_8h_source.html">MotionProcessor.h</a>.</p>
 </div><hr/><h2>Member Function Documentation</h2>
 <a class="anchor" id="a2314d6d47c9318b1dc61515ce20cf819"></a><!-- doxytag: member="OpencvSfM::MotionProcessor::getFrame" ref="a2314d6d47c9318b1dc61515ce20cf819" args="()" -->
 <div class="memitem">
@@ -134,16 +137,12 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
       </table>
 </div>
 <div class="memdoc">
-<p>use this method if you want to get a field of view from this camera. Be carreful : this function can return a fake FieldOfView! Indeed, if we are at the end of the video, we can't get an other frame... </p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramname">numFrame</td><td>if you want to get a previously loaded frame, you can use this param. If below 0, get a new frame... </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>a FoV. If the video is finished, the FoV returned is not usable! Test the validity with the bool FieldOfView::isRealFoV() method. </dd></dl>
+<p>use this method if you want to get a picture from this motion handler </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The current frame. If the video is finished, the Mat returned is not usable! Test if the matrix is empty before using it! </dd></dl>
 
-<p>Definition at line <a class="el" href="_motion_processor_8cpp_source.html#l00102">102</a> of file <a class="el" href="_motion_processor_8cpp_source.html">MotionProcessor.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_motion_processor_8cpp_source.html#l00119">119</a> of file <a class="el" href="_motion_processor_8cpp_source.html">MotionProcessor.cpp</a>.</p>
+
+<p>Referenced by <a class="el" href="_sequence_analyzer_8cpp_source.html#l00013">OpencvSfM::SequenceAnalyzer::SequenceAnalyzer()</a>.</p>
 
 </div>
 </div>
@@ -170,34 +169,29 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the value of the property </dd></dl>
 
-<p>Definition at line <a class="el" href="_motion_processor_8cpp_source.html#l00270">270</a> of file <a class="el" href="_motion_processor_8cpp_source.html">MotionProcessor.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_motion_processor_8cpp_source.html#l00287">287</a> of file <a class="el" href="_motion_processor_8cpp_source.html">MotionProcessor.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a7a14674a19924a56943e9887f0895dee"></a><!-- doxytag: member="OpencvSfM::MotionProcessor::setInputSource" ref="a7a14674a19924a56943e9887f0895dee" args="(int idWebCam)" -->
+<a class="anchor" id="a30629fa0a0f3f9a941a97a27c618e22a"></a><!-- doxytag: member="OpencvSfM::MotionProcessor::isBidirectional" ref="a30629fa0a0f3f9a941a97a27c618e22a" args="()" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool OpencvSfM::MotionProcessor::setInputSource </td>
+          <td class="memname">bool OpencvSfM::MotionProcessor::isBidirectional </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>idWebCam</em></td><td>)</td>
-          <td></td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [inline]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
-<p>You can attach this camera to a webcam use this method to set it as the input source! </p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramname">idWebCam</td><td>id of the webcam </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>true if input source opened without problems </dd></dl>
+<p>Use this function to know if this flux is bidirectional (i.e. frames can be iterate randomly) Can be used to know if the sequence is finite </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>true is you can access to frames randomly, false else </dd></dl>
 
-<p>Definition at line <a class="el" href="_motion_processor_8cpp_source.html#l00043">43</a> of file <a class="el" href="_motion_processor_8cpp_source.html">MotionProcessor.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_motion_processor_8h_source.html#l00071">71</a> of file <a class="el" href="_motion_processor_8h_source.html">MotionProcessor.h</a>.</p>
+
+<p>Referenced by <a class="el" href="_sequence_analyzer_8cpp_source.html#l00013">OpencvSfM::SequenceAnalyzer::SequenceAnalyzer()</a>.</p>
 
 </div>
 </div>
@@ -225,7 +219,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
       </table>
 </div>
 <div class="memdoc">
-<p>You can attach this camera to a video file or a single picture. use this method to set it as the input source! </p>
+<p>You can attach this motion handler to a video file or a single picture. use this method to set it as the input source! </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramname">nameOfFile</td><td>name of the media file (picture or avi movie) </td></tr>
@@ -267,12 +261,64 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
       </table>
 </div>
 <div class="memdoc">
-<p>You can attach this camera to a list of file. use this method to set the input source! For example, if the files are img1.jpg, img2.jpg, ... img125.jpg, prefix will be equal to "img", suffix to ".jpg" and startNumber equal to 1 </p>
+<p>You can attach this motion handler to a list of file. use this method to set the input source! For example, if the files are img1.jpg, img2.jpg, ... img125.jpg, prefix will be equal to "img", suffix to ".jpg" and startNumber equal to 1 </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramname">prefix</td><td>the part of the files names which stay the same (img) </td></tr>
     <tr><td class="paramname">suffix</td><td>the type of the files (.jpg for instance) </td></tr>
     <tr><td class="paramname">startNumber</td><td>the first number to use... </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>true if input source opened without problems </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a7a14674a19924a56943e9887f0895dee"></a><!-- doxytag: member="OpencvSfM::MotionProcessor::setInputSource" ref="a7a14674a19924a56943e9887f0895dee" args="(int idWebCam)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool OpencvSfM::MotionProcessor::setInputSource </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>idWebCam</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>You can attach this motion handler to a webcam use this method to set it as the input source! </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">idWebCam</td><td>id of the webcam </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>true if input source opened without problems </dd></dl>
+
+<p>Definition at line <a class="el" href="_motion_processor_8cpp_source.html#l00048">48</a> of file <a class="el" href="_motion_processor_8cpp_source.html">MotionProcessor.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a297d734c62329988c34c06ef007c0532"></a><!-- doxytag: member="OpencvSfM::MotionProcessor::setInputSource" ref="a297d734c62329988c34c06ef007c0532" args="(std::vector&lt; std::string &gt; list_images)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool OpencvSfM::MotionProcessor::setInputSource </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; std::string &gt;&#160;</td>
+          <td class="paramname"><em>list_images</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>You can attach this motion handler to a list of picture use this method to set it as the input source! </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">list_images</td><td>list of pictures' names </td></tr>
   </table>
   </dd>
 </dl>
@@ -313,11 +359,29 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_motion_processor_8cpp_source.html#l00197">197</a> of file <a class="el" href="_motion_processor_8cpp_source.html">MotionProcessor.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_motion_processor_8cpp_source.html#l00214">214</a> of file <a class="el" href="_motion_processor_8cpp_source.html">MotionProcessor.cpp</a>.</p>
+
+<p>Referenced by <a class="el" href="_sequence_analyzer_8cpp_source.html#l00013">OpencvSfM::SequenceAnalyzer::SequenceAnalyzer()</a>.</p>
 
 </div>
 </div>
 <hr/><h2>Member Data Documentation</h2>
+<a class="anchor" id="ae4e50c101f03493306dce261283bdbb3"></a><!-- doxytag: member="OpencvSfM::MotionProcessor::pos_in_loading_process_" ref="ae4e50c101f03493306dce261283bdbb3" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned int <a class="el" href="class_opencv_sf_m_1_1_motion_processor.html#ae4e50c101f03493306dce261283bdbb3">OpencvSfM::MotionProcessor::pos_in_loading_process_</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>When the camera is attached to a list of file, pos_in_loading_process_ will be used to store actual number of image (not always the same than numFrame_). </p>
+
+<p>Definition at line <a class="el" href="_motion_processor_8h_source.html#l00055">55</a> of file <a class="el" href="_motion_processor_8h_source.html">MotionProcessor.h</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a9bb3fdc8916e6d6c00a7a81408a6bbfd"></a><!-- doxytag: member="OpencvSfM::MotionProcessor::sourceName_" ref="a9bb3fdc8916e6d6c00a7a81408a6bbfd" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -330,7 +394,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <div class="memdoc">
 <p>When the camera is attached to a list of file, sourceName_ will be used to store name of the prefix. For example, if the files are img1.jpg, img2.jpg, ... img125.jpg, sourceName_ will be equal to img </p>
 
-<p>Definition at line <a class="el" href="_motion_processor_8h_source.html#l00040">40</a> of file <a class="el" href="_motion_processor_8h_source.html">MotionProcessor.h</a>.</p>
+<p>Definition at line <a class="el" href="_motion_processor_8h_source.html#l00045">45</a> of file <a class="el" href="_motion_processor_8h_source.html">MotionProcessor.h</a>.</p>
 
 </div>
 </div>
@@ -346,7 +410,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <div class="memdoc">
 <p>When the camera is attached to a list of file, suffix_ will be used to store name of the suffix. For example, if the files are img1.jpg, img2.jpg, ... img125.jpg, suffix_ will be equal to .jpg </p>
 
-<p>Definition at line <a class="el" href="_motion_processor_8h_source.html#l00045">45</a> of file <a class="el" href="_motion_processor_8h_source.html">MotionProcessor.h</a>.</p>
+<p>Definition at line <a class="el" href="_motion_processor_8h_source.html#l00050">50</a> of file <a class="el" href="_motion_processor_8h_source.html">MotionProcessor.h</a>.</p>
 
 </div>
 </div>
@@ -369,7 +433,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Mon May 30 2011 17:50:30 for GSoC2011SfM by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Mon Jul 25 2011 12:41:00 for GSoC2011SfM by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

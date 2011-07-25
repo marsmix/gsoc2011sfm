@@ -27,41 +27,9 @@ using namespace cv;
 #else
 # define _ATTRIBUTE_UNUSED_
 #endif
-// A macro to disallow operator=
-// This should be used in the private: declarations for a class.
-#define _DISALLOW_ASSIGN_(type)\
-  void operator=(type const &)
-
-// A macro to disallow copy constructor and operator=
-// This should be used in the private: declarations for a class.
-#define _DISALLOW_COPY_AND_ASSIGN_(type)\
-  type(type const &);\
-  _DISALLOW_ASSIGN_(type)
 
 class Tutorial_Handler;
 
-// Defines the abstract factory interface that creates instances
-// of a Test object.
-class TutoFactoryBase {
- public:
-  virtual ~TutoFactoryBase() {}
-
-  // Creates a test instance to run. The instance is both created and destroyed
-  // within TestInfoImpl::Run()
-  virtual Tutorial_Handler* CreateTest() = 0;
-
- protected:
-  TutoFactoryBase(string n,string h,string f)
-  {name=n;help=h;file=f;}
-  string name;
-  string help;
-  string file;
-
- private:
-  _DISALLOW_COPY_AND_ASSIGN_(TutoFactoryBase);
-};
-
-class Tutorial_Handler;
 class Intern_tutorial_list
 {
   vector<Tutorial_Handler*> list_of_tutos;
@@ -77,22 +45,27 @@ public:
 
 // This class create an instance of tutorial...
 template <class TutoClass>
-class TutoFactoryImpl : public TutoFactoryBase {
+class TutoFactoryImpl {
+protected:
+  string id_tuto;
+  string name;
+  string help;
+  string file;
  public:
-   TutoFactoryImpl(string n,string h,string f)
-     :TutoFactoryBase(n,h,f){};
-  virtual Tutorial_Handler* CreateTest() {
-    return new TutoClass(name,help,file); }
+   TutoFactoryImpl(string id,string n,string h,string f)
+   {id_tuto=id;name=n;help=h;file=f;};
+  Tutorial_Handler* CreateTest() {
+    return new TutoClass(id_tuto,name,help,file); }
 };
 
 CREATE_EXTERN_MUTEX( my_mutex_Tutorial_Handler );
 
 class Tutorial_Handler
 {
-  _DISALLOW_COPY_AND_ASSIGN_(Tutorial_Handler);
 protected:
-  Tutorial_Handler(string name,string help,string file)
+  Tutorial_Handler(string id,string name,string help,string file)
   {
+    this->id_of_tuto = id;
     this->name_of_tuto = name;
     this->tuto_help = help;
     this->file_of_tuto = file;
@@ -117,8 +90,11 @@ public:
 
   static int print_menu();
 
-  static void run_tuto(int id_tuto);
-  
+  static bool run_tuto(int id_tuto);
+
+  static bool ask_to_run_tuto(string name_of_tuto);
+
+  string id_of_tuto;
   string name_of_tuto;
   string file_of_tuto;
   string tuto_help;
@@ -133,24 +109,22 @@ enum { LOAD_INTRA=1, LOAD_POSITION=2, LOAD_FULL=3};
 vector<PointOfView> loadCamerasFromFile(string fileName, int flag_model = LOAD_FULL);
 
 
+#define TOSTR(x) #x
+#define TUTO_CLASS_NAME_(tuto_name)  class_##tuto_name##_Test
 
-#define TUTO_CLASS_NAME_(tuto_name) \
-  class_##tuto_name##_Test
 // Helper macro for defining tuto.
 #define NEW_TUTO(t_name, tuto_name, tuto_help)\
 class TUTO_CLASS_NAME_(t_name) : public Tutorial_Handler {\
  public:\
-  TUTO_CLASS_NAME_(t_name)(string n,string h,string f)\
-    :Tutorial_Handler(n,h,f){}\
+  TUTO_CLASS_NAME_(t_name)(string id,string n,string h,string f)\
+    :Tutorial_Handler(id,n,h,f){}\
   static Tutorial_Handler* const add_to_vector _ATTRIBUTE_UNUSED_;\
- private:\
-  _DISALLOW_COPY_AND_ASSIGN_( TUTO_CLASS_NAME_(t_name) );\
   virtual void tuto_body();\
 };\
 Tutorial_Handler* const TUTO_CLASS_NAME_(t_name)\
   ::add_to_vector = Tutorial_Handler\
-    ::registerTuto(new TutoFactoryImpl<TUTO_CLASS_NAME_(t_name)>(tuto_name, tuto_help,\
-    __FILE__));\
+    ::registerTuto(new TutoFactoryImpl<TUTO_CLASS_NAME_(t_name)>(\
+    TOSTR(t_name), tuto_name, tuto_help, __FILE__));\
 void TUTO_CLASS_NAME_(t_name)::tuto_body()
 
 

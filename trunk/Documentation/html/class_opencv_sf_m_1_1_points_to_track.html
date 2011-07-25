@@ -68,13 +68,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-attribs">Protected Attributes</a>  </div>
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
+<a href="#pro-static-attribs">Static Protected Attributes</a>  </div>
   <div class="headertitle">
 <div class="title">OpencvSfM::PointsToTrack Class Reference</div>  </div>
 </div>
 <div class="contents">
 <!-- doxytag: class="OpencvSfM::PointsToTrack" -->
-<p>This class can be used to store informations about points and features. This is an abstract class: you can't use it directly. Use for instance <a class="el" href="class_opencv_sf_m_1_1_points_to_track_with_image.html" title="This class can be used to find points and features in pictures using SIFT detector.">PointsToTrackWithImage</a>.  
+<p>This class can be used to store informations about point and features. This is an abstract class: you can't use it directly. Use for instance <a class="el" href="class_opencv_sf_m_1_1_points_to_track_with_image.html" title="This class can be used to find points and features in pictures using SIFT detector.">PointsToTrackWithImage</a>.  
  <a href="class_opencv_sf_m_1_1_points_to_track.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_points_to_track_8h_source.html">PointsToTrack.h</a>&gt;</code></p>
@@ -92,19 +94,24 @@ Inheritance diagram for OpencvSfM::PointsToTrack:</div>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track.html#a0974269063e5a7708e1b992480666f87">PointsToTrack</a> (std::vector&lt; cv::KeyPoint &gt; keypoints=std::vector&lt; cv::KeyPoint &gt;(0), cv::Mat descriptors=cv::Mat())</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track.html#a81706fbb7c997cbfd478397a5e7b3dc7">PointsToTrack</a> (int corresponding_image=-1, std::vector&lt; cv::KeyPoint &gt; keypoints=std::vector&lt; cv::KeyPoint &gt;(0), cv::Mat descriptors=cv::Mat())</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track.html#a530e94d0c39358538d907e977263cae0">~PointsToTrack</a> (void)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track.html#ab672d2d9b350500dde92f0d39c8c2a98">computeKeypointsAndDesc</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track.html#a9f310ef736a0494457ee9f2193b8b986">computeKeypointsAndDesc</a> (bool forcing_recalculation=false)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track.html#ac7009164560dac1f4d3283c4bf1181a3">computeKeypoints</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track.html#a1e5ef9b8da87d1b412c348ad813d0267">computeDescriptors</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track.html#a6ac0b2e69bb0fa51af529ec395fd0df7">addKeypoints</a> (std::vector&lt; cv::KeyPoint &gt; keypoints, cv::Mat descriptors=cv::Mat(), bool computeMissingDescriptor=false)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">std::vector&lt; cv::KeyPoint &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track.html#ab646203ef4a8955b9540ffc5b78943d4">getKeypoints</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track.html#a6ac0b2e69bb0fa51af529ec395fd0df7">addKeypoints</a> (std::vector&lt; cv::KeyPoint &gt; keypoints, cv::Mat descriptors=cv::Mat(), bool computeMissingDescriptor=false)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track.html#a076f28dac2b30dfcdb2097c496adfd9e">addKeypoint</a> (cv::KeyPoint point)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const std::vector&lt; cv::KeyPoint &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track.html#ab0ff4754d1e5c734521b5d46aef37c49">getKeypoints</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track.html#a196acc6cc4be60ad141eef597db3787c">getKeyMatches</a> (const std::vector&lt; <a class="el" href="class_opencv_sf_m_1_1_track_of_points.html">TrackOfPoints</a> &gt; &amp;matches, int otherImage, std::vector&lt; cv::Point2f &gt; &amp;pointsVals) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const cv::KeyPoint &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track.html#abb8a5af3e4d1e71900284a9e318bc316">getKeypoint</a> (unsigned int index) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track.html#a4ca955b907dee279030559d255a4e151">getDescriptors</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track.html#adda3cb43ad421e89b8ddfe24f1c30b30">printPointsOnImage</a> (const cv::Mat &amp;image, cv::Mat &amp;outImg, const cv::Scalar &amp;color=cv::Scalar::all(-1), int flags=cv::DrawMatchesFlags::DEFAULT) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2a3e9cb24add788e7c4970d248d789ba"></a><!-- doxytag: member="OpencvSfM::PointsToTrack::read" ref="a2a3e9cb24add788e7c4970d248d789ba" args="(const cv::FileNode &amp;fn)" -->
-void&#160;</td><td class="memItemRight" valign="bottom"><b>read</b> (const cv::FileNode &amp;fn)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4313423bb8db1700a7639fbfddb173b5"></a><!-- doxytag: member="OpencvSfM::PointsToTrack::write" ref="a4313423bb8db1700a7639fbfddb173b5" args="(cv::FileStorage &amp;fs) const " -->
-void&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> (cv::FileStorage &amp;fs) const </td></tr>
+<tr><td colspan="2"><h2><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaae603d73a658ed0b4d2c82463372c3b"></a><!-- doxytag: member="OpencvSfM::PointsToTrack::read" ref="aaae603d73a658ed0b4d2c82463372c3b" args="(const cv::FileNode &amp;node, PointsToTrack &amp;points)" -->
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>read</b> (const cv::FileNode &amp;node, <a class="el" href="class_opencv_sf_m_1_1_points_to_track.html">PointsToTrack</a> &amp;points)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4659d15437d115ece00feb5335923d50"></a><!-- doxytag: member="OpencvSfM::PointsToTrack::write" ref="a4659d15437d115ece00feb5335923d50" args="(cv::FileStorage &amp;fs, const PointsToTrack &amp;points)" -->
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> (cv::FileStorage &amp;fs, const <a class="el" href="class_opencv_sf_m_1_1_points_to_track.html">PointsToTrack</a> &amp;points)</td></tr>
 <tr><td colspan="2"><h2><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a08c9523080571e71e30b11a2f8b9c6b9"></a><!-- doxytag: member="OpencvSfM::PointsToTrack::keypoints_" ref="a08c9523080571e71e30b11a2f8b9c6b9" args="" -->
@@ -113,20 +120,34 @@ std::vector&lt; cv::KeyPoint &gt;&#160;</td><td class="memItemRight" valign="bot
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adcbf3783bdf4a2a1d3e10c4b74224899"></a><!-- doxytag: member="OpencvSfM::PointsToTrack::descriptors_" ref="adcbf3783bdf4a2a1d3e10c4b74224899" args="" -->
 cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track.html#adcbf3783bdf4a2a1d3e10c4b74224899">descriptors_</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">this attribute will store descritors for each points in a matrix with size (n*m), where n is the number of points and m is the desciptor size. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa1ad5a647af1dd6583dbd780e94c089c"></a><!-- doxytag: member="OpencvSfM::PointsToTrack::corresponding_image_" ref="aa1ad5a647af1dd6583dbd780e94c089c" args="" -->
+int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track.html#aa1ad5a647af1dd6583dbd780e94c089c">corresponding_image_</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">index of frame when available <br/></td></tr>
+<tr><td colspan="2"><h2><a name="pro-static-attribs"></a>
+Static Protected Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abb10da9503a8ac931d9d167149309df3"></a><!-- doxytag: member="OpencvSfM::PointsToTrack::glob_number_images_" ref="abb10da9503a8ac931d9d167149309df3" args="" -->
+static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_opencv_sf_m_1_1_points_to_track.html#abb10da9503a8ac931d9d167149309df3">glob_number_images_</a> = 0</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">total numbers of images! <br/></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
-<div class="textblock"><p>This class can be used to store informations about points and features. This is an abstract class: you can't use it directly. Use for instance <a class="el" href="class_opencv_sf_m_1_1_points_to_track_with_image.html" title="This class can be used to find points and features in pictures using SIFT detector.">PointsToTrackWithImage</a>. </p>
+<div class="textblock"><p>This class can be used to store informations about point and features. This is an abstract class: you can't use it directly. Use for instance <a class="el" href="class_opencv_sf_m_1_1_points_to_track_with_image.html" title="This class can be used to find points and features in pictures using SIFT detector.">PointsToTrackWithImage</a>. </p>
 <p>To create a structure from motion, most methods use points to compute the structure. This class focus on the first task in SfM: find points in image which are easy to track... When available, a feature vector for each points is very helpful: the matching will be easier. </p>
 
-<p>Definition at line <a class="el" href="_points_to_track_8h_source.html#l00018">18</a> of file <a class="el" href="_points_to_track_8h_source.html">PointsToTrack.h</a>.</p>
+<p>Definition at line <a class="el" href="_points_to_track_8h_source.html#l00024">24</a> of file <a class="el" href="_points_to_track_8h_source.html">PointsToTrack.h</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a0974269063e5a7708e1b992480666f87"></a><!-- doxytag: member="OpencvSfM::PointsToTrack::PointsToTrack" ref="a0974269063e5a7708e1b992480666f87" args="(std::vector&lt; cv::KeyPoint &gt; keypoints=std::vector&lt; cv::KeyPoint &gt;(0), cv::Mat descriptors=cv::Mat())" -->
+<a class="anchor" id="a81706fbb7c997cbfd478397a5e7b3dc7"></a><!-- doxytag: member="OpencvSfM::PointsToTrack::PointsToTrack" ref="a81706fbb7c997cbfd478397a5e7b3dc7" args="(int corresponding_image=&#45;1, std::vector&lt; cv::KeyPoint &gt; keypoints=std::vector&lt; cv::KeyPoint &gt;(0), cv::Mat descriptors=cv::Mat())" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">OpencvSfM::PointsToTrack::PointsToTrack </td>
           <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>corresponding_image</em> = <code>-1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">std::vector&lt; cv::KeyPoint &gt;&#160;</td>
           <td class="paramname"><em>keypoints</em> = <code>std::vector&lt;cv::KeyPoint&gt;(0)</code>, </td>
         </tr>
@@ -147,13 +168,14 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>this constructor create an object with available information... </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
+    <tr><td class="paramname">corresponding_image</td><td>Global index of image </td></tr>
     <tr><td class="paramname">keypoints</td><td>the points we will try to track... </td></tr>
     <tr><td class="paramname">descriptors</td><td>the feature vector for each points... </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_points_to_track_8cpp_source.html#l00012">12</a> of file <a class="el" href="_points_to_track_8cpp_source.html">PointsToTrack.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_points_to_track_8cpp_source.html#l00014">14</a> of file <a class="el" href="_points_to_track_8cpp_source.html">PointsToTrack.cpp</a>.</p>
 
 </div>
 </div>
@@ -173,11 +195,38 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <div class="memdoc">
 <p>Destructor : delete points and features vectors </p>
 
-<p>Definition at line <a class="el" href="_points_to_track_8cpp_source.html#l00017">17</a> of file <a class="el" href="_points_to_track_8cpp_source.html">PointsToTrack.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_points_to_track_8cpp_source.html#l00027">27</a> of file <a class="el" href="_points_to_track_8cpp_source.html">PointsToTrack.cpp</a>.</p>
 
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="a076f28dac2b30dfcdb2097c496adfd9e"></a><!-- doxytag: member="OpencvSfM::PointsToTrack::addKeypoint" ref="a076f28dac2b30dfcdb2097c496adfd9e" args="(cv::KeyPoint point)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned int OpencvSfM::PointsToTrack::addKeypoint </td>
+          <td>(</td>
+          <td class="paramtype">cv::KeyPoint&#160;</td>
+          <td class="paramname"><em>point</em></td><td>)</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This method is used to add a keypoint at the end of the points vector... </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">keypoints</td><td>Keypoints to add </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>index of the keypoint. </dd></dl>
+
+<p>Definition at line <a class="el" href="_points_to_track_8h_source.html#l00073">73</a> of file <a class="el" href="_points_to_track_8h_source.html">PointsToTrack.h</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a6ac0b2e69bb0fa51af529ec395fd0df7"></a><!-- doxytag: member="OpencvSfM::PointsToTrack::addKeypoints" ref="a6ac0b2e69bb0fa51af529ec395fd0df7" args="(std::vector&lt; cv::KeyPoint &gt; keypoints, cv::Mat descriptors=cv::Mat(), bool computeMissingDescriptor=false)" -->
 <div class="memitem">
 <div class="memproto">
@@ -203,7 +252,7 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td><code> [virtual]</code></td>
+          <td></td><td></td>
         </tr>
       </table>
 </div>
@@ -218,7 +267,7 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_points_to_track_8cpp_source.html#l00041">41</a> of file <a class="el" href="_points_to_track_8cpp_source.html">PointsToTrack.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_points_to_track_8cpp_source.html#l00067">67</a> of file <a class="el" href="_points_to_track_8cpp_source.html">PointsToTrack.cpp</a>.</p>
 
 </div>
 </div>
@@ -239,9 +288,9 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 
 <p>Reimplemented in <a class="el" href="class_opencv_sf_m_1_1_points_to_track_with_image.html#aee97104c9c66601e5c51237717cb2522">OpencvSfM::PointsToTrackWithImage</a>.</p>
 
-<p>Definition at line <a class="el" href="_points_to_track_8cpp_source.html#l00037">37</a> of file <a class="el" href="_points_to_track_8cpp_source.html">PointsToTrack.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_points_to_track_8cpp_source.html#l00063">63</a> of file <a class="el" href="_points_to_track_8cpp_source.html">PointsToTrack.cpp</a>.</p>
 
-<p>Referenced by <a class="el" href="_points_to_track_8cpp_source.html#l00041">addKeypoints()</a>, and <a class="el" href="_points_to_track_8cpp_source.html#l00023">computeKeypointsAndDesc()</a>.</p>
+<p>Referenced by <a class="el" href="_points_to_track_8cpp_source.html#l00067">addKeypoints()</a>, and <a class="el" href="_points_to_track_8cpp_source.html#l00034">computeKeypointsAndDesc()</a>.</p>
 
 </div>
 </div>
@@ -263,29 +312,36 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 
 <p>Reimplemented in <a class="el" href="class_opencv_sf_m_1_1_points_to_track_with_image.html#a4fba046ec6498fcea5b38253d19b80f9">OpencvSfM::PointsToTrackWithImage</a>.</p>
 
-<p>Definition at line <a class="el" href="_points_to_track_8cpp_source.html#l00031">31</a> of file <a class="el" href="_points_to_track_8cpp_source.html">PointsToTrack.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_points_to_track_8cpp_source.html#l00057">57</a> of file <a class="el" href="_points_to_track_8cpp_source.html">PointsToTrack.cpp</a>.</p>
 
-<p>Referenced by <a class="el" href="_points_to_track_8cpp_source.html#l00023">computeKeypointsAndDesc()</a>.</p>
+<p>Referenced by <a class="el" href="_points_to_track_8cpp_source.html#l00034">computeKeypointsAndDesc()</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ab672d2d9b350500dde92f0d39c8c2a98"></a><!-- doxytag: member="OpencvSfM::PointsToTrack::computeKeypointsAndDesc" ref="ab672d2d9b350500dde92f0d39c8c2a98" args="()" -->
+<a class="anchor" id="a9f310ef736a0494457ee9f2193b8b986"></a><!-- doxytag: member="OpencvSfM::PointsToTrack::computeKeypointsAndDesc" ref="a9f310ef736a0494457ee9f2193b8b986" args="(bool forcing_recalculation=false)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">int OpencvSfM::PointsToTrack::computeKeypointsAndDesc </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>forcing_recalculation</em> = <code>false</code></td><td>)</td>
           <td><code> [virtual]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 <p>This method is used to compute both Keypoints and descriptors... </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">forcing_recalculation</td><td>if true previous keypoints are removed... If false and if keypoints and descriptor exists, nothing is done. </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the number of points </dd></dl>
 
-<p>Definition at line <a class="el" href="_points_to_track_8cpp_source.html#l00023">23</a> of file <a class="el" href="_points_to_track_8cpp_source.html">PointsToTrack.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_points_to_track_8cpp_source.html#l00034">34</a> of file <a class="el" href="_points_to_track_8cpp_source.html">PointsToTrack.cpp</a>.</p>
 
 </div>
 </div>
@@ -305,16 +361,86 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>this method return the descritors for each points in a matrix with size (n*m), where n is the number of points and m is the desciptor size. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>descritors for each points in a matrix with size (n*m), where n is the number of points and m is the desciptor size. </dd></dl>
 
-<p>Definition at line <a class="el" href="_points_to_track_8h_source.html#l00065">65</a> of file <a class="el" href="_points_to_track_8h_source.html">PointsToTrack.h</a>.</p>
+<p>Definition at line <a class="el" href="_points_to_track_8h_source.html#l00098">98</a> of file <a class="el" href="_points_to_track_8h_source.html">PointsToTrack.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ab646203ef4a8955b9540ffc5b78943d4"></a><!-- doxytag: member="OpencvSfM::PointsToTrack::getKeypoints" ref="ab646203ef4a8955b9540ffc5b78943d4" args="() const " -->
+<a class="anchor" id="a196acc6cc4be60ad141eef597db3787c"></a><!-- doxytag: member="OpencvSfM::PointsToTrack::getKeyMatches" ref="a196acc6cc4be60ad141eef597db3787c" args="(const std::vector&lt; TrackOfPoints &gt; &amp;matches, int otherImage, std::vector&lt; cv::Point2f &gt; &amp;pointsVals) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt;cv::KeyPoint&gt; OpencvSfM::PointsToTrack::getKeypoints </td>
+          <td class="memname">void OpencvSfM::PointsToTrack::getKeyMatches </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="class_opencv_sf_m_1_1_track_of_points.html">TrackOfPoints</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>matches</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>otherImage</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; cv::Point2f &gt; &amp;&#160;</td>
+          <td class="paramname"><em>pointsVals</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>this method return the points coordinates corresponding to tracks </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">matches</td><td>list of tracks. Only points found in tracks are returned </td></tr>
+    <tr><td class="paramname">pointsVals</td><td>[out] points found in tracks </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="_points_to_track_8cpp_source.html#l00136">136</a> of file <a class="el" href="_points_to_track_8cpp_source.html">PointsToTrack.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="abb8a5af3e4d1e71900284a9e318bc316"></a><!-- doxytag: member="OpencvSfM::PointsToTrack::getKeypoint" ref="abb8a5af3e4d1e71900284a9e318bc316" args="(unsigned int index) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const cv::KeyPoint&amp; OpencvSfM::PointsToTrack::getKeypoint </td>
+          <td>(</td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>index</em></td><td>)</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>this method return the points coordinates of the i^th entry </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">index</td><td>number of keypoints wanted </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>points coordinates and when available orientation and size </dd></dl>
+
+<p>Definition at line <a class="el" href="_points_to_track_8h_source.html#l00092">92</a> of file <a class="el" href="_points_to_track_8h_source.html">PointsToTrack.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ab0ff4754d1e5c734521b5d46aef37c49"></a><!-- doxytag: member="OpencvSfM::PointsToTrack::getKeypoints" ref="ab0ff4754d1e5c734521b5d46aef37c49" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::vector&lt;cv::KeyPoint&gt;&amp; OpencvSfM::PointsToTrack::getKeypoints </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const<code> [inline]</code></td>
@@ -323,9 +449,9 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 </div>
 <div class="memdoc">
 <p>this method return the points coordinates and sometimes orientation and size </p>
-<dl class="return"><dt><b>Returns:</b></dt><dd>points coordinates and sometimes orientation and size </dd></dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>points coordinates and when available orientation and size </dd></dl>
 
-<p>Definition at line <a class="el" href="_points_to_track_8h_source.html#l00060">60</a> of file <a class="el" href="_points_to_track_8h_source.html">PointsToTrack.h</a>.</p>
+<p>Definition at line <a class="el" href="_points_to_track_8h_source.html#l00079">79</a> of file <a class="el" href="_points_to_track_8h_source.html">PointsToTrack.h</a>.</p>
 
 </div>
 </div>
@@ -376,7 +502,7 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_points_to_track_8cpp_source.html#l00064">64</a> of file <a class="el" href="_points_to_track_8cpp_source.html">PointsToTrack.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_points_to_track_8cpp_source.html#l00097">97</a> of file <a class="el" href="_points_to_track_8cpp_source.html">PointsToTrack.cpp</a>.</p>
 
 </div>
 </div>
@@ -399,7 +525,7 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Mon May 30 2011 17:50:30 for GSoC2011SfM by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Mon Jul 25 2011 12:41:00 for GSoC2011SfM by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

@@ -4,6 +4,7 @@
 #include "macro.h" //SFM_EXPORTS
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
+#include "pcl/visualization/pcl_visualizer.h"
 
 #include "Camera.h"
 #include "TracksOfPoints.h"
@@ -118,26 +119,24 @@ namespace OpencvSfM{
     {
       return translation_;
     };
-
     virtual void setTranslationVector(cv::Mat newVect)
     {
       for(int i=0; i<3; ++i)
         translation_.at<double>(i,0) = newVect.at<double>(i,0);
     };
+
     inline void rotationAroundX(double angle) {
         double c = cos(angle), s = sin(angle);
         double data[] = {1,  0,  0, 0,  c, -s, 0,  s,  c};
         cv::Mat R(3,3,CV_64F,data);
         rotation_ *= R;
     }
-
     inline void rotationAroundY(double angle) {
       double c = cos(angle), s = sin(angle);
       double data[] = {c, 0, s, 0, 1, 0, -s, 0, c};
       cv::Mat R(3,3,CV_64F,data);
       rotation_ *= R;
     }
-
     inline void rotationAroundZ(double angle) {
       double c = cos(angle), s = sin(angle);
       double data[] = {c, -s,  0, s,  c,  0, 0,  0,  1};
@@ -145,6 +144,10 @@ namespace OpencvSfM{
       rotation_ *= R;
     }
 
+    void addCameraRepresentation(
+      boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer,
+      int image_width, int image_height, std::string name = "Camera",
+      int viewport = 0);
   };
 
 }
