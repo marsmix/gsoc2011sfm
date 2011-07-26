@@ -11,6 +11,10 @@
 
 
 #include "test_data_sets.h"
+using namespace cv;
+using namespace OpencvSfM;
+using namespace OpencvSfM::tutorials;
+using namespace std;
 
 NEW_TUTO(Triangulation_tests, "Compute of 3D points from 2D position and cameras",
   "Using points projections and cameras parameters, try to find the 3D positions.\nThis is useful to test correctness of algorithms."){

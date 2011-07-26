@@ -18,8 +18,9 @@
 #include "test_data_sets.h"
 
 using namespace OpencvSfM;
-using namespace cv;
-using namespace pcl;
+using namespace OpencvSfM::tutorials;
+//using namespace cv;//Risk of overlaps!
+//using namespace pcl;
 using namespace std;
 
 NEW_TUTO(PCL_tuto, "Learn how you can map values between PCL and OpenCV ",
@@ -43,7 +44,7 @@ NEW_TUTO(PCL_tuto, "Learn how you can map values between PCL and OpenCV ",
     cv::Vec3d& testCVdouble = testPoint;
   }catch(cv::Exception& e )
   {
-    cout<<"Conversion error..."<<endl;
+    cout<<"Conversion error: "<<e.code<<endl;
   }
 
   //But we can do something like that:
@@ -79,15 +80,16 @@ NEW_TUTO(PCL_tuto, "Learn how you can map values between PCL and OpenCV ",
   //////////////////////////////////////////////////////////////////////////
   //Now what can we do with vectors?
   //First a conversion to the generic type:
-  vector<Vec4f > my_vector_OpenCV;//get data from somewhere;
+  vector< cv::Vec4f > my_vector_OpenCV;//get data from somewhere;
   my_vector_OpenCV.push_back( cv::Vec4f( 1,2,3,4) );
   my_vector_OpenCV.push_back( cv::Vec4f( 5,6,7,8) );
   my_vector_OpenCV.push_back( cv::Vec4f( 9,0,1,2) );
-  vector<mapping::Point, Eigen::aligned_allocator<mapping::Point> > my_generic_points;
+  vector< mapping::Point, Eigen::aligned_allocator<mapping::Point> > my_generic_points;
   convertToMappedVector( my_vector_OpenCV, my_generic_points );
 
   //Now a conversion from the generic type:
-  std::vector<PointXYZ, Eigen::aligned_allocator<PointXYZ> > my_vector_converted;
+  std::vector<pcl::PointXYZ,
+    Eigen::aligned_allocator<pcl::PointXYZ> > my_vector_converted;
   convertFromMappedVector( my_generic_points, my_vector_converted );
   cout<<"Values of converted vector:"<<endl;
   cout<<my_vector_converted[0]<<"; "<<
@@ -96,14 +98,15 @@ NEW_TUTO(PCL_tuto, "Learn how you can map values between PCL and OpenCV ",
 
   //////////////////////////////////////////////////////////////////////////
   //We can do a conversion without having to use a vector of Point:
-  std::vector<PointXYZ, Eigen::aligned_allocator<PointXYZ> > my_vector_PCL_bis;
+  std::vector<pcl::PointXYZ,
+    Eigen::aligned_allocator<pcl::PointXYZ> > my_vector_PCL_bis;
   mapping::convert_OpenCV_vector( my_vector_OpenCV, my_vector_PCL_bis );
   cout<<"Values of directly converted vector (should be the same):"<<endl;
   cout<<my_vector_PCL_bis[0]<<"; "<<
     my_vector_PCL_bis[1]<<"; "<<
     my_vector_PCL_bis[2]<<endl;
 
-  vector< Vec4f > my_vector_OpenCV_bis;
+  vector< cv::Vec4f > my_vector_OpenCV_bis;
   mapping::convert_PCL_vector( my_vector_PCL_bis, my_vector_OpenCV_bis );
   cout<<"Values of the openCV vector (only the second value):"<<endl;
   cout<<my_vector_OpenCV_bis[1][0]<<"; "<<

@@ -5,7 +5,7 @@
 #include "../src/StructureEstimator.h"
 #include "../src/PointOfView.h"
 #include "../src/CameraPinhole.h"
-#include "../src/libmv_mapping.h"
+//#include "../src/libmv_mapping.h"
 #include "../src/PCL_mapping.h"
 
 #include <boost/thread/thread.hpp>
@@ -24,6 +24,10 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "test_data_sets.h"
+using namespace cv;
+using namespace OpencvSfM;
+using namespace OpencvSfM::tutorials;
+using namespace std;
 
 #define POINT_METHOD "SIFT"
 

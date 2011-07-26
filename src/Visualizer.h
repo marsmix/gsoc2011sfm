@@ -16,18 +16,18 @@ namespace OpencvSfM{
   * You can add to visualization 3D points, cameras, pictures...
   * This class use PCL as back end, but it's hidden!
   */
-  class Visualizer{
+  class SFM_EXPORTS Visualizer{
   protected:
     boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer;
   public:
     Visualizer(std::string name = "3D Viewer");
-    /*
-    void addCamera( cv::Ptr<PointOfView> camera,
+    
+    void addCamera( const PointOfView& camera,
       std::string name = "camera", int viewport = 0 );
-    void add3DPoints( std::vector<cv::Vec3d>& points,
+    void add3DPoints( const std::vector<cv::Vec3d>& points,
       std::string name = "cloud", int viewport = 0 );
 
-    void runInteract();*/
+    void runInteract();
   };
 }
 

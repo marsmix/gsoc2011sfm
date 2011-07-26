@@ -6,7 +6,7 @@
 #include "MotionProcessor.h"
 #include "PointsMatcher.h"
 #include "PointOfView.h"
-#include "libmv_mapping.h"
+//#include "libmv_mapping.h"
 #include "TracksOfPoints.h"
 #include "opencv2/calib3d/calib3d.hpp"
 

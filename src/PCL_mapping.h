@@ -430,13 +430,14 @@ namespace OpencvSfM{
     template<typename TypeFrom, typename allocatorFrom,
       typename PCL_point>
     void convert_OpenCV_vector(
-      std::vector<TypeFrom,allocatorFrom>& vectFrom,
+      const std::vector<TypeFrom,allocatorFrom>& vectFrom,
       pcl::PointCloud< PCL_point >& output)
     {
       int sizeOfData = sizeof( PCL_point ) / sizeof( float );
       sizeOfData = MIN( sizeOfData, TypeFrom::rows );
 
-      vector<TypeFrom,allocatorFrom>::iterator itTrack=vectFrom.begin();
+      std::vector<TypeFrom,allocatorFrom>::const_iterator itTrack =
+        vectFrom.begin();
       while ( itTrack != vectFrom.end() )
       {
         float* datas = convert_to_float( *itTrack );

@@ -4,7 +4,7 @@
 #include "../src/MotionProcessor.h"
 #include "../src/SequenceAnalyzer.h"
 #include "../src/PointsMatcher.h"
-#include "../src/libmv_mapping.h"
+//#include "../src/libmv_mapping.h"
 #include <opencv2/calib3d/calib3d.hpp>
 
 //////////////////////////////////////////////////////////////////////////
@@ -14,6 +14,10 @@
 
 #include "test_data_sets.h"
 #define POINT_METHOD "SIFT"
+using namespace cv;
+using namespace OpencvSfM;
+using namespace OpencvSfM::tutorials;
+using namespace std;
 
 NEW_TUTO(Track_creation, "Learn how you can compute tracks from a list of pictures",
   "Using features detector and matcher, create a vector of tracks (a track is a list of 2D points from the same 3D point).\nYou will also learn how you can save an object using YAML!")
@@ -110,8 +114,8 @@ NEW_TUTO(Track_creation, "Learn how you can compute tracks from a list of pictur
   SequenceAnalyzer motion_estim(vec_points_to_track,matches_algo,images);
 
   pathFileTracks = FROM_SRC_ROOT("Medias/tracks_points_"POINT_METHOD"/motion_tracks1.yml");
-  cout<<"Compute matches between each frames..."<<endl;
-  cout<<"This will take more time than before, but once done"
+  cout<<"Compute matches between each frames..."<<endl<<endl;
+  cout<<"The complexity is O(scary), so be patient but once done "
     "you will not have to do it again, everything will be saved in:\n"<<
     pathFileTracks<<"..."<<endl;
   motion_estim.computeMatches();

@@ -12,6 +12,10 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "test_data_sets.h"
+using namespace cv;
+using namespace OpencvSfM;
+using namespace OpencvSfM::tutorials;
+using namespace std;
 
 NEW_TUTO(Points_Definitions, "How features can be defined",
   "Using 2 pictures loaded using a motion processor, we find points, match them and find the fundamental matrix."){

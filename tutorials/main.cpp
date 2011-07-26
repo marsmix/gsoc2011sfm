@@ -1,6 +1,8 @@
 
 #include "test_data_sets.h"
 
+using namespace OpencvSfM;
+using namespace tutorials;
 int main()
 {
 

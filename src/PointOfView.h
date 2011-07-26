@@ -144,10 +144,6 @@ namespace OpencvSfM{
       rotation_ *= R;
     }
 
-    void addCameraRepresentation(
-      boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer,
-      int image_width, int image_height, std::string name = "Camera",
-      int viewport = 0);
   };
 
 }
