@@ -3,7 +3,7 @@
 
 //Taken from opencv's precom.hpp
 #if _MSC_VER >= 1200
-#pragma warning( disable: 4127 4251)
+#pragma warning( disable: 4127 4251 4521)
 #endif
 
 #if (defined WIN32 || defined _WIN32 || defined WINCE)

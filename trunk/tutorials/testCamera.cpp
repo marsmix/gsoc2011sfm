@@ -14,6 +14,11 @@
 //////////////////////////////////////////////////////////////////////////
 #include "test_data_sets.h"
 
+using namespace cv;
+using namespace OpencvSfM;
+using namespace OpencvSfM::tutorials;
+using namespace std;
+
 NEW_TUTO(Cam_creation, "Learn what you can do with a pinhole distorded camera",
   "Using intra parameters, switch between camera / image coordinates.")
 {

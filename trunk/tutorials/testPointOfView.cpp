@@ -14,6 +14,10 @@ using namespace cv;
 //////////////////////////////////////////////////////////////////////////
 
 #include "test_data_sets.h"
+using namespace cv;
+using namespace OpencvSfM;
+using namespace OpencvSfM::tutorials;
+using namespace std;
 
 NEW_TUTO(Setup_Camera, "Learn how setup cameras",
   "Using intra parameters and positions of cameras, we project 3D poins into cameras' coordinates.")

@@ -13,9 +13,13 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "test_data_sets.h"
+using namespace cv;
+using namespace OpencvSfM;
+using namespace OpencvSfM::tutorials;
+using namespace std;
 
 NEW_TUTO(YAML_Tuto, "Learn how you can load/save object using YAML file format",
-  "After loading an image, we find points and decriptions, theen we save them in a text file. We then reload them to be sure that everything was fine.")
+  "After loading an image, we find points and decriptions, then we save them in a text file. We then reload them to be sure that everything was fine.")
 {
 
   MotionProcessor mp;

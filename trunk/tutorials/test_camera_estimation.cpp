@@ -4,8 +4,8 @@
 #include "../src/MotionProcessor.h"
 #include "../src/SequenceAnalyzer.h"
 #include "../src/CameraPinhole.h"
-#include "../src/libmv_mapping.h"
-#include "../src/ProjectiveEstimator.h"
+//#include "../src/libmv_mapping.h"
+#include "../src/EuclideanEstimator.h"
 
 #include <opencv2/calib3d/calib3d.hpp>
 
@@ -17,6 +17,11 @@
 
 
 #include "test_data_sets.h"
+#define POINT_METHOD "SIFT"
+using namespace cv;
+using namespace OpencvSfM;
+using namespace OpencvSfM::tutorials;
+using namespace std;
 
 NEW_TUTO(Proj_Rec, "Projective reconstruction",
   "Using points and intra parameters, try to compute motion and object"){
@@ -44,32 +49,16 @@ NEW_TUTO(Proj_Rec, "Projective reconstruction",
     images.push_back(imgTmp);
   }
 
-  string pathFileTracks = FROM_SRC_ROOT("Medias/tracks_points_SIFT/motion_tracks.yml");
+  string pathFileTracks = FROM_SRC_ROOT("Medias/tracks_points_"
+    POINT_METHOD"/motion_tracks.yml");
+
   std::ifstream inPoints(pathFileTracks.c_str());
   if( !inPoints.is_open() )
   {
-    pathFileTracks = FROM_SRC_ROOT("Medias/tracks_points_SIFT/motion_tracks1.yml");
-    inPoints.open(pathFileTracks.c_str());
-    if( !inPoints.is_open() )
-    {
-      cout<<"please compute points matches using testMotionEstimator.cpp first!"<<endl;
+    cout<<"you have to run an other tutorial before being able to run this one!"<<endl;
+    bool worked = Tutorial_Handler::ask_to_run_tuto("Track_creation");
+    if( !worked )
       return;
-    }
-    else
-    {
-      FileStorage fsRead(pathFileTracks, FileStorage::READ);
-      FileNode myPtt = fsRead.getFirstTopLevelNode();
-      SequenceAnalyzer motion_tmp( images, myPtt );
-      fsRead.release();
-      motion_tmp.keepOnlyCorrectMatches();
-      pathFileTracks = FROM_SRC_ROOT("Medias/tracks_points_SIFT/motion_tracks.yml");
-      //now save the tracks:
-      FileStorage fsOutMotion(pathFileTracks, FileStorage::WRITE);
-      //Can't find a way to enable the following notation:
-      //fs << *ptt1;
-      SequenceAnalyzer::write(fsOutMotion,motion_tmp);
-      fsOutMotion.release();
-    }
   }
   inPoints.close();
 
@@ -81,12 +70,9 @@ NEW_TUTO(Proj_Rec, "Projective reconstruction",
   vector<TrackOfPoints> &tracks=motion_estim_loaded.getTracks();
   cout<<"numbers of correct tracks loaded:"<<tracks.size()<<endl;
 
-  //now for fun show the sequence on images:
-  //motion_estim_loaded.showTracks(0);
-
   //myCameras contains only intra value. I will use motion_estim_loaded to
   //compute position of cameras:
-  ProjectiveEstimator pe(motion_estim_loaded, myCameras);
+  EuclideanEstimator pe(motion_estim_loaded, myCameras);
 
-  pe.computeReconstruction(myCamerasReal);
+  pe.computeReconstruction();
 }

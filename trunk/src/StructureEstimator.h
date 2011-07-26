@@ -32,14 +32,15 @@ namespace OpencvSfM{
     * Project previously 2D points matches for only two views
     * @param img1 first image to use
     * @param img1 second image to use
-    * @param points3D output of points in 3D
+    * @return output of tracks triangulated (contain 3D point)
     */
-    void computeTwoView(int img1, int img2,
-      std::vector<TrackOfPoints>& points3D);
+    std::vector<TrackOfPoints> computeStructure(
+      const std::vector<int>& list_of_images);
 
   };
 
 }
+
 
 
 #endif

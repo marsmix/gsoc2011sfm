@@ -4,8 +4,9 @@
 #include "../src/StructureEstimator.h"
 #include "../src/PointOfView.h"
 #include "../src/CameraPinhole.h"
-#include "../src/libmv_mapping.h"
+//#include "../src/libmv_mapping.h"
 #include "../src/PCL_mapping.h"
+#include "../src/Visualizer.h"
 
 #include <boost/thread/thread.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
@@ -27,7 +28,11 @@
 
 #define POINT_METHOD "SIFT"
 
-using namespace pcl;
+using namespace OpencvSfM;
+using namespace OpencvSfM::tutorials;
+using namespace std;
+//using namespace cv;//these two namespaces overlaps!
+//using namespace pcl;
 
 NEW_TUTO(PCL_Tutorial, "Learn how you use PCL to show 3D points",
   "This tutorial will show you what you can see from the structure you extracted from motion.")
@@ -41,7 +46,7 @@ NEW_TUTO(PCL_Tutorial, "Learn how you use PCL to show 3D points",
   test_file_exist.open( pathFileTracks );
   if( !test_file_exist.is_open() )
   {
-    cout<<"you should run an other tutorial before being able to run this one!"<<endl;
+    cout<<"you have to run an other tutorial before being able to run this one!"<<endl;
     bool worked = Tutorial_Handler::ask_to_run_tuto("Triangulation_tuto");
     if( !worked )
       return;
@@ -57,36 +62,25 @@ NEW_TUTO(PCL_Tutorial, "Learn how you use PCL to show 3D points",
   //////////////////////////////////////////////////////////////////////////
   //We can now load the points previously found:
   cout<<"create a SequenceAnalyzer using "<<pathFileTracks<<endl;
-  FileStorage fsRead(pathFileTracks, FileStorage::READ);
-  FileNode myPtt = fsRead.getFirstTopLevelNode();
-  vector<Mat> images;//empty list of image as we don't need them here...
+  cv::FileStorage fsRead(pathFileTracks, cv::FileStorage::READ);
+  cv::FileNode myPtt = fsRead.getFirstTopLevelNode();
+  vector< cv::Mat > images;//empty list of image as we don't need them here...
   motion_estim_loaded = new SequenceAnalyzer( images, myPtt );
   fsRead.release();
   cout<<"numbers of correct tracks loaded:"<<
     motion_estim_loaded->getTracks().size()<<endl;
-
-  //////////////////////////////////////////////////////////////////////////
-  //Convert the 3D points to pcl::PointCloud :
-  vector<Vec3d>& tracks = motion_estim_loaded->get3DStructure();
-  PointCloud<PointXYZ>::Ptr my_cloud (new PointCloud<PointXYZ>);
-  OpencvSfM::mapping::convert_OpenCV_vector( tracks, *my_cloud );
-  
+    
   //////////////////////////////////////////////////////////////////////////
   // Open 3D viewer and add point cloud
-  boost::shared_ptr<visualization::PCLVisualizer> viewer (
-    new visualization::PCLVisualizer ("3D Viewer"));
-  viewer->setBackgroundColor (0, 0, 0);
-  viewer->addCoordinateSystem (0.1);
-  viewer->initCameraParameters ();
-  visualization::PointCloudColorHandlerCustom<PointXYZ> 
-    single_color(my_cloud, 0, 255, 0);
-  viewer->addPointCloud<PointXYZ> (my_cloud, single_color, "Structure triangulated");
-  viewer->setPointCloudRenderingProperties (
-    visualization::PCL_VISUALIZER_POINT_SIZE, 2, "Structure triangulated");
+
+  Visualizer debugView ( "3D Viewer" );
+  vector< cv::Vec3d >& tracks = motion_estim_loaded->get3DStructure();
+  debugView.add3DPoints( tracks, "Structure triangulated" );
+
   char buf[250];
   for(int i = 0; i<myCameras.size() ; ++i)
-    myCameras[i].addCameraRepresentation( viewer, 640, 480,
-    ((string)"Cam") + ((string)itoa(i,buf,10)) );
-    
-  viewer->spin();
+    debugView.addCamera( myCameras[i],
+      ((string)"Cam") + ((string)itoa(i,buf,10)) );
+
+  debugView.runInteract();
 }

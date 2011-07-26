@@ -59,10 +59,8 @@ namespace OpencvSfM{
     */
     inline bool containImage(const int image_wanted) const
     {
-      if(std::find(images_indexes_.begin(),images_indexes_.end(),image_wanted) ==
-        images_indexes_.end())
-        return false;
-      return true;
+      return std::find(images_indexes_.begin(),images_indexes_.end(),
+        image_wanted) != images_indexes_.end();
     }
     /**
     * This function is used to know if the track contains the query point
@@ -123,7 +121,8 @@ namespace OpencvSfM{
     double triangulateRobust(std::vector<PointOfView>& cameras,
       const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
       cv::Vec3d& points3D,
-      double reproj_error = 4);
+      double reproj_error = 4,
+      const std::vector<bool> &masks = std::vector<bool>());
   protected:
     double errorEstimate(std::vector< PointOfView >& cameras,
       const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
@@ -233,6 +232,15 @@ namespace OpencvSfM{
     * @param max_number maximum allowed links between images
     */
     void getOrderedLinks(std::vector<ImageLink>& outList,
+      int min_number=0, int max_number=1e9);
+    /**
+    * get the related images to the first parameter
+    * @param first_image [in] first image index
+    * @param outList [in/out] ordered vector of links between images
+    * @param min_number minimum allowed links between images
+    * @param max_number maximum allowed links between images
+    */
+    void getImagesRelatedTo(int first_image, std::vector<ImageLink>& outList,
       int min_number=0, int max_number=1e9);
   };
 }

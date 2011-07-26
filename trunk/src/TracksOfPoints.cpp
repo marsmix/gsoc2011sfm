@@ -216,7 +216,8 @@ namespace OpencvSfM{
 
   double TrackOfPoints::triangulateRobust(std::vector<PointOfView>& cameras,
     const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
-    cv::Vec3d& points3D, double reproj_error)
+    cv::Vec3d& points3D, double reproj_error,
+    const std::vector<bool> &masksValues)
   {
     cv::RNG& rng = cv::theRNG();
     unsigned int nviews = images_indexes_.size();
@@ -233,14 +234,27 @@ namespace OpencvSfM{
         return error;
       }
     }
+    int ptSize = 0;
+    if( masksValues.size() == nviews )
+    {
+      for (int i=0; i<nviews; ++i)
+      {
+        if(masksValues[i]!=0)
+          ptSize++;
+      }
+    }
+    else
+      ptSize = nviews;
 
-    int num_iter=0, max_iter=10;
+    int num_iter=0, max_iter=ptSize - 1;
     for(num_iter=0; num_iter<max_iter; ++num_iter)
     {
       masks.clear();
       int nb_vals=0;
       for (unsigned int cpt = 0; cpt < nviews; cpt++) {
         bool valTmp = (rng(2) != 0);
+        if( masksValues.size() == nviews )
+          valTmp = valTmp & masksValues[cpt];
         if( valTmp )
           nb_vals++;
         masks.push_back(valTmp);
@@ -327,4 +341,47 @@ namespace OpencvSfM{
     quickSort(outLinks, distance, 0, distance.size()-1 );
   }
 
+  void ImagesGraphConnection::getImagesRelatedTo(int first_image,
+    std::vector<ImageLink>& outList, int min_number, int max_number)
+  {
+    int it = 0,
+      it_end = images_graph_.size()[0];
+    int idx[2];
+    for(; it < first_image; ++it)
+    {
+      uchar* currentValue=images_graph_.ptr(it, first_image, false);
+      if( currentValue != NULL )
+      {
+        //we have a value here... Are there enough links:
+        int &val = * reinterpret_cast<int*>(currentValue);
+        if( val > min_number && val < max_number )
+        {
+          //it's a new link, add it:
+          ImageLink link;
+          link.imgSrc = it;
+          link.imgDest = first_image;
+          outList.push_back(link);
+        }
+      }
+    }
+    ++it;//skeep the diagonal
+    for(; it < it_end; ++it)
+    {
+      uchar* currentValue=images_graph_.ptr( first_image, it, false);
+      if( currentValue != NULL )
+      {
+        //we have a value here... Are there enough links:
+        int &val = * reinterpret_cast<int*>(currentValue);
+        if( val > min_number && val < max_number )
+        {
+          //it's a new link, add it:
+          ImageLink link;
+          link.imgSrc = first_image;
+          link.imgDest = it;
+          outList.push_back(link);
+        }
+      }
+    }
+
+  }
 }

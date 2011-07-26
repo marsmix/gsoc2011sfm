@@ -14,6 +14,10 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "test_data_sets.h"
+using namespace cv;
+using namespace OpencvSfM;
+using namespace OpencvSfM::tutorials;
+using namespace std;
 
 NEW_TUTO(Camera_tuto, "Learn how you can mix 3D objects and fully parameterized cameras",
   "Using fully parameterized cameras, we draw a bounding box around the object.")

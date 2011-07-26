@@ -34,9 +34,13 @@ namespace OpencvSfM{
     }
     return output_mask;
   }
-  void StructureEstimator::computeTwoView(int img1, int img2,
-    vector<TrackOfPoints>& points3D)
+
+  std::vector<TrackOfPoints> StructureEstimator::computeStructure(
+    const vector<int>& list_of_images)
   {
+    CV_Assert( list_of_images.size() > 1 );
+
+    std::vector<TrackOfPoints> points3D;
     vector<TrackOfPoints>& tracks = sequence_.getTracks();
     vector< Ptr< PointsToTrack > > &points_to_track = sequence_.getPoints();
 
@@ -45,31 +49,39 @@ namespace OpencvSfM{
     vector<PointOfView>::size_type num_camera = cameras_.size();
     int idImage=-1, idPoint=-1;
     vector<TrackOfPoints>::size_type i;
+    vector<int>::size_type images_size =list_of_images.size();
 
     for (i=0; i < key_size; i++)
     {
       TrackOfPoints &track = tracks[i];
-      if( track.containImage(img1) && track.containImage(img2) )
+      int nbLinks = 0;
+      for( size_t it_img = 0; it_img<images_size ; ++it_img)
+        if( track.containImage( list_of_images[ it_img ] ) )
+          nbLinks++;
+
+      if( nbLinks > 1 )
       {
         unsigned int nviews = track.getNbTrack();
         vector<bool> mask;
         for(unsigned int j=0; j<nviews; ++j)
         {
-          if( img1 == track.getImageIndex( j ) ||
-            img2 == track.getImageIndex( j ) )
+          if( std::find(list_of_images.begin(),list_of_images.end(),
+            track.getImageIndex( j ) ) != list_of_images.end() )
             mask.push_back(true);
           else
             mask.push_back(false);
         }
 
         cv::Vec3d point_final;
-        double distance=track.triangulateLinear( cameras_,points_to_track, point_final,
-          mask );
+        double distance=track.triangulateRobust( cameras_,points_to_track, point_final,
+          4, mask );
 
-        points3D.push_back(track);
+        //if( distance<max_repro_error_ )
+          points3D.push_back(track);
       }
 
     }
+    return points3D;
   }
 
 }

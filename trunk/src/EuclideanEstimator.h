@@ -1,11 +1,12 @@
-#ifndef _GSOC_SFM_POINTS_3D_ESTIMATION_H
-#define _GSOC_SFM_POINTS_3D_ESTIMATION_H 1
+#ifndef _GSOC_SFM_POINTS_3D_EUCLIDEAN_ESTIMATION_H
+#define _GSOC_SFM_POINTS_3D_EUCLIDEAN_ESTIMATION_H 1
 
 #include "macro.h" //SFM_EXPORTS
 #include "SequenceAnalyzer.h"
 #include "PointOfView.h"
-#include "libmv_mapping.h"
 #include "opencv2/core/eigen.hpp"
+#include "libmv/base/vector.h"
+#include "libmv/numeric/numeric.h"
 #include <iostream>
 
 namespace OpencvSfM{
@@ -18,7 +19,7 @@ namespace OpencvSfM{
   * As this class use a lot of libmv functions, the parameters are
   * using libmv structures...
   */
-  class SFM_EXPORTS ProjectiveEstimator
+  class SFM_EXPORTS EuclideanEstimator
   {
   protected:
     int index_origin;///<index of camera set as origin...
@@ -26,11 +27,13 @@ namespace OpencvSfM{
     libmv::vector<libmv::Mat3> rotations_;
     libmv::vector<libmv::Vec3> translations_;
     std::vector<PointOfView>& cameras_;
+    std::vector<bool> camera_computed_;
+    std::vector< TrackOfPoints > point_computed_;
     SequenceAnalyzer &sequence_;
   public:
-    ProjectiveEstimator(SequenceAnalyzer &sequence,
+    EuclideanEstimator(SequenceAnalyzer &sequence,
       std::vector<PointOfView>& cameras);
-    virtual ~ProjectiveEstimator(void);
+    virtual ~EuclideanEstimator(void);
 
     /**
     * Add a new camera to the estimator
@@ -40,26 +43,29 @@ namespace OpencvSfM{
     {
       libmv::Mat3 intra_param;
       cv::Ptr<Camera> intra=camera.getIntraParameters();
-      cv::cv2eigen(intra->getIntraMatrix(),intra_param);
-      intra_params_.push_back(intra_param);
+      cv::cv2eigen( intra->getIntraMatrix().t(), intra_param );
+      intra_params_.push_back( intra_param );
       libmv::Mat3 rotation_mat;
-      cv::cv2eigen(camera.getRotationMatrix(),rotation_mat);
+      cv::cv2eigen( camera.getRotationMatrix(), rotation_mat );
       rotations_.push_back(rotation_mat);
       libmv::Vec3 translation_vec;
-      cv::cv2eigen(camera.getTranslationVector(),translation_vec);
-      translations_.push_back(translation_vec);
+      cv::cv2eigen( camera.getTranslationVector(), translation_vec );
+      translations_.push_back( translation_vec );
+      camera_computed_.push_back( false );
     }
     
     /**
-    * improve cameras positions.
-    * camReal is only here to test quality of estimation...
+    * comptue cameras and structure if intra parameters are known.
     */
-    void computeReconstruction(std::vector<PointOfView>& camReal);
+    void computeReconstruction();
 
   protected:
-    void updateTwoViewMotion(std::vector<TrackOfPoints>& tracks,
-      std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
+    void initialReconstruction(std::vector<TrackOfPoints>& tracks,
+      const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
       int image1, int image2);
+
+    void cameraResection( unsigned int image,
+      const cv::Ptr< PointsToTrack > points_to_track );
   };
 
 }
