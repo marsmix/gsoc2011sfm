@@ -34,53 +34,53 @@ using namespace std;
 //using namespace cv;//these two namespaces overlaps!
 //using namespace pcl;
 
-NEW_TUTO(PCL_Tutorial, "Learn how you use PCL to show 3D points",
-  "This tutorial will show you what you can see from the structure you extracted from motion.")
+NEW_TUTO( PCL_Tutorial, "Learn how you use PCL to show 3D points",
+  "This tutorial will show you what you can see from the structure you extracted from motion." )
 {
   //////////////////////////////////////////////////////////////////////////
   //first see if we have the points to show:
   SequenceAnalyzer *motion_estim_loaded;
-  string pathFileTracks = FROM_SRC_ROOT("Medias/tracks_points_"POINT_METHOD
-    "/motion_tracks_triangulated.yml");
+  string pathFileTracks = FROM_SRC_ROOT( "Medias/tracks_points_"POINT_METHOD
+    "/motion_tracks_triangulated.yml" );
   std::ifstream test_file_exist;
   test_file_exist.open( pathFileTracks );
-  if( !test_file_exist.is_open() )
+  if( !test_file_exist.is_open( ) )
   {
     cout<<"you have to run an other tutorial before being able to run this one!"<<endl;
-    bool worked = Tutorial_Handler::ask_to_run_tuto("Triangulation_tuto");
+    bool worked = Tutorial_Handler::ask_to_run_tuto( "Triangulation_tuto" );
     if( !worked )
       return;
   }
-  test_file_exist.close();
+  test_file_exist.close( );
 
   //////////////////////////////////////////////////////////////////////////
   //We also load cameras from the temple dataset:
   cout<<"Load the cameras from Medias/temple/temple_par.txt"<<endl;
   vector<PointOfView> myCameras=loadCamerasFromFile(
-    FROM_SRC_ROOT("Medias/temple/temple_par.txt"));
+    FROM_SRC_ROOT( "Medias/temple/temple_par.txt" ));
 
   //////////////////////////////////////////////////////////////////////////
   //We can now load the points previously found:
   cout<<"create a SequenceAnalyzer using "<<pathFileTracks<<endl;
-  cv::FileStorage fsRead(pathFileTracks, cv::FileStorage::READ);
-  cv::FileNode myPtt = fsRead.getFirstTopLevelNode();
+  cv::FileStorage fsRead( pathFileTracks, cv::FileStorage::READ );
+  cv::FileNode myPtt = fsRead.getFirstTopLevelNode( );
   vector< cv::Mat > images;//empty list of image as we don't need them here...
   motion_estim_loaded = new SequenceAnalyzer( images, myPtt );
-  fsRead.release();
+  fsRead.release( );
   cout<<"numbers of correct tracks loaded:"<<
-    motion_estim_loaded->getTracks().size()<<endl;
+    motion_estim_loaded->getTracks( ).size( )<<endl;
     
   //////////////////////////////////////////////////////////////////////////
   // Open 3D viewer and add point cloud
 
   Visualizer debugView ( "3D Viewer" );
-  vector< cv::Vec3d >& tracks = motion_estim_loaded->get3DStructure();
+  vector< cv::Vec3d >& tracks = motion_estim_loaded->get3DStructure( );
   debugView.add3DPoints( tracks, "Structure triangulated" );
 
-  char buf[250];
-  for(int i = 0; i<myCameras.size() ; ++i)
-    debugView.addCamera( myCameras[i],
-      ((string)"Cam") + ((string)itoa(i,buf,10)) );
+  char buf[ 250 ];
+  for( int i = 0; i<myCameras.size( ) ; ++i )
+    debugView.addCamera( myCameras[ i ],
+      ( (string )"Cam" ) + ( (string )itoa( i,buf,10 )) );
 
-  debugView.runInteract();
+  debugView.runInteract( );
 }

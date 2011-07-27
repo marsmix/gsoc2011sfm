@@ -3,13 +3,13 @@
 
 using namespace OpencvSfM;
 using namespace tutorials;
-int main()
+int main( )
 {
 
-  int choice = Tutorial_Handler::print_menu();
+  int choice = Tutorial_Handler::print_menu( );
   while( choice>=0 )
   {
-    Tutorial_Handler::run_tuto(choice);
-    choice = Tutorial_Handler::print_menu();
+    Tutorial_Handler::run_tuto( choice );
+    choice = Tutorial_Handler::print_menu( );
   }
 }

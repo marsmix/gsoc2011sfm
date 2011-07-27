@@ -20,14 +20,14 @@ namespace OpencvSfM{
   protected:
     boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer;
   public:
-    Visualizer(std::string name = "3D Viewer");
+    Visualizer( std::string name = "3D Viewer" );
     
     void addCamera( const PointOfView& camera,
       std::string name = "camera", int viewport = 0 );
     void add3DPoints( const std::vector<cv::Vec3d>& points,
       std::string name = "cloud", int viewport = 0 );
 
-    void runInteract();
+    void runInteract( );
   };
 }
 

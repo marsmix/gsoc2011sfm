@@ -7,12 +7,12 @@ using std::vector;
 
 namespace OpencvSfM{
 
-  Camera::Camera()
+  Camera::Camera( )
   {
   }
 
 
-  Camera::~Camera(void)
+  Camera::~Camera( void )
   {
   }
 

@@ -25,7 +25,7 @@ namespace OpencvSfM{
   {
   protected:
     std::vector<cv::KeyPoint> keypoints_;///<This attribute will store points coordinates and sometimes orientation and size
-    cv::Mat descriptors_;///<this attribute will store descritors for each points in a matrix with size (n*m), where n is the number of points and m is the desciptor size.
+    cv::Mat descriptors_;///<this attribute will store descritors for each points in a matrix with size ( n*m ), where n is the number of points and m is the desciptor size.
     int corresponding_image_;///<index of frame when available
     static int glob_number_images_;///<total numbers of images!
   public:
@@ -35,12 +35,12 @@ namespace OpencvSfM{
     * @param keypoints the points we will try to track...
     * @param descriptors the feature vector for each points...
     */
-    PointsToTrack(int corresponding_image=-1, std::vector<cv::KeyPoint> keypoints=
-      std::vector<cv::KeyPoint>(0), cv::Mat descriptors=cv::Mat());
+    PointsToTrack( int corresponding_image=-1, std::vector<cv::KeyPoint> keypoints=
+      std::vector<cv::KeyPoint>( 0 ), cv::Mat descriptors=cv::Mat( ) );
     /**
     * Destructor : delete points and features vectors
     */
-    virtual ~PointsToTrack(void);
+    virtual ~PointsToTrack( void );
     
     /**
     * This method is used to compute both Keypoints and descriptors...
@@ -48,63 +48,63 @@ namespace OpencvSfM{
     * If false and if keypoints and descriptor exists, nothing is done.
     * @return the number of points
     */
-    virtual int computeKeypointsAndDesc(bool forcing_recalculation=false);
+    virtual int computeKeypointsAndDesc( bool forcing_recalculation=false );
     /**
     * This method is used to compute only Keypoints...
     * @return the number of points
     */
-    virtual int computeKeypoints();
+    virtual int computeKeypoints( );
     /**
     * This method is used to compute only descriptors...
     */
-    virtual void computeDescriptors();
+    virtual void computeDescriptors( );
     /**
     * This method is used to add Keypoints...
     * @param keypoints Keypoints to add
     * @param descriptors of points, if any
     * @param computeMissingDescriptor if true, the missing descriptors are computed.
     */
-    void addKeypoints(std::vector<cv::KeyPoint> keypoints,cv::Mat descriptors=cv::Mat(),bool computeMissingDescriptor=false);
+    void addKeypoints( std::vector<cv::KeyPoint> keypoints,cv::Mat descriptors=cv::Mat( ),bool computeMissingDescriptor=false );
     /**
     * This method is used to add a keypoint at the end of the points vector...
     * @param keypoints Keypoints to add
     * @return index of the keypoint.
     */
-    inline unsigned int addKeypoint(cv::KeyPoint point)
-    {keypoints_.push_back(point); return keypoints_.size()-1;};
+    inline unsigned int addKeypoint( cv::KeyPoint point )
+    {keypoints_.push_back( point ); return keypoints_.size( )-1;};
     /**
     * this method return the points coordinates and sometimes orientation and size
     * @return points coordinates and when available orientation and size
     */
-    inline const std::vector<cv::KeyPoint>& getKeypoints() const {return keypoints_;};
+    inline const std::vector<cv::KeyPoint>& getKeypoints( ) const {return keypoints_;};
     /**
     * this method return the points coordinates corresponding to tracks
     * @param matches list of tracks. Only points found in tracks are returned
-    * @param pointsVals [out] points found in tracks
+    * @param pointsVals [ out ] points found in tracks
     */
-    void getKeyMatches(const std::vector<TrackOfPoints>& matches, int otherImage,
-      std::vector<cv::Point2f>& pointsVals) const;
+    void getKeyMatches( const std::vector<TrackOfPoints>& matches, int otherImage,
+      std::vector<cv::Point2f>& pointsVals ) const;
     /**
     * this method return the points coordinates of the i^th entry
     * @param index number of keypoints wanted
     * @return points coordinates and when available orientation and size
     */
-    inline const cv::KeyPoint& getKeypoint(unsigned int index) const
-    {CV_DbgAssert( index<keypoints_.size()); return keypoints_[index];};
+    inline const cv::KeyPoint& getKeypoint( unsigned int index ) const
+    {CV_DbgAssert( index<keypoints_.size( ) ); return keypoints_[ index ];};
     /**
-    * this method return the descritors for each points in a matrix with size (n*m), where n is the number of points and m is the desciptor size.
-    * @return descritors for each points in a matrix with size (n*m), where n is the number of points and m is the desciptor size.
+    * this method return the descritors for each points in a matrix with size ( n*m ), where n is the number of points and m is the desciptor size.
+    * @return descritors for each points in a matrix with size ( n*m ), where n is the number of points and m is the desciptor size.
     */
-    cv::Mat getDescriptors() const {return descriptors_;};
+    cv::Mat getDescriptors( ) const {return descriptors_;};
     /**
     * To show the points on image, use this function to draw points on it.
     * @param image Source image.
     * @param outImg Output image. Its content depends on flags value what is drawn in output image. See possible flags bit values.
     * @param color Color of keypoints
-    * @param flags Possible flags bit values is defined by DrawMatchesFlags (see http://opencv.willowgarage.com/documentation/cpp/features2d_drawing_function_of_keypoints_and_matches.html#cv-drawmatches)
+    * @param flags Possible flags bit values is defined by DrawMatchesFlags ( see http://opencv.willowgarage.com/documentation/cpp/features2d_drawing_function_of_keypoints_and_matches.html#cv-drawmatches )
     */
     //
-    void printPointsOnImage(const cv::Mat &image, cv::Mat& outImg, const cv::Scalar& color=cv::Scalar::all(-1), int flags=cv::DrawMatchesFlags::DEFAULT) const;
+    void printPointsOnImage( const cv::Mat &image, cv::Mat& outImg, const cv::Scalar& color=cv::Scalar::all( -1 ), int flags=cv::DrawMatchesFlags::DEFAULT ) const;
 
     static void read( const cv::FileNode& node, PointsToTrack& points );
 
@@ -119,8 +119,8 @@ static inline void cv::write( cv::FileStorage& fs, const std::string& name,
   OpencvSfM::PointsToTrack::write( fs,points );
 };
 //! reads vector of keypoints from the specified file storage node
-static inline void cv::read(const cv::FileNode& node, OpencvSfM::PointsToTrack& points, 
-  OpencvSfM::PointsToTrack defaultValue = OpencvSfM::PointsToTrack())
+static inline void cv::read( const cv::FileNode& node, OpencvSfM::PointsToTrack& points, 
+  OpencvSfM::PointsToTrack defaultValue = OpencvSfM::PointsToTrack( ) )
 {
   OpencvSfM::PointsToTrack::read( node,points );
 }
