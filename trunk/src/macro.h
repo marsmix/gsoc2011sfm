@@ -3,14 +3,14 @@
 
 //Taken from opencv's precom.hpp
 #if _MSC_VER >= 1200
-#pragma warning( disable: 4127 4251 4521)
+#pragma warning( disable: 4127 4251 4521 )
 #endif
 
-#if (defined WIN32 || defined _WIN32 || defined WINCE)
+#if ( defined WIN32 || defined _WIN32 || defined WINCE )
   #if defined SFM_API_EXPORTS
-      #define SFM_EXPORTS __declspec(dllexport)
+      #define SFM_EXPORTS __declspec( dllexport )
   #else
-      #define SFM_EXPORTS __declspec(dllimport)
+      #define SFM_EXPORTS __declspec( dllimport )
   #endif
 #else
     #define SFM_EXPORTS

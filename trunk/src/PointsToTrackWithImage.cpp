@@ -16,49 +16,49 @@ namespace OpencvSfM
   using cv::line;
   using cv::circle;
 
-  PointsToTrackWithImage::PointsToTrackWithImage(int corresponding_image,
+  PointsToTrackWithImage::PointsToTrackWithImage( int corresponding_image,
     Mat imageToAnalyse, Mat maskOfAnalyse,Ptr<FeatureDetector> feature_detector,
-    Ptr<DescriptorExtractor> descriptor_detector)
-    :PointsToTrack(corresponding_image),imageToAnalyse_(imageToAnalyse),
-    maskOfAnalyse_(maskOfAnalyse),feature_detector_(feature_detector),
-    descriptor_detector_(descriptor_detector)
+    Ptr<DescriptorExtractor> descriptor_detector )
+    :PointsToTrack( corresponding_image ),imageToAnalyse_( imageToAnalyse ),
+    maskOfAnalyse_( maskOfAnalyse ),feature_detector_( feature_detector ),
+    descriptor_detector_( descriptor_detector )
   {
   }
 
-  PointsToTrackWithImage::PointsToTrackWithImage(int corresponding_image,
+  PointsToTrackWithImage::PointsToTrackWithImage( int corresponding_image,
     Mat imageToAnalyse, Mat maskOfAnalyse,string feature_detector,
-    string descriptor_detector/*=""SIFT""*/)
-    :PointsToTrack(corresponding_image),imageToAnalyse_(imageToAnalyse),
-    maskOfAnalyse_(maskOfAnalyse),
-    feature_detector_(FeatureDetector::create(feature_detector)),
-    descriptor_detector_(DescriptorExtractor::create(descriptor_detector))
+    string descriptor_detector/*=""SIFT""*/ )
+    :PointsToTrack( corresponding_image ),imageToAnalyse_( imageToAnalyse ),
+    maskOfAnalyse_( maskOfAnalyse ),
+    feature_detector_( FeatureDetector::create( feature_detector )),
+    descriptor_detector_( DescriptorExtractor::create( descriptor_detector ))
   {
   }
 
-  void PointsToTrackWithImage::setFeatureDetector(cv::Ptr<cv::FeatureDetector> feature_detector)
+  void PointsToTrackWithImage::setFeatureDetector( cv::Ptr<cv::FeatureDetector> feature_detector )
   {
     feature_detector_=feature_detector;
   }
 
-  void PointsToTrackWithImage::setDescriptorExtractor(cv::Ptr<cv::DescriptorExtractor> descriptor_detector)
+  void PointsToTrackWithImage::setDescriptorExtractor( cv::Ptr<cv::DescriptorExtractor> descriptor_detector )
   {
     descriptor_detector_=descriptor_detector;
   }
 
-  PointsToTrackWithImage::~PointsToTrackWithImage(void)
+  PointsToTrackWithImage::~PointsToTrackWithImage( void )
   {
-    imageToAnalyse_.release();
-    maskOfAnalyse_.release();
+    imageToAnalyse_.release( );
+    maskOfAnalyse_.release( );
   }
 
-  int PointsToTrackWithImage::computeKeypoints()
+  int PointsToTrackWithImage::computeKeypoints( )
   {
-    feature_detector_->detect(imageToAnalyse_,this->keypoints_,maskOfAnalyse_);
-    return this->keypoints_.size();
+    feature_detector_->detect( imageToAnalyse_,this->keypoints_,maskOfAnalyse_ );
+    return this->keypoints_.size( );
   }
 
-  void PointsToTrackWithImage::computeDescriptors()
+  void PointsToTrackWithImage::computeDescriptors( )
   {
-    descriptor_detector_->compute(imageToAnalyse_,this->keypoints_,this->descriptors_);
+    descriptor_detector_->compute( imageToAnalyse_,this->keypoints_,this->descriptors_ );
   }
 }

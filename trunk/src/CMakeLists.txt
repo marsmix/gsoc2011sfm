@@ -1,2 +1,2 @@
-#include_directories("${PROJECT_SOURCE_DIR}/src")
-define_new_library(core)
+#include_directories( "${PROJECT_SOURCE_DIR}/src" )
+define_new_library( core )

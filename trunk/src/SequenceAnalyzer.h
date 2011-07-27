@@ -58,7 +58,7 @@ namespace OpencvSfM{
     */
     std::vector<TrackOfPoints> tracks_;
     /**
-    * Graph of images relations (value (i,j) correspond to the numbers
+    * Graph of images relations ( value ( i,j ) correspond to the numbers
     * of matches between theses two images
     */
     ImagesGraphConnection images_graph_;
@@ -67,66 +67,66 @@ namespace OpencvSfM{
     * Constructor taking a MotionProcessor to load images and a features detector
     * and descriptor to find matches.
     * @param input_sequence input images
-    * @param feature_detector Algorithm to use for features detection (see http://opencv.willowgarage.com/documentation/cpp/common_interfaces_for_feature_detection_and_descriptor_extraction.html#featuredetector)
-    * @param descriptor_detector Algorithm to use for descriptors detection (see http://opencv.willowgarage.com/documentation/cpp/common_interfaces_for_feature_detection_and_descriptor_extraction.html#descriptorextractor)
+    * @param feature_detector Algorithm to use for features detection ( see http://opencv.willowgarage.com/documentation/cpp/common_interfaces_for_feature_detection_and_descriptor_extraction.html#featuredetector )
+    * @param descriptor_detector Algorithm to use for descriptors detection ( see http://opencv.willowgarage.com/documentation/cpp/common_interfaces_for_feature_detection_and_descriptor_extraction.html#descriptorextractor )
     * @param match_algorithm algorithm to match points of each images
     */
-    SequenceAnalyzer(MotionProcessor input_sequence,
+    SequenceAnalyzer( MotionProcessor input_sequence,
       cv::Ptr<cv::FeatureDetector> feature_detector,
       cv::Ptr<cv::DescriptorExtractor> descriptor_extractor,
-      cv::Ptr<PointsMatcher> match_algorithm);
+      cv::Ptr<PointsMatcher> match_algorithm );
     /**
     * Constructor taking a vector of points to track and a PointsMatcher
     * algorithm to find matches.
     * @param images input images. Points should be in the same order!
-    * @param points_to_track list of points to track with (or not) features
+    * @param points_to_track list of points to track with ( or not ) features
     * @param match_algorithm algorithm to match points of each images
     */
     SequenceAnalyzer(
       std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
       cv::Ptr<PointsMatcher> match_algorithm,
-      const std::vector<cv::Mat> &images);
+      const std::vector<cv::Mat> &images );
     /**
     * Constructor taking a list of images and a FileNode
     * @param images input images. Points should be in the same order!
     * @param file YAML file to get points and matches
     */
-    SequenceAnalyzer(std::vector<cv::Mat> &images, cv::FileNode file);
+    SequenceAnalyzer( std::vector<cv::Mat> &images, cv::FileNode file );
 
-    ~SequenceAnalyzer(void);
+    ~SequenceAnalyzer( void );
     /**
     * This method add new image to track. When adding, the matches are not
     * computed, use computeMatches to compute them!
     * @param points extracted points with features vectors.
     */
-    void addNewImage(cv::Mat image,
-      cv::Ptr<PointsToTrack> points = cv::Ptr<PointsToTrack>());
+    void addNewImage( cv::Mat image,
+      cv::Ptr<PointsToTrack> points = cv::Ptr<PointsToTrack>( ) );
     
     /**
     * This method compute the matches between each points of each images.
     * It first compute missing features descriptor, then train each matcher.
-    * Finally compute tracks of keypoints (a track is a connected set of 
-    * matching keypoints across multiple images)
+    * Finally compute tracks of keypoints ( a track is a connected set of 
+    * matching keypoints across multiple images )
     */
-    void computeMatches();
+    void computeMatches( );
     /**
     * This method keep only tracks with more than mininum_image_matches
     */
-    void keepOnlyCorrectMatches();
+    void keepOnlyCorrectMatches( );
     /**
     * This method can be used to get the tracks
     */
-    inline std::vector<TrackOfPoints> &getTracks(){return tracks_;};
+    inline std::vector<TrackOfPoints> &getTracks( ){return tracks_;};
     /**
     * This method can be used to get the points
     */
-    inline std::vector< cv::Ptr< PointsToTrack > > &getPoints(){
+    inline std::vector< cv::Ptr< PointsToTrack > > &getPoints( ){
       return points_to_track_;};
 
-    inline ImagesGraphConnection& getImgGraph()
+    inline ImagesGraphConnection& getImgGraph( )
     {
-      if( !images_graph_.isGraphCreated(images_.size()) )
-        constructImagesGraph();
+      if( !images_graph_.isGraphCreated( images_.size( ) ) )
+        constructImagesGraph( );
       return images_graph_;
     };
     /**
@@ -139,23 +139,23 @@ namespace OpencvSfM{
 
     static void write( cv::FileStorage& fs, const SequenceAnalyzer& points );
     
-    inline int getNumViews() const
+    inline int getNumViews( ) const
     {
       unsigned int maxImg=0;
-      std::vector<TrackOfPoints>::size_type key_size = tracks_.size(),
+      std::vector<TrackOfPoints>::size_type key_size = tracks_.size( ),
         i=0;
-      for (i=0; i < key_size; i++)
+      for ( i=0; i < key_size; i++ )
       {
-        const TrackOfPoints &track = tracks_[i];
-        int nviews = track.images_indexes_.size();
-        for(int j = 0;j<nviews;++j)
-          if(maxImg<track.images_indexes_[j])
-            maxImg=track.images_indexes_[j];
+        const TrackOfPoints &track = tracks_[ i ];
+        int nviews = track.images_indexes_.size( );
+        for( int j = 0;j<nviews;++j )
+          if( maxImg<track.images_indexes_[ j ] )
+            maxImg=track.images_indexes_[ j ];
       }
       return maxImg;
     }
 
-    inline cv::Mat getImage(int idx) { return images_[idx]; };
+    inline cv::Mat getImage( int idx ) { return images_[ idx ]; };
 
     /**
     * This function add matches to tracks
@@ -163,22 +163,22 @@ namespace OpencvSfM{
     * @param img1 index of source matches image
     * @param img2 index of destination matches image
     */
-    inline void addMatches(std::vector<cv::DMatch> &newMatches,
-      unsigned int img1, unsigned int img2);
+    inline void addMatches( std::vector<cv::DMatch> &newMatches,
+      unsigned int img1, unsigned int img2 );
     /**
     * This function add new Tracks
     * @param newTracks new Tracks to add
     */
-    void addTracks(std::vector<TrackOfPoints> &newTracks);
+    void addTracks( std::vector<TrackOfPoints> &newTracks );
     /**
     * This function constructs and feeds the images_graph_
     */
-    void constructImagesGraph();
+    void constructImagesGraph( );
     /**
     * This function will create a list of 3D points corresponding to
     * object viewed in the sequence
     */
-    std::vector< cv::Vec3d > get3DStructure();
+    std::vector< cv::Vec3d > get3DStructure( );
   };
 
 }

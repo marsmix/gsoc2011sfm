@@ -20,20 +20,20 @@ namespace OpencvSfM{
     * @param minimum_inputs number of input needed to solve the problem
     * @return 
     */
-    TwoViewSolver(unsigned short minimum_inputs=0);
-    virtual ~TwoViewSolver(void);
+    TwoViewSolver( unsigned short minimum_inputs=0 );
+    virtual ~TwoViewSolver( void );
 
     /**
     * used to know how many parameters we need to solve this problem:
     * @return number of minimal inputs
     */
-    inline unsigned short getMinimInputs(){return minimum_inputs_;};
+    inline unsigned short getMinimInputs( ){return minimum_inputs_;};
 
     /**
     * The function used to compute the solution.
     * @param 
     */
-    virtual void solve()=0;
+    virtual void solve( )=0;
   };
 }
 
