@@ -123,6 +123,8 @@ namespace OpencvSfM{
     unsigned int i=0,j=0;
     while ( matches_it != end_matches_it )
     {
+      if( i>5 )
+        break;
       Ptr<PointsMatcher> point_matcher = ( *matches_it );
 
       //the folowing vector is computed only the first time
@@ -131,6 +133,8 @@ namespace OpencvSfM{
       j=i+1;
       while ( matches_it1 != end_matches_it )
       {
+        if( j>5 )
+          break;
         Ptr<PointsMatcher> point_matcher1 = ( *matches_it1 );
         vector<DMatch> matches_i_j;
 
@@ -395,8 +399,8 @@ namespace OpencvSfM{
         point[ 2 ] = it_track[ "point3D_triangulated" ][ 2 ];
         track.point3D = Ptr<cv::Vec3d>( new cv::Vec3d( point ) );
       }
-      cv::FileNodeIterator itPoints = it_track[ "track" ].begin( ),
-        itPoints_end = it_track[ "track" ].end( );
+      cv::FileNodeIterator itPoints = it_track[ "list_of_points" ].begin( ),
+        itPoints_end = it_track[ "list_of_points" ].end( );
       while( itPoints != itPoints_end )
       {
         int idImage;
@@ -427,10 +431,10 @@ namespace OpencvSfM{
   {
     vector<TrackOfPoints>::size_type key_size = me.tracks_.size( );
     int idImage=-1, idPoint=-1;
-
+    
     fs << "SequenceAnalyzer" << "{";
     fs << "nbPictures" << ( int )me.points_to_track_.size( );
-    fs << "TrackPoints" << "[ ";
+    fs << "TrackPoints" << "[";
     for ( vector<TrackOfPoints>::size_type i=0; i < key_size; i++ )
     {
       const TrackOfPoints &track = me.tracks_[ i ];
@@ -442,7 +446,7 @@ namespace OpencvSfM{
         fs << "has_3d_position" << ( !track.point3D.empty( ) );
         if( !track.point3D.empty( ) )
           fs << "point3D_triangulated" << *track.point3D;
-        fs << "track" << "[ :";
+        fs << "list_of_points" << "[:";
         for ( unsigned int j = 0; j < nbPoints ; j++ )
         {
           idImage = track.images_indexes_[ j ];
@@ -450,7 +454,7 @@ namespace OpencvSfM{
           if( idImage>=0 && idPoint>=0 )
           {
             fs << idImage;
-            fs  << "[ :";
+            fs  << "[:";
 
             const cv::KeyPoint kpt = me.points_to_track_[ idImage ]->
               getKeypoints( )[ idPoint ];
@@ -461,13 +465,13 @@ namespace OpencvSfM{
             cv::write( fs, kpt.response );
             cv::write( fs, kpt.octave );
             cv::write( fs, kpt.class_id );
-            fs << " ]" ;
+            fs << "]" ;
           }
         }
-        fs << " ]" << "}" ;
+        fs << "]" << "}" ;
       }
     }
-    fs << " ]" << "}";
+    fs << "]" << "}";
   }
 
   void SequenceAnalyzer::constructImagesGraph( )

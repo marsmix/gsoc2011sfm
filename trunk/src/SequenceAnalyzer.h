@@ -17,7 +17,7 @@ namespace OpencvSfM{
   * \brief This class tries to match points in the entire sequence.
   * It follow ideas proposed by Noah Snavely:
   * Modeling the World from Internet Photo Collections
-  * 
+  *
   * This class process an input video to first extracts the
   * features, then matches them and keeps them only when
   * there is more than 2 pictures containing the point.
@@ -101,11 +101,11 @@ namespace OpencvSfM{
     */
     void addNewImage( cv::Mat image,
       cv::Ptr<PointsToTrack> points = cv::Ptr<PointsToTrack>( ) );
-    
+
     /**
     * This method compute the matches between each points of each images.
     * It first compute missing features descriptor, then train each matcher.
-    * Finally compute tracks of keypoints ( a track is a connected set of 
+    * Finally compute tracks of keypoints ( a track is a connected set of
     * matching keypoints across multiple images )
     */
     void computeMatches( );
@@ -138,7 +138,7 @@ namespace OpencvSfM{
     static void read( const cv::FileNode& node, SequenceAnalyzer& points );
 
     static void write( cv::FileStorage& fs, const SequenceAnalyzer& points );
-    
+
     inline int getNumViews( ) const
     {
       unsigned int maxImg=0;

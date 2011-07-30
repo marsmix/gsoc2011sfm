@@ -14,6 +14,10 @@
 
 #include "test_data_sets.h"
 #define POINT_METHOD "SIFT"
+#define DETECTOR_METHOD SiftFeatureDetector
+#define DESCRIPTOR_METHOD SiftDescriptorExtractor
+#define MATCHER_METHOD FlannBasedMatcher
+
 using namespace cv;
 using namespace OpencvSfM;
 using namespace OpencvSfM::tutorials;
@@ -31,18 +35,18 @@ NEW_TUTO( Track_creation, "Learn how you can compute tracks from a list of pictu
     return;
   }
 
-  //Configure input ( not needed, but show how we can do 
-  //mp.setProperty( CV_CAP_PROP_CONVERT_RGB,0 );//Only greyscale, due to SIFT
+  //Configure input ( not needed, but show how we can do
+  mp.setProperty( CV_CAP_PROP_CONVERT_RGB,0 );//Only greyscale, due to SIFT
 
   Ptr<FeatureDetector> detector;
-  detector=Ptr<FeatureDetector>( new FastFeatureDetector( ) );
+  detector=Ptr<FeatureDetector>( new DETECTOR_METHOD( ) );
   Ptr<DescriptorExtractor> desc_extractor;
-  desc_extractor=Ptr<DescriptorExtractor>( new BriefDescriptorExtractor( 32 ));
+  desc_extractor=Ptr<DescriptorExtractor>( new DESCRIPTOR_METHOD( ));
   vector< Ptr< PointsToTrack > > vec_points_to_track;
   Ptr<PointsToTrack> ptrPoints_tmp;
 
   Ptr<DescriptorMatcher> matcher;
-  matcher=Ptr<DescriptorMatcher>( new BruteForceMatcher<Hamming>( ) );
+  matcher=Ptr<DescriptorMatcher>( new MATCHER_METHOD( ));
   Ptr<PointsMatcher> matches_algo ( new PointsMatcher( matcher ) );
 
   //universal method to get the current image:
@@ -78,7 +82,7 @@ NEW_TUTO( Track_creation, "Learn how you can compute tracks from a list of pictu
     int nbFrame=0;
     cout<<"Compute points and description for each frame..."<<endl;
     cout<<"This can take time so be patient ; )"<<endl;
-    while ( !currentImage.empty( ) )// && nbFrame<50 )
+    while ( !currentImage.empty( )  && nbFrame<5 )
     {
       //if the image is loaded, find the points:
       cout<<"Create a new PointsToTrack..."<<endl;
@@ -86,7 +90,7 @@ NEW_TUTO( Track_creation, "Learn how you can compute tracks from a list of pictu
       ptrPoints_tmp = Ptr<PointsToTrack>( new PointsToTrackWithImage ( nbFrame,
         currentImage, Mat( ), detector, desc_extractor ));
       ptrPoints_tmp->computeKeypointsAndDesc( );
-      
+
       vec_points_to_track.push_back( ptrPoints_tmp );
       images.push_back( currentImage );
       nbFrame++;
@@ -100,12 +104,12 @@ NEW_TUTO( Track_creation, "Learn how you can compute tracks from a list of pictu
       cout<<"Can't create "<<pathFileTracks<<"!\nPlease verify you have access to the directory!"<<endl;
       return;
     }
-    fsOut << "Vector_of_motionTrack" << "[ ";
+    fsOut << "Vector_of_motionTrack" << "[";
     for( unsigned int i=0;i<vec_points_to_track.size( ); i++ )
     {
       PointsToTrack::write( fsOut,*vec_points_to_track[ i ] );
     }
-    fsOut << " ]";
+    fsOut << "]";
     fsOut.release( );
 
   }
@@ -156,7 +160,7 @@ NEW_TUTO( Track_creation, "Learn how you can compute tracks from a list of pictu
   //now for fun show the sequence on images:
   motion_estim.showTracks( 0 );
 
-  
+
   /*
   //and create a new PointsToTrack using this file:
   vector<Ptr<PointsToTrack>> points_empty;

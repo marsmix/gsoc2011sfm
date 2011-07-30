@@ -105,7 +105,11 @@ find_library( LIBMV_LIB_DIR "multiview"
 	PATHS ${LIBMV_HEADER_DIR} "../${LIBMV_HEADER_DIR}"
 	PATH_SUFFIXES "lib"
 	DOC "The path to LIBMV lib" )
+if( WIN32 )
 SET ( LIBMV_LIB debug "multiview_d" "numeric_d" "V3D" "ldl" "colamd" optimized "multiview" "numeric" "V3D" "ldl" "colamd" )
+else( )
+SET ( LIBMV_LIB "libmultiview.a" "libnumeric.a" "libtools.a" "libV3D.a" "libldl.a" "libcolamd.a" "libglog.a" "libgflags.a" "libgtest.a" )
+endif( )
 include_directories( ${LIBMV_HEADER_DIR} )
 link_directories( ${LIBMV_LIB_DIR} )
 SET( SFM_LINKER_LIBS ${SFM_LINKER_LIBS} ${LIBMV_LIB} )

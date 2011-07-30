@@ -11,6 +11,7 @@
 #include "libmv/multiview/bundle.h"
 
 #include <pcl/io/vtk_io.h>
+#include <sstream>
 
 using std::vector;
 using cv::Ptr;
@@ -18,7 +19,7 @@ using cv::Ptr;
 namespace OpencvSfM{
   //the next two functions are only for intern usage, no external interface...
 
-  // Approximation of reprojection error; 
+  // Approximation of reprojection error;
   // The one from libmv don't use Mat2X as input
   double SampsonDistance2( const libmv::Mat &F,
     const libmv::Mat2X &x1, const libmv::Mat2X &x2 ) {
@@ -531,11 +532,14 @@ namespace OpencvSfM{
     Visualizer debugView ( "Debug viewer" );
     debugView.add3DPoints( tracks3D );
 
-    char buf[ 250 ];
     for( int i = 0; i<cameras_.size( ) ; ++i )
       if( camera_computed_[i] )
-      debugView.addCamera( cameras_[ i ],
-      ( (std::string )"Cam" ) + ( (std::string )itoa( i,buf,10 )) );
+      {
+        std::stringstream cam_name("Cam");
+        cam_name<<i;
+        debugView.addCamera( cameras_[ i ],
+          cam_name.str() );
+      }
 
 
 
