@@ -39,7 +39,7 @@ NEW_TUTO( Triangulation_tuto, "Learn how you can triangulate 2D points",
   SequenceAnalyzer *motion_estim_loaded;
   string pathFileTracks = FROM_SRC_ROOT( "Medias/tracks_points_"POINT_METHOD"/motion_tracks_triangulated.yml" );
   std::ifstream test_file_exist;
-  test_file_exist.open( pathFileTracks );
+  test_file_exist.open( pathFileTracks.c_str() );
   if( test_file_exist.is_open( ) )
   {
     test_file_exist.close( );
@@ -55,7 +55,7 @@ NEW_TUTO( Triangulation_tuto, "Learn how you can triangulate 2D points",
   else
   {
     pathFileTracks = FROM_SRC_ROOT( "Medias/tracks_points_"POINT_METHOD"/motion_tracks.yml" );
-    test_file_exist.open( pathFileTracks );
+    test_file_exist.open( pathFileTracks.c_str() );
     if( !test_file_exist.is_open( ) )
     {
       cout<<"you should run an other tutorial before being able to run this one!"<<endl;
@@ -64,7 +64,7 @@ NEW_TUTO( Triangulation_tuto, "Learn how you can triangulate 2D points",
         return;
     }
     test_file_exist.close( );
-  
+
     cout<<"First load the cameras from Medias/temple/temple_par.txt"<<endl;
     vector<PointOfView> myCameras=loadCamerasFromFile( FROM_SRC_ROOT( "Medias/temple/temple_par.txt" ));
     MotionProcessor mp;

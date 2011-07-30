@@ -13,6 +13,7 @@
 
 
 
+#include <sstream>
 #include <numeric>
 
 //////////////////////////////////////////////////////////////////////////
@@ -43,7 +44,7 @@ NEW_TUTO( PCL_Tutorial, "Learn how you use PCL to show 3D points",
   string pathFileTracks = FROM_SRC_ROOT( "Medias/tracks_points_"POINT_METHOD
     "/motion_tracks_triangulated.yml" );
   std::ifstream test_file_exist;
-  test_file_exist.open( pathFileTracks );
+  test_file_exist.open( pathFileTracks.c_str() );
   if( !test_file_exist.is_open( ) )
   {
     cout<<"you have to run an other tutorial before being able to run this one!"<<endl;
@@ -69,18 +70,21 @@ NEW_TUTO( PCL_Tutorial, "Learn how you use PCL to show 3D points",
   fsRead.release( );
   cout<<"numbers of correct tracks loaded:"<<
     motion_estim_loaded->getTracks( ).size( )<<endl;
-    
+
   //////////////////////////////////////////////////////////////////////////
   // Open 3D viewer and add point cloud
 
   Visualizer debugView ( "3D Viewer" );
-  vector< cv::Vec3d >& tracks = motion_estim_loaded->get3DStructure( );
+  const vector< cv::Vec3d >& tracks = motion_estim_loaded->get3DStructure( );
   debugView.add3DPoints( tracks, "Structure triangulated" );
 
-  char buf[ 250 ];
-  for( int i = 0; i<myCameras.size( ) ; ++i )
-    debugView.addCamera( myCameras[ i ],
-      ( (string )"Cam" ) + ( (string )itoa( i,buf,10 )) );
+    for( int i = 0; i<myCameras.size( ) ; ++i )
+    {
+      std::stringstream cam_name("Cam");
+      cam_name<<i;
+      debugView.addCamera( myCameras[ i ],
+        cam_name.str() );
+    }
 
   debugView.runInteract( );
 }

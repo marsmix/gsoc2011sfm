@@ -13,9 +13,9 @@ namespace OpencvSfM{
 
   /** \brief This class perform a projective estimation
   * of the motion. Given points matches and cameras with intra parameters,
-  * it tries to find the best cameras positions and 3D points. Does not 
+  * it tries to find the best cameras positions and 3D points. Does not
   * perform a bundle ajustement!
-  * 
+  *
   * As this class use a lot of libmv functions, the data members are
   * using libmv structures...
   */
@@ -53,7 +53,7 @@ namespace OpencvSfM{
       translations_.push_back( translation_vec );
       camera_computed_.push_back( false );
     }
-    
+
     /**
     * comptue cameras and structure if intra parameters are known.
     */
@@ -65,7 +65,7 @@ namespace OpencvSfM{
 
     bool cameraResection( unsigned int image );
 
-    void EuclideanEstimator::bundleAdjustement( );
+    void bundleAdjustement( );
   };
 
 }

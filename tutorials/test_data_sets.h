@@ -34,7 +34,7 @@ namespace OpencvSfM{
     public:
       static Intern_tutorial_list *getInstance( )
       {
-        static Intern_tutorial_list *ref_static = 
+        static Intern_tutorial_list *ref_static =
           new Intern_tutorial_list( );
         return ref_static;
       }
@@ -80,7 +80,7 @@ namespace OpencvSfM{
       {
         Tutorial_Handler* out = addTuto->CreateTest( );
         P_MUTEX( my_mutex_Tutorial_Handler );
-        vector<Tutorial_Handler*> &local_list_of_tutos =
+        std::vector<Tutorial_Handler*> &local_list_of_tutos =
           Intern_tutorial_list::getInstance( )->list_of_tutos;
         local_list_of_tutos.push_back( out );
         V_MUTEX( my_mutex_Tutorial_Handler );

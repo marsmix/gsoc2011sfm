@@ -46,10 +46,10 @@ namespace OpencvSfM{
     for( unsigned int i = 0; i < camera_mesh.size( ); ++i )
     {
       //translate to the correct location:
-      camera_mesh[ i ] = ( Mat ) ( (Mat )( camera_mesh[ i ] ) - 
+      camera_mesh[ i ] = ( Mat ) ( (Mat )( camera_mesh[ i ] ) -
         camera.getTranslationVector( ) );
       //rotate the ith point:
-      camera_mesh[ i ] = ( Mat ) ( (Mat )( camera_mesh[ i ] ).t( ) * 
+      camera_mesh[ i ] = ( Mat ) ( (Mat )( camera_mesh[ i ] ).t( ) *
         camera.getRotationMatrix( ) );
     }
     pcl::PointCloud<pcl::PointXYZ>::Ptr camera_cloud (
@@ -89,7 +89,7 @@ namespace OpencvSfM{
 
     //pcl::io::saveVTKFile ( "mesh.vtk", triangles );
     //now add mesh to the viewer:
-    viewer->addPolygonMesh<pcl::PointXYZ>( camera_cloud, vertices, name, viewport );
+    viewer->addPolygonMesh( triangles, name, viewport );
     viewer->setShapeRenderingProperties(
       pcl::visualization::PCL_VISUALIZER_LINE_WIDTH, 1.5, name );
 
@@ -104,20 +104,20 @@ namespace OpencvSfM{
       new pcl::PointCloud< pcl::PointXYZ > );
     mapping::convert_OpenCV_vector( points, *my_cloud );
 
-    pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> 
+    pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ>
       single_color( my_cloud, 0, 255, 0 );
     viewer->addPointCloud<pcl::PointXYZ> ( my_cloud, single_color,
       name, viewport );
     viewer->setPointCloudRenderingProperties (
       pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 2, name, viewport );
-    
+
     pcl::PolygonMesh triangles;
     sensor_msgs::PointCloud2 msg;
     pcl::toROSMsg( *my_cloud, msg );
     triangles.cloud = msg;
     pcl::io::saveVTKFile ( ((std::string)"test")+name+((std::string)".vtk"),
       triangles );
-    
+
   }
 
   void Visualizer::runInteract( )

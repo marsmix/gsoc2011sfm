@@ -1,11 +1,11 @@
 #include "test_data_sets.h"
-DECLARE_MUTEX( my_mutex_Tutorial_Handler );
 
 using namespace std;
 using namespace cv;
 
 namespace OpencvSfM{
   namespace tutorials{
+    DECLARE_MUTEX( my_mutex_Tutorial_Handler );
 
     vector<PointOfView> loadCamerasFromFile( string fileName, int flag_model )
     {
@@ -84,7 +84,7 @@ namespace OpencvSfM{
       int rep=-1;
       cin>>rep;
       cin.clear( ); //clear the error bits for the cin input stream
-      cin.sync( ); //synchronize the input buffer, discarding any leftover characters in the buffer 
+      cin.sync( ); //synchronize the input buffer, discarding any leftover characters in the buffer
       return rep;
     }
 

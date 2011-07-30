@@ -2,6 +2,7 @@
 #ifndef PCL_MAPPING_H
 #define PCL_MAPPING_H
 
+#include <vector>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 #include <opencv2/core/core.hpp>
@@ -23,7 +24,7 @@ we have to find a way to use union or use bad cast like I do here:
 namespace OpencvSfM{
 
   namespace mapping{
-    
+
     /**
     * This function can be used to convert an Matx to a ( float* ).
     * @param mapped pointer on Point2D or Point
@@ -141,7 +142,7 @@ namespace OpencvSfM{
       float *data_;//Max size of points in both library
       unsigned char size_of_data;
       bool should_remove;
-      
+
       /**
       * Copy constructor ( deep copy! )
       **/
@@ -213,7 +214,7 @@ namespace OpencvSfM{
         initData( this, 6, reinterpret_cast< float* >( &kp ) );
       };
 
-      Point( pcl::PointXY& pXY ){ 
+      Point( pcl::PointXY& pXY ){
         initData( this, 2, reinterpret_cast< float* >( &pXY ) );
       };
       Point( pcl::PointXYZ& pXYZ ){ initData( this, 4, pXYZ.data ); };
@@ -409,7 +410,31 @@ namespace OpencvSfM{
           reinterpret_cast<const char*>( valConverted ),
           sizeof( TypeFrom ) );//assign the new value
 
-        delete valConverted;
+        switch( TypeTo::depth )
+        {
+        case CV_8U:
+          delete reinterpret_cast<uchar*>(valConverted);
+          break;
+        case CV_8S:
+          delete reinterpret_cast<char*>(valConverted);
+          break;
+        case CV_16U:
+          delete reinterpret_cast<ushort*>(valConverted);
+          break;
+        case CV_16S:
+          delete reinterpret_cast<short*>(valConverted);
+          break;
+        case CV_32S:
+          delete reinterpret_cast<int*>(valConverted);
+          break;
+        case CV_32F:
+          delete reinterpret_cast<float*>(valConverted);
+          break;
+        case CV_64F:
+          delete reinterpret_cast<double*>(valConverted);
+          break;
+          break;
+        }
         it++;
       }
     }
@@ -436,11 +461,11 @@ namespace OpencvSfM{
       int sizeOfData = sizeof( PCL_point ) / sizeof( float );
       sizeOfData = MIN( sizeOfData, TypeFrom::rows );
 
-      std::vector<TypeFrom,allocatorFrom>::const_iterator itTrack =
-        vectFrom.begin( );
-      while ( itTrack != vectFrom.end( ) )
+      size_t itTrack = 0,
+      max_size = vectFrom.size( );
+      while ( itTrack < max_size )
       {
-        float* datas = convert_to_float( *itTrack );
+        float* datas = convert_to_float( vectFrom[ itTrack ] );
         PCL_point p;
         for( int i=0; i<sizeOfData; ++i )
           p.data[ i ] = datas[ i ];

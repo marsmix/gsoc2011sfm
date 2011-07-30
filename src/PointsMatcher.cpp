@@ -59,7 +59,7 @@ namespace OpencvSfM{
 
       it++;
     }
-    
+
 
     matcher_->add( pointsDesc );
     matcher_->train( );
@@ -83,7 +83,7 @@ namespace OpencvSfM{
 
     CV_DbgAssert( !keyPoints.empty( ) );
     CV_DbgAssert( !descMat.empty( ) );
-    
+
     matcher_->match( descMat, matches, masks );
   }
 
@@ -228,7 +228,7 @@ namespace OpencvSfM{
       match( otherMatcher->pointCollection_[ 0 ], matches, masks );
     }
 
-    
+
     //now construct the vector of DMatch, but in the other way ( 2 -> 1 ):
     vector<DMatch> matchesOtherWay;
     otherMatcher->match( pointCollection_[ 0 ], matchesOtherWay, masks );
@@ -337,7 +337,7 @@ namespace OpencvSfM{
   {
     vector<PointsToTrack>::size_type key_size = points.pointCollection_.size( );
 
-    fs << "PointsMatcher" << "[ ";
+    fs << "PointsMatcher" << "[";
 
     for ( vector<PointsToTrack>::size_type i=0; i < key_size; i++ )
     {
@@ -345,6 +345,6 @@ namespace OpencvSfM{
       PointsToTrack::write( fs, *points.pointCollection_[ i ] );
       fs  << "}";
     }
-    fs << " ]";
+    fs << "]";
   }
 }
