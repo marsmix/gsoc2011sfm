@@ -12,17 +12,22 @@
 
 #cmakedefine HAVE_PTHREAD_H
 #ifdef HAVE_PTHREAD_H
-#define CREATE_STATIC_MUTEX(my_mutex) static pthread_mutex_t my_mutex
-#define CREATE_EXTERN_MUTEX(my_mutex) extern pthread_mutex_t my_mutex
-#define DECLARE_MUTEX( my_mutex ) pthread_mutex_t my_mutex = PTHREAD_MUTEX_INITIALIZER
-#define P_MUTEX(my_mutex) pthread_mutex_lock(&my_mutex);
+#define INCLUDE_MUTEX <pthread.h>
+#define DECLARE_MUTEX( my_mutex ) sem_t my_mutex
+#define INIT_SEMAPHORE(my_mutex, i) sem_init(&my_mutex, 0, (i))
+#define P_MUTEX(my_mutex) pthread_mutex_lock(&my_mutex)
 #define V_MUTEX(my_mutex) pthread_mutex_unlock(&my_mutex)
 #else
-#define CREATE_STATIC_MUTEX(x) //static pthread_mutex_t x
-#define CREATE_EXTERN_MUTEX(x) //extern pthread_mutex_t x
-#define DECLARE_MUTEX(x) //pthread_mutex_t x =  init
-#define P_MUTEX(x) //pthread_mutex_lock(&x)
-#define V_MUTEX(x) //pthread_mutex_unlock(&x)
+#define INCLUDE_MUTEX <boost/interprocess/sync/interprocess_semaphore.hpp>
+#define DECLARE_MUTEX( my_mutex ) boost::interprocess::interprocess_semaphore *my_mutex
+#define INIT_SEMAPHORE(my_mutex, i) my_mutex = new\
+  boost::interprocess::interprocess_semaphore( i )
+#define P_MUTEX( my_mutex ) my_mutex->wait()
+#define V_MUTEX( my_mutex ) my_mutex->post()
 #endif
+
+#define CREATE_STATIC_MUTEX( my_mutex ) static DECLARE_MUTEX( my_mutex )
+#define CREATE_EXTERN_MUTEX( my_mutex ) extern DECLARE_MUTEX( my_mutex )
+#define INIT_MUTEX(my_mutex) INIT_SEMAPHORE(my_mutex, 1)
 
 #endif
