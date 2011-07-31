@@ -69,7 +69,6 @@ namespace OpencvSfM{
       return outVect;
     }
 
-
     int Tutorial_Handler::print_menu( )
     {
       cout<<endl<<"//////////////////////////////////////////////////"<<endl;

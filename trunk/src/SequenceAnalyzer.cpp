@@ -1,5 +1,10 @@
 #include "SequenceAnalyzer.h"
 
+#include "config.h" //SEMAPHORE
+
+#include INCLUDE_MUTEX
+#include <boost/thread/thread.hpp>
+
 #include <iostream>
 #include <sstream>
 using cv::Ptr;
@@ -84,61 +89,43 @@ namespace OpencvSfM{
     images_.push_back( image );
   }
 
-  void SequenceAnalyzer::computeMatches( )
-  {
-    //First compute missing features descriptors:
-    vector< Ptr< PointsToTrack > >::iterator it =
-      points_to_track_.begin( );
-    vector< Ptr< PointsToTrack > >::iterator end_iter =
-      points_to_track_.end( );
-    while ( it != end_iter )
+  //Boost thread:
+  struct MatchingThread{
+    unsigned int i;
+    vector< Ptr< PointsMatcher > >::iterator matches_it;
+    Ptr<SequenceAnalyzer> seq_analyser;
+
+    static vector< Ptr< PointsMatcher > >::iterator end_matches_it;
+    static vector<Mat> masks;
+    static unsigned int mininum_points_matches;
+    //semaphore to synchronize threads:
+    CREATE_STATIC_MUTEX( thread_concurr );
+    CREATE_STATIC_MUTEX( add_to_track );
+
+    //////////////////////////////////////////////////////////////////////////
+
+    MatchingThread(Ptr<SequenceAnalyzer> seq_analyser,unsigned int i,
+      vector< Ptr< PointsMatcher > >::iterator matches_it)
     {
-      Ptr<PointsToTrack> points_to_track_i=( *it );
-
-      points_to_track_i->computeKeypointsAndDesc( false );
-
-      it++;
+      this->i = i;
+      this->matches_it = matches_it;
+      this->seq_analyser = seq_analyser;
+      this->seq_analyser.addref();//avoid ptr deletion...
     }
 
-    //here, all keypoints and descriptors are computed.
-    //Now create and train the matcher:
-    it=points_to_track_.begin( );
-    //We skip previous matcher already computed:
-    it+=matches_.size( );
-    while ( it != end_iter )
+    void operator()()
     {
-      Ptr<PointsToTrack> points_to_track_i = ( *it );
-      Ptr<PointsMatcher> point_matcher = match_algorithm_->clone( true );
-      point_matcher->add( points_to_track_i );
-      point_matcher->train( );
-      matches_.push_back( point_matcher );
-
-      it++;
-    }
-
-    //Now we are ready to match each picture with other:
-    vector<Mat> masks;
-    vector< Ptr< PointsMatcher > >::iterator matches_it = matches_.begin( );
-    vector< Ptr< PointsMatcher > >::iterator end_matches_it = matches_.end( );
-    unsigned int i=0,j=0;
-    while ( matches_it != end_matches_it )
-    {
-      if( i>5 )
-        break;
       Ptr<PointsMatcher> point_matcher = ( *matches_it );
-
-      //the folowing vector is computed only the first time
-
+      if( point_matcher.empty() )
+        return;
       vector< Ptr< PointsMatcher > >::iterator matches_it1 = matches_it+1;
-      j=i+1;
+      unsigned int j=i+1;
       while ( matches_it1 != end_matches_it )
       {
-        if( j>5 )
-          break;
         Ptr<PointsMatcher> point_matcher1 = ( *matches_it1 );
         vector<DMatch> matches_i_j;
 
-        point_matcher->crossMatch( point_matcher1,matches_i_j,masks );
+        point_matcher->crossMatch( point_matcher1, matches_i_j, masks );
 
 //////////////////////////////////////////////////////////////////////////
 //For now we use fundamental function from OpenCV but soon use libmv !
@@ -213,9 +200,11 @@ namespace OpencvSfM{
 //////////////////////////////////////////////////////////////////////////
         if( matches_i_j.size( ) > mininum_points_matches && nb_iter < 8 )
         {
-          addMatches( matches_i_j,i,j );
+          P_MUTEX( add_to_track );
+          seq_analyser->addMatches( matches_i_j,i,j );
           std::clog<<"find "<<matches_i_j.size( )<<
             " matches between "<<i<<" "<<j<<std::endl;
+          V_MUTEX( add_to_track );
         }else
         {
           std::clog<<"can't find matches between "<<i<<" "<<j<<std::endl;
@@ -223,9 +212,76 @@ namespace OpencvSfM{
         j++;
         matches_it1++;
       }
+      V_MUTEX( MatchingThread::thread_concurr );//wake up waiting thread
+    }
+  };
+  vector< Ptr< PointsMatcher > >::iterator MatchingThread::end_matches_it;
+  vector<Mat> MatchingThread::masks;
+  unsigned int MatchingThread::mininum_points_matches=50;
+
+  DECLARE_MUTEX( MatchingThread::thread_concurr );
+  DECLARE_MUTEX( MatchingThread::add_to_track );
+
+  //////////////////////////////////////////////////////////////////////////
+
+  void SequenceAnalyzer::computeMatches( )
+  {
+    //First compute missing features descriptors:
+    vector< Ptr< PointsToTrack > >::iterator it =
+      points_to_track_.begin( );
+    vector< Ptr< PointsToTrack > >::iterator end_iter =
+      points_to_track_.end( );
+    while ( it != end_iter )
+    {
+      Ptr<PointsToTrack> points_to_track_i=( *it );
+
+      points_to_track_i->computeKeypointsAndDesc( false );
+
+      it++;
+    }
+
+    //here, all keypoints and descriptors are computed.
+    //Now create and train the matcher:
+    it=points_to_track_.begin( );
+    //We skip previous matcher already computed:
+    it+=matches_.size( );
+    while ( it != end_iter )
+    {
+      Ptr<PointsToTrack> points_to_track_i = ( *it );
+      Ptr<PointsMatcher> point_matcher = match_algorithm_->clone( true );
+      point_matcher->add( points_to_track_i );
+      point_matcher->train( );
+      matches_.push_back( point_matcher );
+
+      it++;
+    }
+
+    //Now we are ready to match each picture with other:
+    vector<Mat> masks;
+    vector< Ptr< PointsMatcher > >::iterator matches_it = matches_.begin( );
+
+    MatchingThread::end_matches_it = matches_.end( );
+    MatchingThread::mininum_points_matches = mininum_points_matches;
+    unsigned int nb_proc = boost::thread::hardware_concurrency();
+    INIT_SEMAPHORE( MatchingThread::thread_concurr,nb_proc );
+    INIT_MUTEX( MatchingThread::add_to_track );
+
+    unsigned int i=0;
+
+    while ( matches_it != MatchingThread::end_matches_it )
+    {
+      //can we start a new thread?
+      P_MUTEX( MatchingThread::thread_concurr );
+      //create local values for the thead:
+      MatchingThread match_thread(this, i, matches_it);
+      //start the thread:
+      boost::thread myThread(match_thread);
+
       i++;
       matches_it++;
     }
+    for(int wait_endThread = 0; wait_endThread<nb_proc-1 ; ++wait_endThread)
+      P_MUTEX( MatchingThread::thread_concurr );//wait for last threads
   }
 
   void SequenceAnalyzer::keepOnlyCorrectMatches( )

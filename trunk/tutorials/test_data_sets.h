@@ -7,6 +7,8 @@
 #include "../src/CameraPinhole.h"
 #include <opencv2/core/core.hpp>
 
+#include INCLUDE_MUTEX
+
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -28,10 +30,15 @@ namespace OpencvSfM{
 
     class Tutorial_Handler;
 
+    CREATE_EXTERN_MUTEX( my_mutex_Tutorial_Handler );
     class Intern_tutorial_list
     {
       std::vector<Tutorial_Handler*> list_of_tutos;
     public:
+      Intern_tutorial_list()
+      {
+        INIT_MUTEX( my_mutex_Tutorial_Handler );
+      }
       static Intern_tutorial_list *getInstance( )
       {
         static Intern_tutorial_list *ref_static =
@@ -57,8 +64,6 @@ namespace OpencvSfM{
         return new TutoClass( id_tuto,name,help,file ); }
     };
 
-    CREATE_EXTERN_MUTEX( my_mutex_Tutorial_Handler );
-
     class Tutorial_Handler
     {
     protected:
@@ -78,10 +83,11 @@ namespace OpencvSfM{
       template <class TutoClass>
       static Tutorial_Handler* registerTuto( TutoFactoryImpl<TutoClass>* addTuto )
       {
+        Intern_tutorial_list *inst_tuto = Intern_tutorial_list::getInstance( );
         Tutorial_Handler* out = addTuto->CreateTest( );
         P_MUTEX( my_mutex_Tutorial_Handler );
         std::vector<Tutorial_Handler*> &local_list_of_tutos =
-          Intern_tutorial_list::getInstance( )->list_of_tutos;
+          inst_tuto->list_of_tutos;
         local_list_of_tutos.push_back( out );
         V_MUTEX( my_mutex_Tutorial_Handler );
         return out;
