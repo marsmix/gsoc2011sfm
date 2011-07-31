@@ -82,7 +82,7 @@ NEW_TUTO( Track_creation, "Learn how you can compute tracks from a list of pictu
     int nbFrame=0;
     cout<<"Compute points and description for each frame..."<<endl;
     cout<<"This can take time so be patient ; )"<<endl;
-    while ( !currentImage.empty( )  && nbFrame<5 )
+    while ( !currentImage.empty( ) )
     {
       //if the image is loaded, find the points:
       cout<<"Create a new PointsToTrack..."<<endl;

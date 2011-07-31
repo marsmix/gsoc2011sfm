@@ -12,11 +12,11 @@
 
 #cmakedefine HAVE_PTHREAD_H
 #ifdef HAVE_PTHREAD_H
-#define INCLUDE_MUTEX <pthread.h>
+#define INCLUDE_MUTEX <semaphore.h>
 #define DECLARE_MUTEX( my_mutex ) sem_t my_mutex
 #define INIT_SEMAPHORE(my_mutex, i) sem_init(&my_mutex, 0, (i))
-#define P_MUTEX(my_mutex) pthread_mutex_lock(&my_mutex)
-#define V_MUTEX(my_mutex) pthread_mutex_unlock(&my_mutex)
+#define P_MUTEX(my_mutex) sem_wait(&my_mutex)
+#define V_MUTEX(my_mutex) sem_post(&my_mutex)
 #else
 #define INCLUDE_MUTEX <boost/interprocess/sync/interprocess_semaphore.hpp>
 #define DECLARE_MUTEX( my_mutex ) boost::interprocess::interprocess_semaphore *my_mutex
