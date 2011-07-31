@@ -6,7 +6,9 @@
 #include "PCL_mapping.h"
 #include <pcl/point_types.h>
 #include "libmv/multiview/five_point.h"
+#include "libmv/multiview/affine.h"
 #include "libmv/multiview/fundamental.h"
+#include "libmv/multiview/robust_fundamental.h"
 #include "libmv/multiview/robust_euclidean_resection.h"
 #include "libmv/multiview/bundle.h"
 
@@ -129,91 +131,91 @@ namespace OpencvSfM{
       key_size = camera_computed_.size( );
     vector< Ptr< PointsToTrack > > &points_to_track = sequence_.getPoints( );
 
-    std::vector< TrackOfPoints* > correct_points;
+    // Indexes of points corresponding to the projections:
+    libmv::vector<libmv::Vecu>  x_ids;
     unsigned int npoints = point_computed_.size( );
-    for ( j = 0; j < npoints; ++j )
-    {
-      correct_points.push_back( &point_computed_[j] );
-    }
-
     //because all the points are assumed to be observed in all images,
     //we will keep only 3D tracks viewed by all cameras...
     for ( i = 0; i < key_size; ++i )
-    {
+    {//for each camera:
       if( camera_computed_[ i ] )
       {
         ncamera++;
-        //as size can change, don't move this!
-        unsigned int npoints = correct_points.size( );
+        x_ids.push_back( libmv::Vecu() );
+
+        int nb_projection = 0;
         for ( j = 0; j < npoints; ++j )
-        {
-          if( !correct_points[ j ]->containImage( i ) )
-          {
-            //as this image has not the 2D projection, we remove this track
-            correct_points[ j-- ] = correct_points[ --npoints ];
-            correct_points.pop_back( );
-          }
+        {//for each 3D point:
+          if( point_computed_[ j ].containImage( i ) )
+            nb_projection++;
         }
+        x_ids[ ncamera-1 ].resize( nb_projection );
       }
     }
-    unsigned int nstructure = correct_points.size( );
+    unsigned int nstructure = point_computed_.size( );
     if( nstructure < 3 )
       return;//we don't perform bundle as we don't have enough points...
 
+    //2D points:
     libmv::vector<libmv::Mat2X> x( ncamera );
+    //3D points:
+    libmv::Mat3X                X( 3, nstructure );
     libmv::vector<libmv::Mat3>  Ks( ncamera );
     libmv::vector<libmv::Mat3>  Rs( ncamera );
     libmv::vector<libmv::Vec3>  ts( ncamera );
-    libmv::Mat3X                X( 3, nstructure );
 
     //update each variable:
-    int idx = 0;
+    int idx_visible = 0;
     for ( i=0; i < key_size; ++i )
-    {
+    {//for each camera:
       if( camera_computed_[ i ] )
       {
         //intrinsic & extrinsic parameters:
-        Ks[ idx ] = intra_params_[ i ];
-        Rs[ idx ] = rotations_[ i ];
-        ts[ idx ] = translations_[ i ];
+        Ks[ idx_visible ] = intra_params_[ i ];
+        Rs[ idx_visible ] = rotations_[ i ];
+        ts[ idx_visible ] = translations_[ i ];
 
         //2D projected points
-        libmv::Mat2X m;
-        m.resize( 2, nstructure );
+        x[ idx_visible ].resize( 2, nstructure );
+        int j_visible = 0;
         for ( j = 0; j < nstructure; ++j )
-        {
-          cv::KeyPoint pt = points_to_track[ i ]->getKeypoint(
-            correct_points[ j ]->getIndexPoint( i ) );
-          m( 0, j ) = pt.pt.x;
-          m( 1, j ) = pt.pt.y;
+        {//for each 3D point:
+          if( point_computed_[ j ].containImage( i ) )
+          {
+            cv::KeyPoint pt = points_to_track[ i ]->getKeypoint(
+              point_computed_[ j_visible ].getIndexPoint( i ) );
+            x[ idx_visible ]( 0, j_visible ) = pt.pt.x;
+            x[ idx_visible ]( 1, j_visible ) = pt.pt.y;
+            x_ids[ idx_visible ][ j_visible ] = j;
+            j_visible++;
+          }
         }
-        x[ idx ] = m;
 
-        idx++;
+        idx_visible++;
       }
     }
 
-    idx = 0;
+    idx_visible = 0;
     for ( i=0; i < nstructure; ++i )
     {
       //3D point:
-      cv::Vec3d cv3DPoint = *correct_points[ i ];
+      cv::Vec3d cv3DPoint = point_computed_[ i ];
       X( 0, i ) = cv3DPoint[ 0 ];
       X( 1, i ) = cv3DPoint[ 1 ];
       X( 2, i ) = cv3DPoint[ 2 ];
     }
 
-    libmv::EuclideanBAFull( x, &Ks, &Rs, &ts, &X, libmv::eBUNDLE_METRIC );
+    libmv::EuclideanBA( x, x_ids, &Ks, &Rs, &ts, &X, libmv::eBUNDLE_FOCAL_LENGTH );
     //update geometry:
-    idx = 0;
+    idx_visible = 0;
     for ( i=0; i < key_size; ++i )
     {
       if( camera_computed_[ i ] )
       {
         //intrinsic & extrinsic parameters:
-        intra_params_[ i ] = Ks[ idx ];
-        rotations_[ i ]    = Rs[ idx ];
-        translations_[ i ] = ts[ idx ];
+        intra_params_[ i ] = Ks[ idx_visible ];
+        rotations_[ i ]    = Rs[ idx_visible ];
+        translations_[ i ] = ts[ idx_visible ];
 
         //update camera's structure:
         cv::Mat newRotation,newTranslation;
@@ -222,7 +224,7 @@ namespace OpencvSfM{
         cameras_[ i ].setRotationMatrix( newRotation );
         cameras_[ i ].setTranslationVector( newTranslation );
 
-        idx++;
+        idx_visible++;
       }
     }
 
@@ -233,7 +235,7 @@ namespace OpencvSfM{
       cv3DPoint[ 0 ] = X( 0, i );
       cv3DPoint[ 1 ] = X( 1, i );
       cv3DPoint[ 2 ] = X( 2, i );
-      correct_points[ i ]->set3DPosition( cv3DPoint );
+      point_computed_[ i ].set3DPosition( cv3DPoint );
     }
   }
 
@@ -326,6 +328,7 @@ namespace OpencvSfM{
     return true;
   }
 
+  
   void EuclideanEstimator::initialReconstruction( vector<TrackOfPoints>& tracks,
     int image1, int image2 )
   {

@@ -2,8 +2,11 @@
 #define _GSOC_SFM_POINTSMATCHED_H 1
 
 #include "macro.h" //SFM_EXPORTS
+#include "config.h" //SEMAPHORE
 
 #include "PointsToTrack.h"
+
+#include INCLUDE_MUTEX
 
 #include "opencv2/features2d/features2d.hpp"
 #include <vector>
@@ -15,6 +18,11 @@ namespace OpencvSfM{
   */
   class SFM_EXPORTS PointsMatcher
   {
+    /**
+    * In order to be able to match points in threads, we have to
+    * take care of interprocess access.
+    */
+    DECLARE_MUTEX( thread_concurr );
   public:
     /**
     * Constructor. Need a matcher algorithm...
@@ -55,7 +63,7 @@ namespace OpencvSfM{
     * @param emptyTrainData IIf emptyTrainData is false the method create deep copy of the object, i.e. copies both parameters and train data. If emptyTrainData is true the method create object copy with current parameters but with empty train data..
     * @return An other PointsMatcher instance
     */
-    virtual cv::Ptr<PointsMatcher> clone( bool emptyTrainData=true ) const;
+    virtual cv::Ptr<PointsMatcher> clone( bool emptyTrainData=true );
     /**
     * Find the k best matches for each descriptor from a query set with train descriptors.
     * @param queryPoints  Query set of points and descriptors.

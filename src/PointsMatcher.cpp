@@ -14,10 +14,12 @@ namespace OpencvSfM{
   {
     CV_DbgAssert( !matcher.empty( ) );
     matcher_ = matcher;
+    INIT_MUTEX( thread_concurr );
   }
 
   PointsMatcher::PointsMatcher( const PointsMatcher& copy )
   {
+    INIT_MUTEX( thread_concurr );
     pointCollection_=copy.pointCollection_;
     matcher_ = copy.matcher_->clone( true );
   }
@@ -29,18 +31,22 @@ namespace OpencvSfM{
 
   void PointsMatcher::add( Ptr<PointsToTrack> pointCollection )
   {
+    P_MUTEX( thread_concurr );
     pointCollection_.push_back( pointCollection );
-
+    V_MUTEX( thread_concurr );
   }
 
   void PointsMatcher::clear( )
   {
+    P_MUTEX( thread_concurr );
     matcher_->clear( );
     pointCollection_.clear( );
+    V_MUTEX( thread_concurr );
   }
 
   void PointsMatcher::train( )
   {
+    P_MUTEX( thread_concurr );
     matcher_->clear( );
 
     vector<Mat> pointsDesc;
@@ -63,6 +69,7 @@ namespace OpencvSfM{
 
     matcher_->add( pointsDesc );
     matcher_->train( );
+    V_MUTEX( thread_concurr );
   }
 
   bool PointsMatcher::isMaskSupported( )
@@ -84,7 +91,9 @@ namespace OpencvSfM{
     CV_DbgAssert( !keyPoints.empty( ) );
     CV_DbgAssert( !descMat.empty( ) );
 
+    P_MUTEX( thread_concurr );
     matcher_->match( descMat, matches, masks );
+    V_MUTEX( thread_concurr );
   }
 
   void PointsMatcher::knnMatch(  Ptr<PointsToTrack> queryPoints,
@@ -101,7 +110,9 @@ namespace OpencvSfM{
     CV_DbgAssert( !keyPoints.empty( ) );
     CV_DbgAssert( !descMat.empty( ) );
 
+    P_MUTEX( thread_concurr );
     matcher_->knnMatch( descMat, matches, knn, masks, compactResult );
+    V_MUTEX( thread_concurr );
   }
 
   void PointsMatcher::radiusMatch( cv::Ptr<PointsToTrack> queryPoints,
@@ -117,8 +128,10 @@ namespace OpencvSfM{
 
     CV_DbgAssert( !keyPoints.empty( ) );
     CV_DbgAssert( !descMat.empty( ) );
-
+    
+    P_MUTEX( thread_concurr );
     matcher_->radiusMatch( descMat, matches, maxDistance, masks, compactResult );
+    V_MUTEX( thread_concurr );
   }
 
   bool PointsMatcher::empty( ) const
@@ -126,11 +139,13 @@ namespace OpencvSfM{
     return pointCollection_.empty( ) ||  matcher_->empty( );
   }
 
-  Ptr<PointsMatcher> PointsMatcher::clone( bool emptyTrainData ) const
+  Ptr<PointsMatcher> PointsMatcher::clone( bool emptyTrainData )
   {
+    P_MUTEX( thread_concurr );
     Ptr<PointsMatcher> outPointMatcher=new PointsMatcher( matcher_->clone( emptyTrainData ) );
     if( !emptyTrainData )
       outPointMatcher->pointCollection_=pointCollection_;
+    V_MUTEX( thread_concurr );
 
     return outPointMatcher;
   }
@@ -225,13 +240,15 @@ namespace OpencvSfM{
     if( matches.empty( ) )
     {
       //as we don't have matches for img1 -> img2, compute them:
-      match( otherMatcher->pointCollection_[ 0 ], matches, masks );
+      this->match( otherMatcher->pointCollection_[ 0 ], matches, masks );
     }
 
 
     //now construct the vector of DMatch, but in the other way ( 2 -> 1 ):
     vector<DMatch> matchesOtherWay;
+    P_MUTEX( thread_concurr );
     otherMatcher->match( pointCollection_[ 0 ], matchesOtherWay, masks );
+    V_MUTEX( thread_concurr );
     //now check for reciprocity:
     unsigned int nbPoints=matches.size( );
     for( unsigned int i=0; i<nbPoints; i++ )

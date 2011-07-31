@@ -29,6 +29,11 @@ namespace OpencvSfM{
       double distance=track.triangulateRobust( cameras_,points_to_track, point_final );
       //double distance=track.triangulateLinear( cameras_,points_to_track, point_final );
 
+      //tests:
+
+
+      //////////////////////////////////////////////////////////////////////////
+
       //this is used to take only correct 3D points:
       output_mask.push_back( ( distance<max_repro_error_ ) );
     }
@@ -76,8 +81,8 @@ namespace OpencvSfM{
         double distance=track.triangulateRobust( cameras_,points_to_track, point_final,
           4, mask );
 
-        //if( distance<max_repro_error_ )
-          points3D.push_back( track );
+        if( distance<max_repro_error_ )
+          points3D.push_back( track );//only keep correct points
       }
 
     }

@@ -60,7 +60,7 @@ FIND_PACKAGE( OpenCV REQUIRED )
 # in the future when new Boost versions are released.
 SET( Boost_ADDITIONAL_VERSIONS "1.43" "1.43.0" "1.44" "1.44.0" "1.45" "1.45.0" "1.46.1" "1.46.0" "1.46" "1.47" )
 
-find_package( Boost COMPONENTS filesystem system )
+find_package( Boost COMPONENTS filesystem system thread )
 if( Boost_FOUND )
 	add_definitions( -DHAVE_BOOST )
 	LINK_DIRECTORIES( ${Boost_LIBRARY_DIRS} )
@@ -101,9 +101,7 @@ add_definitions( ${PCL_DEFINITIONS} )
 find_path( LIBMV_HEADER_DIR "libmv/multiview"
 	PATH_SUFFIXES "src"
 	DOC "The path to LIBMV headers" )
-find_library( LIBMV_LIB_DIR "multiview"
-	PATHS ${LIBMV_HEADER_DIR} "../${LIBMV_HEADER_DIR}"
-	PATH_SUFFIXES "lib"
+find_path( LIBMV_LIB_DIR "lib"
 	DOC "The path to LIBMV lib" )
 if( WIN32 )
 SET ( LIBMV_LIB debug "multiview_d" "numeric_d" "V3D" "ldl" "colamd" optimized "multiview" "numeric" "V3D" "ldl" "colamd" )
