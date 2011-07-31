@@ -71,6 +71,8 @@ else( )
 	message( STATUS " ** Warning: Boost library Could NOT be found, you will not be able to process automatically a folder full of images /!\\" )
 endif( )
 
+add_definitions("-DEIGEN2_SUPPORT")
+
 find_path( EIGEN_DIR "Eigen/Core"
 	PATHS "/usr/local/include/" "/opt/include/" "/usr/include/"
 	PATH_SUFFIXES "eigen2" "eigen3" "eigen"
