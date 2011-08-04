@@ -118,29 +118,36 @@ namespace OpencvSfM{
     }
   }
 
-
   EuclideanEstimator::~EuclideanEstimator( void )
   {
     //TODO!!!!
   }
 
   void EuclideanEstimator::bundleAdjustement( )
-  {
-    unsigned int ncamera = 0,
-      i = 0, j = 0,
+  {/*
+    //wrap the lourakis SBA:
+    
+    int n = point_computed_.size( ),   // number of points
+      ncon = 0,// number of points (starting from the 1st) whose parameters should not be modified.
+      m = 0,   // number of images
+      mcon = 0,// number of images (starting from the 1st) whose parameters should not be modified.
+      cnp = 6,// number of parameters for ONE camera; e.g. 6 for Euclidean cameras
+      pnp = 3;// number of parameters for ONE point; e.g. 3 for Euclidean points
+    if( n < 3 )
+      return;//we don't perform bundle as we don't have enough points...
+    int i = 0, j = 0,
       key_size = camera_computed_.size( );
     vector< Ptr< PointsToTrack > > &points_to_track = sequence_.getPoints( );
 
     // Indexes of points corresponding to the projections:
     libmv::vector<libmv::Vecu>  x_ids;
-    unsigned int npoints = point_computed_.size( );
-    //because all the points are assumed to be observed in all images,
-    //we will keep only 3D tracks viewed by all cameras...
+
+    //because some points are sometime not visible:
     for ( i = 0; i < key_size; ++i )
     {//for each camera:
       if( camera_computed_[ i ] )
       {
-        ncamera++;
+        m++;
         x_ids.push_back( libmv::Vecu() );
 
         int nb_projection = 0;
@@ -149,20 +156,18 @@ namespace OpencvSfM{
           if( point_computed_[ j ].containImage( i ) )
             nb_projection++;
         }
-        x_ids[ ncamera-1 ].resize( nb_projection );
+        x_ids[ m-1 ].resize( nb_projection );
       }
-    }
-    unsigned int nstructure = point_computed_.size( );
-    if( nstructure < 3 )
-      return;//we don't perform bundle as we don't have enough points...
-
-    //2D points:
-    libmv::vector<libmv::Mat2X> x( ncamera );
-    //3D points:
-    libmv::Mat3X                X( 3, nstructure );
-    libmv::vector<libmv::Mat3>  Ks( ncamera );
-    libmv::vector<libmv::Mat3>  Rs( ncamera );
-    libmv::vector<libmv::Vec3>  ts( ncamera );
+    }//2D points:
+    
+    char *vmask = new char[ n*m ];//visibility mask: vmask[i, j]=1 if point i visible in image j, 0 otherwise.
+    double *p = new double[m*cnp + n*pnp];//initial parameter vector p0: (a1, ..., am, b1, ..., bn).
+                   // aj are the image j parameters, bi are the i-th point parameters
+                   //
+    double *x = new double[n*m*2];// measurements vector: (x_11^T, .. x_1m^T, ..., x_n1^T, .. x_nm^T)^T where
+                   // x_ij is the projection of the i-th point on the j-th image.
+                   // NOTE: some of the x_ij might be missing, if point i is not visible in image j;
+                   // see vmask[i, j], max. size n*m*mnp
 
     //update each variable:
     int idx_visible = 0;
@@ -170,10 +175,9 @@ namespace OpencvSfM{
     {//for each camera:
       if( camera_computed_[ i ] )
       {
-        //intrinsic & extrinsic parameters:
-        Ks[ idx_visible ] = intra_params_[ i ];
-        Rs[ idx_visible ] = rotations_[ i ];
-        ts[ idx_visible ] = translations_[ i ];
+        //extrinsic parameters only (intra are know in euclidean reconstruction)
+        Eigen::Quaternionf rot_tmp = rotations_[ i ];
+        translations_[ i ];
 
         //2D projected points
         x[ idx_visible ].resize( 2, nstructure );
@@ -203,40 +207,7 @@ namespace OpencvSfM{
       X( 0, i ) = cv3DPoint[ 0 ];
       X( 1, i ) = cv3DPoint[ 1 ];
       X( 2, i ) = cv3DPoint[ 2 ];
-    }
-
-    libmv::EuclideanBA( x, x_ids, &Ks, &Rs, &ts, &X, libmv::eBUNDLE_FOCAL_LENGTH );
-    //update geometry:
-    idx_visible = 0;
-    for ( i=0; i < key_size; ++i )
-    {
-      if( camera_computed_[ i ] )
-      {
-        //intrinsic & extrinsic parameters:
-        intra_params_[ i ] = Ks[ idx_visible ];
-        rotations_[ i ]    = Rs[ idx_visible ];
-        translations_[ i ] = ts[ idx_visible ];
-
-        //update camera's structure:
-        cv::Mat newRotation,newTranslation;
-        cv::eigen2cv( rotations_[ i ], newRotation );
-        cv::eigen2cv( translations_[ i ], newTranslation );
-        cameras_[ i ].setRotationMatrix( newRotation );
-        cameras_[ i ].setTranslationVector( newTranslation );
-
-        idx_visible++;
-      }
-    }
-
-    for ( i=0; i < nstructure; ++i )
-    {
-      //3D point:
-      cv::Vec3d cv3DPoint;
-      cv3DPoint[ 0 ] = X( 0, i );
-      cv3DPoint[ 1 ] = X( 1, i );
-      cv3DPoint[ 2 ] = X( 2, i );
-      point_computed_[ i ].set3DPosition( cv3DPoint );
-    }
+    }*/
   }
 
   bool EuclideanEstimator::cameraResection( unsigned int image )
@@ -292,7 +263,7 @@ namespace OpencvSfM{
       intra_params_[ image ],
       rms_inliers_threshold, &R, &t, &inliers, 1e-3 );
 
-    if( score > 5 || inliers.size( ) < key_size / 4 )
+    if( score > 5 || inliers.size( ) < (int)key_size / 4 )
       return false;//bad resection :(
 
 
@@ -323,8 +294,6 @@ namespace OpencvSfM{
 
     point_computed_ = se.computeStructure( images_to_compute );
 
-    // Performs a bundle adjustment
-    bundleAdjustement( );
     return true;
   }
 
@@ -379,9 +348,10 @@ namespace OpencvSfM{
       x2( 0,i ) = -pointNorm2[ i ][ 0 ];
       x2( 1,i ) = -pointNorm2[ i ][ 1 ];
     }
-
+    
     double error = robust5Points( x1, x2,
       intra_params_[ image1 ], intra_params_[ image2 ], E );
+
 
     //std::cout<<"E: "<<E<<std::endl;
     //std::cout<<"max_error: "<<error<<std::endl;
@@ -417,7 +387,6 @@ namespace OpencvSfM{
     images_to_compute.push_back( image1 );
     images_to_compute.push_back( image2 );
     point_computed_ = se.computeStructure( images_to_compute );
-    bundleAdjustement();
   }
 
 
@@ -481,10 +450,10 @@ namespace OpencvSfM{
     //and 3D estimation from these 2 first cameras...
     //Find for other cameras position:
     vector<ImageLink> images_close;
-
-    /*while( nbMatches>10 )
+    int nbIter = 0 ;
+    //while( nbMatches>10 && nbIter<10 )
     {
-
+      nbIter++;
       images_close.clear( );
       while ( images_close.size( ) == 0 )
       {
@@ -520,6 +489,8 @@ namespace OpencvSfM{
           cameraResection( new_id_image );
         }
       }
+      // Performs a bundle adjustment
+      //bundleAdjustement( );
     }//*/
     vector<cv::Vec3d> tracks3D;
     vector<TrackOfPoints>::iterator itTrack=point_computed_.begin( );
@@ -535,11 +506,11 @@ namespace OpencvSfM{
     Visualizer debugView ( "Debug viewer" );
     debugView.add3DPoints( tracks3D );
 
-    for( int i = 0; i<cameras_.size( ) ; ++i )
+    for( unsigned int i = 0; i<cameras_.size( ) ; ++i )
       if( camera_computed_[i] )
       {
-        std::stringstream cam_name("Cam");
-        cam_name<<i;
+        std::stringstream cam_name;
+        cam_name<<"Cam"<< ( i+1 );
         debugView.addCamera( cameras_[ i ],
           cam_name.str() );
       }

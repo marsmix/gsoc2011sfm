@@ -129,7 +129,8 @@ namespace OpencvSfM{
   protected:
     double errorEstimate( std::vector< PointOfView >& cameras,
       const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
-      cv::Vec3d& points3D ) const;
+      cv::Vec3d& points3D,
+      const std::vector<bool> &masks = std::vector<bool>( ) ) const;
   };
   
   

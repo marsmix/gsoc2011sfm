@@ -77,14 +77,14 @@ NEW_TUTO( PCL_Tutorial, "Learn how you use PCL to show 3D points",
   Visualizer debugView ( "3D Viewer" );
   const vector< cv::Vec3d >& tracks = motion_estim_loaded->get3DStructure( );
   debugView.add3DPoints( tracks, "Structure triangulated" );
-
-    for( int i = 0; i<myCameras.size( ) ; ++i )
-    {
-      std::stringstream cam_name("Cam");
-      cam_name<<i;
-      debugView.addCamera( myCameras[ i ],
-        cam_name.str() );
-    }
+  /*
+  for( int i = 0; i<myCameras.size( ) ; ++i )
+  {
+    std::stringstream cam_name("Cam");
+    cam_name<<i;
+    debugView.addCamera( myCameras[ i ],
+      cam_name.str() );
+  }*/
 
   debugView.runInteract( );
 }

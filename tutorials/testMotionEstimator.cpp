@@ -139,7 +139,7 @@ NEW_TUTO( Track_creation, "Learn how you can compute tracks from a list of pictu
   SequenceAnalyzer::write( fsOutMotion1,motion_estim );
   fsOutMotion1.release( );
 
-  cout<<"We will no remove bad points matches..."<<endl;
+  cout<<"We will now remove bad points matches..."<<endl;
   motion_estim.keepOnlyCorrectMatches( );
 
   tracks=motion_estim.getTracks( );
