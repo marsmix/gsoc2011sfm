@@ -146,21 +146,24 @@ namespace OpencvSfM{
 
   double TrackOfPoints::errorEstimate( std::vector<PointOfView>& cameras,
     const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
-    cv::Vec3d& points3D ) const
+    cv::Vec3d& points3D, const std::vector<bool> &masks) const
   {
     double distance=0.0;
     unsigned int nviews = images_indexes_.size( );
     for ( unsigned int cpt = 0; cpt < nviews; cpt++ ) {
       int num_camera=images_indexes_[ cpt ];
       int num_point=point_indexes_[ cpt ];
-      cv::Ptr<PointsToTrack> points2D = points_to_track[ num_camera ];
+      if(( masks.size() == 0 ) || ( cpt<masks.size() && masks[cpt] ))
+      {
+        cv::Ptr<PointsToTrack> points2D = points_to_track[ num_camera ];
 
-      const KeyPoint& p=points2D->getKeypoint( num_point );
-      cv::Vec2d projP = cameras[ num_camera ].project3DPointIntoImage( points3D );
+        const KeyPoint& p=points2D->getKeypoint( num_point );
+        cv::Vec2d projP = cameras[ num_camera ].project3DPointIntoImage( points3D );
 
-      //compute back-projection
-      distance += ( (p.pt.x-projP[ 0 ] )*( p.pt.x-projP[ 0 ] ) + 
-        ( p.pt.y-projP[ 1 ] )*( p.pt.y-projP[ 1 ] ) );
+        //compute back-projection
+        distance += sqrt( (p.pt.x-projP[ 0 ] )*( p.pt.x-projP[ 0 ] ) + 
+          ( p.pt.y-projP[ 1 ] )*( p.pt.y-projP[ 1 ] ) );
+      }
     }
     return distance/static_cast<double>( nviews );
   }
@@ -218,7 +221,7 @@ namespace OpencvSfM{
     else
       *point3D = points3D;
 
-    return errorEstimate( cameras, points_to_track, points3D );
+    return errorEstimate( cameras, points_to_track, points3D, masks );
   }
 
   double TrackOfPoints::triangulateRobust( std::vector<PointOfView>& cameras,
@@ -232,20 +235,11 @@ namespace OpencvSfM{
     vector<bool> masks;
     cv::Vec3d bestPoints3D;
 
-    if( !point3D.empty( ) )
-    {
-      double error = errorEstimate( cameras, points_to_track, *point3D );
-      if( error<reproj_error )
-      {
-        points3D = *point3D;
-        return error;
-      }
-    }
     int ptSize = 0;
     bool has_mask = masksValues.size( ) == nviews;
     if( has_mask )
     {
-      for ( int i=0; i<nviews; ++i )
+      for ( unsigned int i=0; i<nviews; ++i )
       {
         if( masksValues[ i ]!=0 )
           ptSize++;
@@ -279,9 +273,8 @@ namespace OpencvSfM{
         nb_vals++;
       }
       //create mask:
-      triangulateLinear( cameras, points_to_track, points3D, masks );
+      distance = triangulateLinear( cameras, points_to_track, points3D, masks );
 
-      distance = errorEstimate( cameras, points_to_track, points3D );
       if( distance < best_distance )
       {
         //new best model...
@@ -356,7 +349,6 @@ namespace OpencvSfM{
   {
     int it = 0,
       it_end = images_graph_.size( )[ 0 ];
-    int idx[ 2 ];
     for( ; it < first_image; ++it )
     {
       uchar* currentValue=images_graph_.ptr( it, first_image, false );

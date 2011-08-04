@@ -280,7 +280,8 @@ namespace OpencvSfM{
       i++;
       matches_it++;
     }
-    for(int wait_endThread = 0; wait_endThread<nb_proc-1 ; ++wait_endThread)
+    for(unsigned int wait_endThread = 0;
+      wait_endThread<nb_proc ; ++wait_endThread)
       P_MUTEX( MatchingThread::thread_concurr );//wait for last threads
   }
 
@@ -291,9 +292,11 @@ namespace OpencvSfM{
 
     while ( index < tracks_size )
     {
-      if( tracks_[ index ].getNbTrack( ) <= mininum_image_matches )
+      if( ( tracks_[ index ].getNbTrack( ) <= mininum_image_matches ) ||
+        ( tracks_[ index ].track_consistance <= 3 ) )
       {
         //problem with this track, too small to be consistent
+        // or inconsistant...
         tracks_size--;
         tracks_[ index ]=tracks_[ tracks_size ];
         tracks_.pop_back( );
@@ -490,6 +493,7 @@ namespace OpencvSfM{
     
     fs << "SequenceAnalyzer" << "{";
     fs << "nbPictures" << ( int )me.points_to_track_.size( );
+    fs << "nbPoints" << ( int )key_size;
     fs << "TrackPoints" << "[";
     for ( vector<TrackOfPoints>::size_type i=0; i < key_size; i++ )
     {

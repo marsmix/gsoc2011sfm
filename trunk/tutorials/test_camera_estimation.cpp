@@ -23,7 +23,7 @@ using namespace OpencvSfM;
 using namespace OpencvSfM::tutorials;
 using namespace std;
 
-NEW_TUTO( Proj_Rec, "Projective reconstruction",
+NEW_TUTO( Proj_Rec, "Euclidean reconstruction",
   "Using points and intra parameters, try to compute motion and object" ){
 
   //universal method to get the current image:

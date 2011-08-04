@@ -46,10 +46,10 @@ namespace OpencvSfM{
     for( unsigned int i = 0; i < camera_mesh.size( ); ++i )
     {
       //translate to the correct location:
-      camera_mesh[ i ] = ( Mat ) ( (Mat )( camera_mesh[ i ] ) -
+      camera_mesh[ i ] = ( Vec3d ) ( Mat ) ( ( Mat )( camera_mesh[ i ] ) -
         camera.getTranslationVector( ) );
       //rotate the ith point:
-      camera_mesh[ i ] = ( Mat ) ( (Mat )( camera_mesh[ i ] ).t( ) *
+      camera_mesh[ i ] = ( Vec3d ) ( Mat ) ( ( Mat )( camera_mesh[ i ] ).t( ) *
         camera.getRotationMatrix( ) );
     }
     pcl::PointCloud<pcl::PointXYZ>::Ptr camera_cloud (

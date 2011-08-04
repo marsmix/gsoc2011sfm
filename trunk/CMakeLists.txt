@@ -54,13 +54,26 @@ include( LibraryAdd.cmake REQUIRED )
 include( ProjectAdd.cmake REQUIRED )
 
 FIND_PACKAGE( OpenCV REQUIRED )
+set( SFM_LINKER_LIBS ${OpenCV_LIBS} )
+
 
 # Unfortunately boost puts the version number into the
 # actual filename for the libraries, so this variable will certainly be needed
 # in the future when new Boost versions are released.
 SET( Boost_ADDITIONAL_VERSIONS "1.43" "1.43.0" "1.44" "1.44.0" "1.45" "1.45.0" "1.46.1" "1.46.0" "1.46" "1.47" )
 
-find_package( Boost COMPONENTS filesystem system thread )
+include( CheckIncludeFiles )
+check_include_files( "pthread.h" HAVE_PTHREAD_H )
+
+set( BOOST_needed_list filesystem system thread )
+if( ${HAVE_PTHREAD_H} )
+	find_package( Threads )
+	set( SFM_LINKER_LIBS ${SFM_LINKER_LIBS} ${CMAKE_THREAD_LIBS_INIT} )
+	set( BOOST_needed_list ${BOOST_needed_list} thread )
+endif( )
+
+	
+find_package( Boost COMPONENTS ${BOOST_needed_list} )
 if( Boost_FOUND )
 	add_definitions( -DHAVE_BOOST )
 	LINK_DIRECTORIES( ${Boost_LIBRARY_DIRS} )
@@ -70,6 +83,8 @@ else( )
 	DOC "The path to Boost root directory ( before boost_1_XX_X )" )
 	message( STATUS " ** Warning: Boost library Could NOT be found, you will not be able to process automatically a folder full of images /!\\" )
 endif( )
+#set( SFM_LINKER_LIBS ${SFM_LINKER_LIBS} ${Boost_LIBRARIES} )
+
 
 add_definitions("-DEIGEN2_SUPPORT")
 
@@ -80,15 +95,6 @@ find_path( EIGEN_DIR "Eigen/Core"
 #Generate the source list:
 #include_directories( "${PROJECT_SOURCE_DIR}/src" )
 #include_directories( "${PROJECT_SOURCE_DIR}/tutorials" )
-include( CheckIncludeFiles )
-check_include_files( "pthread.h" HAVE_PTHREAD_H )
-
-set( SFM_LINKER_LIBS ${OpenCV_LIBS} ${Boost_LIBRARIES} )
-
-if( ${HAVE_PTHREAD_H} )
-	find_package( Threads )
-	set( SFM_LINKER_LIBS ${SFM_LINKER_LIBS} ${CMAKE_THREAD_LIBS_INIT} )
-endif( )
 
 include_directories( ${EIGEN_DIR} )
 

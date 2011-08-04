@@ -26,7 +26,7 @@ namespace OpencvSfM{
   {
   protected:
     static const int mininum_points_matches = 40;
-    static const int mininum_image_matches = 2;
+    static const int mininum_image_matches = 4;
     /**
     * optional, method to use for feature detection
     */
