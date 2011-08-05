@@ -41,8 +41,7 @@ NEW_TUTO( PCL_Tutorial, "Learn how you use PCL to show 3D points",
   //////////////////////////////////////////////////////////////////////////
   //first see if we have the points to show:
   SequenceAnalyzer *motion_estim_loaded;
-  string pathFileTracks = FROM_SRC_ROOT( "Medias/tracks_points_"POINT_METHOD
-    "/motion_tracks_triangulated.yml" );
+  string pathFileTracks = FROM_SRC_ROOT( "Medias/motion_tracks_triangulated.yml" );
   std::ifstream test_file_exist;
   test_file_exist.open( pathFileTracks.c_str() );
   if( !test_file_exist.is_open( ) )
