@@ -37,74 +37,64 @@ NEW_TUTO( Triangulation_tuto, "Learn how you can triangulate 2D points",
   vector<Mat> images;
 
   SequenceAnalyzer *motion_estim_loaded;
-  string pathFileTracks = FROM_SRC_ROOT( "Medias/tracks_points_"POINT_METHOD"/motion_tracks_triangulated.yml" );
+  stringstream pathFile;
+  pathFile<<FROM_SRC_ROOT( "Medias/" );
+  cout<<"Which file would you open? Usually :"<<endl<<"tracks_points_"POINT_METHOD"/motion_tracks.yml"<<endl;
+  string nameFile;
+  cin>>nameFile;
+  pathFile<<nameFile;
+  string pathFileTracks = pathFile.str();
   std::ifstream test_file_exist;
   test_file_exist.open( pathFileTracks.c_str() );
-  if( test_file_exist.is_open( ) )
+  if( !test_file_exist.is_open( ) )
   {
-    test_file_exist.close( );
-    cout<<"create a SequenceAnalyzer using Medias/tracks_points_"POINT_METHOD"/motion_tracks_triangulated.yml"<<endl;
-    FileStorage fsRead( pathFileTracks, FileStorage::READ );
-    FileNode myPtt = fsRead.getFirstTopLevelNode( );
-    motion_estim_loaded = new SequenceAnalyzer( images, myPtt );
-    fsRead.release( );
-
-    cout<<"numbers of correct tracks loaded:"<<
-      motion_estim_loaded->getTracks( ).size( )<<endl;
-  }
-  else
-  {
+    cout<<"you should run an other tutorial before being able to run this one!"<<endl;
+    bool worked = Tutorial_Handler::ask_to_run_tuto( "Track_creation" );
+    if( !worked )
+      return;
     pathFileTracks = FROM_SRC_ROOT( "Medias/tracks_points_"POINT_METHOD"/motion_tracks.yml" );
-    test_file_exist.open( pathFileTracks.c_str() );
-    if( !test_file_exist.is_open( ) )
-    {
-      cout<<"you should run an other tutorial before being able to run this one!"<<endl;
-      bool worked = Tutorial_Handler::ask_to_run_tuto( "Track_creation" );
-      if( !worked )
-        return;
-    }
-    test_file_exist.close( );
-
-    cout<<"First load the cameras from Medias/temple/temple_par.txt"<<endl;
-    vector<PointOfView> myCameras=loadCamerasFromFile( FROM_SRC_ROOT( "Medias/temple/temple_par.txt" ));
-    MotionProcessor mp;
-    mp.setInputSource( FROM_SRC_ROOT( "Medias/temple/" ),IS_DIRECTORY );
-
-    cout<<"Then load all images from Medias/temple/"<<endl;
-    vector<PointOfView>::iterator itPoV=myCameras.begin( );
-    int index_image=-1;
-    while ( itPoV!=myCameras.end( ) )
-    {
-      Mat imgTmp=mp.getFrame( );//get the current image
-      if( imgTmp.empty( ) )
-        break;//end of sequence: quit!
-      index_image++;
-      images.push_back( imgTmp );
-    }
-
-    cout<<"Finally create a new SequenceAnalyzer using Medias/tracks_points_"POINT_METHOD"/motion_tracks.yml"<<endl;
-    FileStorage fsRead( pathFileTracks, FileStorage::READ );
-    FileNode myPtt = fsRead.getFirstTopLevelNode( );
-    motion_estim_loaded = new SequenceAnalyzer( images, myPtt );
-    fsRead.release( );
-
-    cout<<"numbers of correct tracks loaded:"<<
-      motion_estim_loaded->getTracks( ).size( )<<endl;
-
-    int maxImg=motion_estim_loaded->getNumViews( );
-
-    cout<<"triangulation of points."<<endl;
-    StructureEstimator structure ( *motion_estim_loaded, myCameras );
-    vector<char> mask =  structure.computeStructure( );
-    cout<<std::accumulate( mask.begin( ), mask.end( ), 0 )<<" 3D points found."<<endl;
-
-    //now save the triangulate tracks:
-    pathFileTracks = FROM_SRC_ROOT( "Medias/tracks_points_"POINT_METHOD"/motion_tracks_triangulated.yml" );
-    FileStorage fsOutMotion( pathFileTracks, FileStorage::WRITE );
-    if( !fsOutMotion.isOpened( ) )
-      CV_Error( 0,"Can't create the file!\nPlease verify you have access to the directory!" );
-
-    SequenceAnalyzer::write( fsOutMotion, *motion_estim_loaded );
-    fsOutMotion.release( );
   }
+  test_file_exist.close( );
+
+  cout<<"First load the cameras from Medias/temple/temple_par.txt"<<endl;
+  vector<PointOfView> myCameras=loadCamerasFromFile( FROM_SRC_ROOT( "Medias/temple/temple_par.txt" ));
+  MotionProcessor mp;
+  mp.setInputSource( FROM_SRC_ROOT( "Medias/temple/" ),IS_DIRECTORY );
+
+  cout<<"Then load all images from Medias/temple/"<<endl;
+  vector<PointOfView>::iterator itPoV=myCameras.begin( );
+  int index_image=-1;
+  while ( itPoV!=myCameras.end( ) )
+  {
+    Mat imgTmp=mp.getFrame( );//get the current image
+    if( imgTmp.empty( ) )
+      break;//end of sequence: quit!
+    index_image++;
+    images.push_back( imgTmp );
+  }
+
+  cout<<"Finally create a new SequenceAnalyzer"<<endl;
+  FileStorage fsRead( pathFileTracks, FileStorage::READ );
+  FileNode myPtt = fsRead.getFirstTopLevelNode( );
+  motion_estim_loaded = new SequenceAnalyzer( images, myPtt );
+  fsRead.release( );
+
+  cout<<"numbers of correct tracks loaded:"<<
+    motion_estim_loaded->getTracks( ).size( )<<endl;
+
+  int maxImg=motion_estim_loaded->getNumViews( );
+
+  cout<<"triangulation of points."<<endl;
+  StructureEstimator structure ( *motion_estim_loaded, myCameras );
+  vector<char> mask =  structure.computeStructure( );
+  cout<<std::accumulate( mask.begin( ), mask.end( ), 0 )<<" 3D points found."<<endl;
+
+  //now save the triangulate tracks:
+  pathFileTracks = FROM_SRC_ROOT( "Medias/motion_tracks_triangulated.yml" );
+  FileStorage fsOutMotion( pathFileTracks, FileStorage::WRITE );
+  if( !fsOutMotion.isOpened( ) )
+    CV_Error( 0,"Can't create the file!\nPlease verify you have access to the directory!" );
+
+  SequenceAnalyzer::write( fsOutMotion, *motion_estim_loaded );
+  fsOutMotion.release( );
 }
