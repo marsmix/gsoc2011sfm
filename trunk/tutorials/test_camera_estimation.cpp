@@ -4,6 +4,7 @@
 #include "../src/MotionProcessor.h"
 #include "../src/SequenceAnalyzer.h"
 #include "../src/CameraPinhole.h"
+#include "../src/StructureEstimator.h"
 //#include "../src/libmv_mapping.h"
 #include "../src/EuclideanEstimator.h"
 
@@ -34,7 +35,7 @@ NEW_TUTO( Proj_Rec, "Euclidean reconstruction",
 
   vector<PointOfView> myCameras =
     loadCamerasFromFile( FROM_SRC_ROOT( "Medias/temple/temple_par.txt" ),
-    LOAD_INTRA );
+    LOAD_FULL);//LOAD_INTRA );
   vector<PointOfView> myCamerasReal =
     loadCamerasFromFile( FROM_SRC_ROOT( "Medias/temple/temple_par.txt" ),
     LOAD_FULL );
@@ -67,12 +68,28 @@ NEW_TUTO( Proj_Rec, "Euclidean reconstruction",
   SequenceAnalyzer motion_estim_loaded( images, myPtt );
   fsRead.release( );
 
+
+  //motion_estim_loaded.keepOnlyCorrectMatches();
   vector<TrackOfPoints> &tracks=motion_estim_loaded.getTracks( );
   cout<<"numbers of correct tracks loaded:"<<tracks.size( )<<endl;
 
+  /*/////////////////////////////////////////////////////////////////////////
+
+  cout<<"triangulation of points."<<endl;
+  StructureEstimator structure ( motion_estim_loaded, myCameras );
+  vector<char> mask =  structure.computeStructure( );
+
+  /////////////////////////////////////////////////////////////////////////*/
+    
   //myCameras contains only intra value. I will use motion_estim_loaded to
   //compute position of cameras:
   EuclideanEstimator pe( motion_estim_loaded, myCameras );
-
-  pe.computeReconstruction( );
+  
+  pe.computeReconstruction( );/*
+  for(int d = 0;d<pe.camera_computed_.size(); d++)
+    pe.camera_computed_[d] = true;
+  pe.point_computed_ = tracks;
+  pe.bundleAdjustement();
+  pe.viewEstimation();
+  //*/
 }

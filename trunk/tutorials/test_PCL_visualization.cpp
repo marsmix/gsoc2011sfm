@@ -67,6 +67,7 @@ NEW_TUTO( PCL_Tutorial, "Learn how you use PCL to show 3D points",
   vector< cv::Mat > images;//empty list of image as we don't need them here...
   motion_estim_loaded = new SequenceAnalyzer( images, myPtt );
   fsRead.release( );
+  motion_estim_loaded->keepOnlyCorrectMatches();
   cout<<"numbers of correct tracks loaded:"<<
     motion_estim_loaded->getTracks( ).size( )<<endl;
 

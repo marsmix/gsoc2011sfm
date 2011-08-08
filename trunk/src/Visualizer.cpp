@@ -87,7 +87,7 @@ namespace OpencvSfM{
     triangles.cloud = msg;
     triangles.polygons = vertices;
 
-    //pcl::io::saveVTKFile ( "mesh.vtk", triangles );
+    pcl::io::saveVTKFile ( "meshCam.vtk", triangles );
     //now add mesh to the viewer:
     viewer->addPolygonMesh( triangles, name, viewport );
     viewer->setShapeRenderingProperties(
