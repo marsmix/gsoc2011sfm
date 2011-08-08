@@ -24,7 +24,7 @@ using namespace OpencvSfM::tutorials;
 using namespace std;
 
 NEW_TUTO( PCL_tuto, "Learn how you can map values between PCL and OpenCV ",
-  "We will show how we can switch between PCL obects and OpenCV objects." )
+  "We will show how we can switch between PCL objects and OpenCV objects." )
 {
 
   mapping::Point testPoint;

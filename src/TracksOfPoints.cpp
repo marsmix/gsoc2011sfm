@@ -150,6 +150,7 @@ namespace OpencvSfM{
   {
     double distance=0.0;
     unsigned int nviews = images_indexes_.size( );
+    double real_views = 0.0;
     for ( unsigned int cpt = 0; cpt < nviews; cpt++ ) {
       int num_camera=images_indexes_[ cpt ];
       int num_point=point_indexes_[ cpt ];
@@ -163,9 +164,10 @@ namespace OpencvSfM{
         //compute back-projection
         distance += sqrt( (p.pt.x-projP[ 0 ] )*( p.pt.x-projP[ 0 ] ) + 
           ( p.pt.y-projP[ 1 ] )*( p.pt.y-projP[ 1 ] ) );
+        real_views++;
       }
     }
-    return distance/static_cast<double>( nviews );
+    return distance/real_views;
   }
   double TrackOfPoints::triangulateLinear( vector<PointOfView>& cameras,
     const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
@@ -290,7 +292,7 @@ namespace OpencvSfM{
       point3D = Ptr<cv::Vec3d>( new cv::Vec3d( points3D ) );
     else
       *point3D = points3D;
-    return distance;
+    return best_distance;
   }
   
   int ImagesGraphConnection::getHighestLink( int &first_image, int &second_image,

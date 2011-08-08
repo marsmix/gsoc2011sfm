@@ -27,13 +27,14 @@ namespace OpencvSfM{
     libmv::vector<libmv::Mat3> rotations_;
     libmv::vector<libmv::Vec3> translations_;
     std::vector<PointOfView>& cameras_;
-    std::vector<bool> camera_computed_;
-    std::vector< TrackOfPoints > point_computed_;
     SequenceAnalyzer &sequence_;
   public:
     EuclideanEstimator( SequenceAnalyzer &sequence,
       std::vector<PointOfView>& cameras );
     virtual ~EuclideanEstimator( void );
+
+    std::vector< TrackOfPoints > point_computed_;
+    std::vector<bool> camera_computed_;
 
     /**
     * Add a new camera to the estimator
@@ -43,7 +44,8 @@ namespace OpencvSfM{
     {
       libmv::Mat3 intra_param;
       cv::Ptr<Camera> intra=camera.getIntraParameters( );
-      cv::cv2eigen( intra->getIntraMatrix( ).t( ), intra_param );
+      //transpose because libmv needs intra params this way...
+      cv::cv2eigen( intra->getIntraMatrix( ).t(), intra_param );
       intra_params_.push_back( intra_param );
       libmv::Mat3 rotation_mat;
       cv::cv2eigen( camera.getRotationMatrix( ), rotation_mat );
@@ -59,13 +61,15 @@ namespace OpencvSfM{
     */
     void computeReconstruction( );
 
+    void bundleAdjustement( );
+
+    void viewEstimation();
+
   protected:
     void initialReconstruction( std::vector<TrackOfPoints>& tracks,
       int image1, int image2 );
 
     bool cameraResection( unsigned int image );
-
-    void bundleAdjustement( );
   };
 
 }
