@@ -25,8 +25,8 @@ namespace OpencvSfM{
   class SFM_EXPORTS SequenceAnalyzer
   {
   protected:
-    static const int mininum_points_matches = 40;
-    static const int mininum_image_matches = 4;
+    static const int mininum_points_matches = 20;
+    static const int mininum_image_matches = 3;
     /**
     * optional, method to use for feature detection
     */
@@ -174,6 +174,11 @@ namespace OpencvSfM{
     * This function constructs and feeds the images_graph_
     */
     void constructImagesGraph( );
+    /**
+    * This function will create a list of points color corresponding to
+    * object viewed in the sequence
+    */
+    std::vector< unsigned int > getColors( );
     /**
     * This function will create a list of 3D points corresponding to
     * object viewed in the sequence

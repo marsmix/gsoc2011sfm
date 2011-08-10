@@ -151,30 +151,25 @@ namespace OpencvSfM{
     Eigen::Quaterniond rot_init = datas->rotations[j];
     double coef = sqrt( 1.0 - aj[0]*aj[0] - aj[1]*aj[1] - aj[2]*aj[2] );
     Eigen::Quaterniond quat_delta( coef, aj[0],aj[1],aj[2] );
-    Eigen::Quaterniond rot_total = quat_delta * rot_init;
+    Eigen::Quaterniond rot_total = rot_init * quat_delta;
     libmv::Vec3 translat(aj[3],aj[4],aj[5]);
     rotation = rot_total;
-    proj<<rotation,translat;
+    proj.block<3, 3>(0, 0) = rotation;
+    proj.col(3) = translat;
     libmv::Vec4 point3D;
     point3D<<bj[0], bj[1], bj[2], 1;
 
     //could be done like this:
-    //libmv::Vec3 point = K^t * (proj * point3D) ;
-    //but like this, it's faster:
-    libmv::Vec3 point = (proj * point3D) ;
-    if( point(2,0)!=0 )
-    {
-      xij[0] = point(0,0) / point(2,0);
-      xij[1] = point(1,0) / point(2,0);
+    //libmv::Vec3 point = K.transpose() * (proj * point3D) ;
 
-      xij[0] = K( 0,0 ) * xij[0] + K( 1,0 ) * xij[1] + K( 2,0 );
-      xij[1] = K( 1,1 ) * xij[1] + K( 2,1 );
-    }
-    else
-    {
-      xij[0] = 1e20;
-      xij[1] = 1e20;
-    }
+    //but like this, it's faster:
+    
+    libmv::Vec3 point = (proj * point3D) ;
+    xij[0] = point(0,0) / point(2,0);
+    xij[1] = point(1,0) / point(2,0);
+
+    xij[0] = K( 0,0 ) * xij[0] + K( 1,0 ) * xij[1] + K( 2,0 );
+    xij[1] = K( 1,1 ) * xij[1] + K( 2,1 );
   }
 
   //TODO : optimize this (no need to use matrix)!
@@ -193,32 +188,25 @@ namespace OpencvSfM{
     Eigen::Quaterniond rot_total = quat_delta * rot_init;
     rotation = rot_total;
     libmv::Vec3 translat(aj[3],aj[4],aj[5]);
-    proj<<rotation,translat;
+    proj.block<3, 3>(0, 0) = rotation;
+    proj.col(3) = translat;
     libmv::Vec4 point3D;
     point3D<<bj[0], bj[1], bj[2], 1;
     //libmv::Vec3 point = K^t * (proj * point3D) ;
     //but like this, it's faster:
     libmv::Vec3 point = (proj * point3D) ;
-    if( point(2,0)!=0 )
-    {
-      xij[0] = point(0,0) / point(2,0);
-      xij[1] = point(1,0) / point(2,0);
+    xij[0] = point(0,0) / point(2,0);
+    xij[1] = point(1,0) / point(2,0);
 
-      xij[0] = K( 0,0 ) * xij[0] + K( 1,0 ) * xij[1] + K( 2,0 );
-      xij[1] = K( 1,1 ) * xij[1] + K( 2,1 );
-    }
-    else
-    {
-      xij[0] = 1e20;
-      xij[1] = 1e20;
-    }
+    xij[0] = K( 0,0 ) * xij[0] + K( 1,0 ) * xij[1] + K( 2,0 );
+    xij[1] = K( 1,1 ) * xij[1] + K( 2,1 );
   }
 
   void EuclideanEstimator::bundleAdjustement( )
   {
     //wrap the lourakis SBA:
     
-    int n = point_computed_.size( ),   // number of points
+    unsigned int n = point_computed_.size( ),   // number of points
       ncon = 0,// number of points (starting from the 1st) whose parameters should not be modified.
       m = 0,   // number of images (or camera)
       mcon = 1,// number of images (starting from the 1st) whose parameters should not be modified.
@@ -227,7 +215,7 @@ namespace OpencvSfM{
       pnp = 3,// number of parameters for ONE 3D point; e.g. 3 for Euclidean points
       mnp = 2;// number of parameters for ONE projected point; e.g. 2 for Euclidean points
 
-    int i = 0, j = 0,
+    unsigned int i = 0, j = 0,
       nb_cam = camera_computed_.size( );
     vector< Ptr< PointsToTrack > > &points_to_track = sequence_.getPoints( );
 
@@ -283,12 +271,11 @@ namespace OpencvSfM{
 
       p_local[0] = 0; p_local[1] = 0;
       p_local[2] = 0;
-      double coef = 1.0 - p_local[0]*p_local[0] -
-        p_local[1]*p_local[1] - p_local[2]*p_local[2];
 
       p_local[3] = translations_[ idx_cam ](0);
       p_local[4] = translations_[ idx_cam ](1);
       p_local[5] = translations_[ idx_cam ](2);
+      cout<<rotations_[ idx_cam ]<<translations_[ idx_cam ]<<endl;
 
       p_local+=cnp;
     }
@@ -326,7 +313,7 @@ namespace OpencvSfM{
     data.points3D = points3D_values;
     data.projections = x;
 
-    //////////////////////////////////////////////////////////////////////////
+    /*/////////////////////////////////////////////////////////////////////////
     //Debug compare projected point vs estimated point:
     idx_visible = 0;
     double xij[2];
@@ -359,8 +346,8 @@ namespace OpencvSfM{
     int verbose = 0;         //no debug
     double opts[SBA_OPTSSZ] = {
       0.1,		//Tau
-      1e-20,		//E1
-      1e-20,		//E2
+      1e-12,		//E1
+      1e-12,		//E2
       0,		//E3 average reprojection error
       0		//E4 relative reduction in the RMS reprojection error
     };
@@ -373,9 +360,6 @@ namespace OpencvSfM{
 
     std::cout<<"SBA returned in "<<iter<<" iter, reason "<<info[6]
     <<", error "<<info[1]<<" [initial "<< info[0]<<"]\n";
-
-    if( iter>0 )
-    {
 
     //set new values:
     m = idx_cameras.size();
@@ -391,13 +375,14 @@ namespace OpencvSfM{
       double coef = sqrt( 1.0 -
         p_local[0]*p_local[0] - p_local[1]*p_local[1] - p_local[2]*p_local[2] );
       Eigen::Quaterniond quat_delta( coef,p_local[0],p_local[1],p_local[2] );
-      Eigen::Quaterniond rot_total = quat_delta * rot_init;
+      Eigen::Quaterniond rot_total = rot_init * quat_delta;
       //add camera parameters to p:
       rotations_[ idx_cam ] = rot_total;
 
       translations_[ idx_cam ](0) = p_local[3];
       translations_[ idx_cam ](1) = p_local[4];
       translations_[ idx_cam ](2) = p_local[5];
+      cout<<rotations_[ idx_cam ]<<translations_[ idx_cam ]<<endl;
 
       //update camera's structure:
       cv::Mat newRotation,newTranslation;
@@ -408,18 +393,26 @@ namespace OpencvSfM{
 
       p_local+=cnp;
     }
+    for ( j = 0; j < n; ++j )
+    {//for each 3D point:
+      cv::Vec3d& cv3DPoint = point_computed_[ j ];
+      cv3DPoint[ 0 ] = *(p_local++);
+      cv3DPoint[ 1 ] = *(p_local++);
+      cv3DPoint[ 2 ] = *(p_local++);
+    }
 
-    //////////////////////////////////////////////////////////////////////////
+    /*/////////////////////////////////////////////////////////////////////////
     //Debug compare projected point vs estimated point:
     idx_visible = 0;
     //2D projected points
     for ( j = 0; j < n; ++j )
     {//for each 3D point:
       double xij[2];
+      cv::Vec3d& cv3DPoint = point_computed_[ j ];
+      cout<<"Vec3d : "<< cv3DPoint[ 0 ]<<", "<< cv3DPoint[ 1 ]<<", "<< cv3DPoint[ 2 ]<<endl;
       for ( i=0; i < m; ++i )
       {//for each camera:
         int idx_cam = idx_cameras[i];
-        cv::Vec3d& cv3DPoint = point_computed_[ j ];
         if( vmask[ j+(i*n) ] )
         {
           cv::KeyPoint pt = points_to_track[ idx_cam ]->getKeypoint(
@@ -431,21 +424,12 @@ namespace OpencvSfM{
           cout<<pt.pt.x<<","<<pt.pt.y<<" -> ";
           cout<<xij[0]<<","<<xij[1]<<" -> ";
           cout<<proj[0]<<","<<proj[1]<<endl;
-          system("pause");
         }
       }
+      system("pause");
     }
     ////////////////////////////////////////////////////////////////////////*/
 
-    for ( j = 0; j < n; ++j )
-    {//for each 3D point:
-      cv::Vec3d& cv3DPoint = point_computed_[ j ];
-      cv3DPoint[ 0 ] = *(p_local++);
-      cv3DPoint[ 1 ] = *(p_local++);
-      cv3DPoint[ 2 ] = *(p_local++);
-    }
-
-    }
     delete [] vmask;//visibility mask
     delete [] p;//initial parameter vector p0: (a1, ..., am, b1, ..., bn).
     delete [] x;// measurement vector
@@ -455,14 +439,14 @@ namespace OpencvSfM{
   {
     //wrap the lourakis SBA:
 
-    int n = point_computed_.size( ),   // number of points
+    unsigned int n = point_computed_.size( ),   // number of points
       m = 0,   // number of images (or camera)
       mcon = 0,// number of images (starting from the 1st) whose parameters should not be modified.
       cnp = 6,// number of parameters for ONE camera; e.g. 6 for Euclidean cameras
       //use only vector part of quaternion to enforce the unit lenght...
       mnp = 2;// number of parameters for ONE projected point; e.g. 2 for Euclidean points
 
-    int i = 0, j = 0,
+    unsigned int i = 0, j = 0,
       nb_cam = camera_computed_.size( );
     vector< Ptr< PointsToTrack > > &points_to_track = sequence_.getPoints( );
     
@@ -595,15 +579,13 @@ namespace OpencvSfM{
     p_local = p + cnp*(m-1);
 
     //extrinsic parameters only (intra are know in euclidean reconstruction)
-    double coef = 1.0 - 
-      p_local[0]*p_local[0] - p_local[1]*p_local[1] - p_local[2]*p_local[2];
-    if( coef!=coef || coef<=0 )
-      coef = 0;
-    else 
-      coef = sqrt(coef);
-    Eigen::Quaterniond quat( p_local[0],p_local[1],p_local[2], coef );
+    Eigen::Quaterniond rot_init = data.rotations[ m-1 ];
+    double coef = sqrt( 1.0 -
+      p_local[0]*p_local[0] - p_local[1]*p_local[1] - p_local[2]*p_local[2] );
+    Eigen::Quaterniond quat_delta( coef,p_local[0],p_local[1],p_local[2] );
+    Eigen::Quaterniond rot_total = rot_init * quat_delta;
     //add camera parameters to p:
-    rotations_[ image ] = quat;
+    rotations_[ image ] = rot_total;
 
     translations_[ image ](0) = p_local[3];
     translations_[ image ](1) = p_local[4];
@@ -730,7 +712,7 @@ namespace OpencvSfM{
     images_to_compute.push_back( image1 );
     images_to_compute.push_back( image2 );
     point_computed_ = se.computeStructure( images_to_compute );
-    bundleAdjustement();
+    //bundleAdjustement();
   }
 
 
@@ -843,18 +825,20 @@ namespace OpencvSfM{
   void EuclideanEstimator::viewEstimation()
   {
     vector<cv::Vec3d> tracks3D;
+    vector< unsigned int > colors;
     vector<TrackOfPoints>::iterator itTrack=point_computed_.begin( );
     while ( itTrack != point_computed_.end( ) )
     {
       tracks3D.push_back( ( cv::Vec3d )( *itTrack ) );
+      colors.push_back( itTrack->getColor() );
       itTrack++;
     }
 
     //////////////////////////////////////////////////////////////////////////
     // Open 3D viewer and add point cloud
     Visualizer debugView ( "Debug viewer" );
-    debugView.add3DPoints( tracks3D );
-
+    debugView.add3DPointsColored( tracks3D,colors, "Euclidean estimated" );
+    /*
     for( unsigned int i = 0; i<cameras_.size( ) ; ++i )
       if( camera_computed_[i] )
       {
@@ -863,7 +847,7 @@ namespace OpencvSfM{
         debugView.addCamera( cameras_[ i ],
           cam_name.str() );
       }
-
+      */
 
 
       debugView.runInteract( );

@@ -29,6 +29,7 @@ namespace OpencvSfM{
     cv::Ptr<cv::Vec3d> point3D;
     std::vector<unsigned int> images_indexes_;
     std::vector<unsigned int> point_indexes_;
+    unsigned int color;
     /**
     * if <0 the track is inconsistent
     * if >0 represent the degree of consistence ( higher is better )
@@ -42,7 +43,7 @@ namespace OpencvSfM{
     operator cv::Vec<Type,size>&( ) {
       return *point3D;
     }
-    TrackOfPoints( ):track_consistance( 0 ){};
+    TrackOfPoints( ):track_consistance( 0 ),color(0){};
     /**
     * This function add matches to track
     * @param image_src index of source matches image
@@ -126,6 +127,8 @@ namespace OpencvSfM{
 
 
     void set3DPosition( cv::Vec3d newPoint );
+    inline unsigned int getColor() const {return color;};
+    inline void setColor(unsigned int c) {color = c;};
   protected:
     double errorEstimate( std::vector< PointOfView >& cameras,
       const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,

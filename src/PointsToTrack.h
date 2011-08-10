@@ -24,8 +24,21 @@ namespace OpencvSfM{
   class SFM_EXPORTS PointsToTrack
   {
   protected:
-    std::vector<cv::KeyPoint> keypoints_;///<This attribute will store points coordinates and sometimes orientation and size
-    cv::Mat descriptors_;///<this attribute will store descritors for each points in a matrix with size ( n*m ), where n is the number of points and m is the desciptor size.
+    /**
+    * This attribute will store points coordinates
+    * and sometimes orientation and size
+    */
+    std::vector<cv::KeyPoint> keypoints_;
+    /**
+    * this attribute will store descritors for each points in a matrix
+    * with size ( n*m ), where 
+    * n is the number of points and m is the desciptor size.
+    */
+    cv::Mat descriptors_;
+    /**
+    * When available, the color of each point can be stored here.
+    */
+    std::vector<unsigned int> RGB_values_;
     int corresponding_image_;///<index of frame when available
     static int glob_number_images_;///<total numbers of images!
   public:
@@ -108,6 +121,13 @@ namespace OpencvSfM{
     */
     //
     void printPointsOnImage( const cv::Mat &image, cv::Mat& outImg, const cv::Scalar& color=cv::Scalar::all( -1 ), int flags=cv::DrawMatchesFlags::DEFAULT ) const;
+
+    inline unsigned int getColor( unsigned int index ) const{
+      if( index<RGB_values_.size() )
+        return RGB_values_[index];
+      else
+        return 0;
+    }
 
     static void read( const cv::FileNode& node, PointsToTrack& points );
 

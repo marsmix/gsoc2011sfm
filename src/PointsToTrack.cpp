@@ -123,6 +123,18 @@ namespace OpencvSfM{
       CV_Error( CV_StsError, "PointsToTrack FileNode is not correct!" );
     node_descriptors >> points.descriptors_;
 
+    cv::FileNode node_colors = node[ "colors" ];
+    if( !node_colors.empty( ) )
+    {
+      cv::FileNodeIterator it = node_colors.begin( ), it_end = node_colors.end( );
+      while( it != it_end )
+      {
+        int color;
+        it >> color;
+        points.RGB_values_.push_back( color );
+        //it++ is not needed as the >> operator increment automatically it!
+      }
+    }
   };
   void PointsToTrack::write( cv::FileStorage& fs, const PointsToTrack& keypoints )
   {
@@ -130,7 +142,13 @@ namespace OpencvSfM{
     cv::write( fs, "keypoints", keypoints.keypoints_ );
 
     fs << "descriptors" << keypoints.descriptors_;
-    fs << "}" << "}";
+    fs << "colors" <<"[:";
+    unsigned int size_max = keypoints.RGB_values_.size( );
+    for(unsigned int i=0; i<size_max; ++i )
+    {
+      fs << (int)(keypoints.RGB_values_[i] & 0x00FFFFFF);
+    }
+    fs << "]" << "}" << "}";
   }
 
   void PointsToTrack::getKeyMatches( const std::vector<TrackOfPoints>& matches,

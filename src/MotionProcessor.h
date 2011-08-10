@@ -57,7 +57,12 @@ namespace OpencvSfM{
     unsigned int numFrame_;///<When the camera is attached to a list of file, numFrame_ will be used to know how many frames we have take.
     int wantedWidth_;///<if below 0, represent the wanted width of Mat returned by getFrame( );
     int wantedHeight_;///<if below 0, represent the wanted height of Mat returned by getFrame( );
-    bool convertToRGB_;///<Boolean flags indicating whether images should be converted to RGB
+    /**
+    * if >0 the loaded image is forced to be a 3-channel color image
+    * if =0 the loaded image is forced to be grayscale
+    * if <0 the loaded image will be loaded as-is
+    */
+    uchar convertToRGB_;
   public:
     MotionProcessor( void );
     ~MotionProcessor( void );

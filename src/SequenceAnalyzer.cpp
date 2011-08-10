@@ -166,7 +166,7 @@ namespace OpencvSfM{
           }
         }
 
-        while( nbErrors > 50 && nb_iter < 8 &&
+        while( nbErrors > 50 && nb_iter < 4 &&
           matches_i_j.size( ) > mininum_points_matches )
         {
           fundam = cv::findFundamentalMat( srcP, destP, status, cv::FM_RANSAC, 1.5 );
@@ -198,7 +198,7 @@ namespace OpencvSfM{
         
 
 //////////////////////////////////////////////////////////////////////////
-        if( matches_i_j.size( ) > mininum_points_matches && nb_iter < 8 )
+        if( matches_i_j.size( ) > mininum_points_matches && nb_iter < 4 )
         {
           P_MUTEX( add_to_track );
           seq_analyser->addMatches( matches_i_j,i,j );
@@ -283,6 +283,30 @@ namespace OpencvSfM{
     for(unsigned int wait_endThread = 0;
       wait_endThread<nb_proc ; ++wait_endThread)
       P_MUTEX( MatchingThread::thread_concurr );//wait for last threads
+
+    //compute the color of each matches:
+    unsigned int max_tracks = tracks_.size();
+    for(unsigned int t=0;t<max_tracks; t++)
+    {
+      TrackOfPoints& tmp = tracks_[t];
+      unsigned int max_points = tmp.point_indexes_.size();
+      int R = 0, G = 0, B = 0;
+      for(unsigned int j=0; j<max_points; ++j)
+      {
+        unsigned int img_idx = tmp.images_indexes_[j];
+        unsigned int pt_idx = tmp.point_indexes_[j];
+
+        unsigned int packed_color = points_to_track_[ img_idx ]->getColor( pt_idx );
+        R += (packed_color>>16) & 0x000000FF;
+        G += (packed_color>>8) & 0x000000FF;
+        B += (packed_color) & 0x000000FF;
+      }
+      R /= max_points;
+      G /= max_points;
+      B /= max_points;
+      tmp.color = (unsigned int)(
+        ((R<<16) & 0x00FF0000) | ((R<<8) & 0x0000FF00)| (B & 0x000000FF));
+    }
   }
 
   void SequenceAnalyzer::keepOnlyCorrectMatches( )
@@ -458,6 +482,9 @@ namespace OpencvSfM{
         point[ 2 ] = it_track[ "point3D_triangulated" ][ 2 ];
         track.point3D = Ptr<cv::Vec3d>( new cv::Vec3d( point ) );
       }
+      int color;
+      it_track[ "color" ] >> color;
+      track.setColor( *((unsigned int*)&color) );
       cv::FileNodeIterator itPoints = it_track[ "list_of_points" ].begin( ),
         itPoints_end = it_track[ "list_of_points" ].end( );
       while( itPoints != itPoints_end )
@@ -505,7 +532,12 @@ namespace OpencvSfM{
         fs << "track_consistance" << track.track_consistance;
         fs << "has_3d_position" << ( !track.point3D.empty( ) );
         if( !track.point3D.empty( ) )
-          fs << "point3D_triangulated" << *track.point3D;
+          fs << "point3D_triangulated" << *(track.point3D);
+
+        unsigned int real_color = track.getColor();
+        int color = *((int*)&real_color);
+        fs << "color" << color;
+
         fs << "list_of_points" << "[:";
         for ( unsigned int j = 0; j < nbPoints ; j++ )
         {
@@ -566,6 +598,19 @@ namespace OpencvSfM{
     {
       if( !itTrack->point3D.empty( ) )
         out_vector.push_back( ( cv::Vec3d )( *itTrack ) );
+      itTrack++;
+    }
+    return out_vector;
+  }
+
+  vector<unsigned int> SequenceAnalyzer::getColors( )
+  {
+    vector<unsigned int> out_vector;
+    vector<TrackOfPoints>::iterator itTrack=tracks_.begin( );
+    while ( itTrack != tracks_.end( ) )
+    {
+      if( !itTrack->point3D.empty( ) )
+        out_vector.push_back( itTrack->getColor() );
       itTrack++;
     }
     return out_vector;

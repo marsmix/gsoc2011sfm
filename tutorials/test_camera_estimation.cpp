@@ -69,7 +69,7 @@ NEW_TUTO( Proj_Rec, "Euclidean reconstruction",
   fsRead.release( );
 
 
-  //motion_estim_loaded.keepOnlyCorrectMatches();
+  motion_estim_loaded.keepOnlyCorrectMatches();
   vector<TrackOfPoints> &tracks=motion_estim_loaded.getTracks( );
   cout<<"numbers of correct tracks loaded:"<<tracks.size( )<<endl;
 

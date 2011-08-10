@@ -76,7 +76,8 @@ NEW_TUTO( PCL_Tutorial, "Learn how you use PCL to show 3D points",
 
   Visualizer debugView ( "3D Viewer" );
   const vector< cv::Vec3d >& tracks = motion_estim_loaded->get3DStructure( );
-  debugView.add3DPoints( tracks, "Structure triangulated" );
+  const vector< unsigned int > colors = motion_estim_loaded->getColors( );
+  debugView.add3DPointsColored( tracks,colors, "Structure triangulated" );
   /*
   for( int i = 0; i<myCameras.size( ) ; ++i )
   {

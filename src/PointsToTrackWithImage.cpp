@@ -54,7 +54,45 @@ namespace OpencvSfM
   int PointsToTrackWithImage::computeKeypoints( )
   {
     feature_detector_->detect( imageToAnalyse_,this->keypoints_,maskOfAnalyse_ );
-    return this->keypoints_.size( );
+    //find color of points:
+    RGB_values_.clear();
+    unsigned int size_max = this->keypoints_.size( );
+    unsigned int colorFinal;
+    char elemSize = imageToAnalyse_.elemSize();
+    for(unsigned int i=0; i<size_max; ++i )
+    {
+      //as we don't know type of image, we use a different processing:
+      switch ( elemSize )
+      {
+      case 1://char
+        {
+          uchar color = imageToAnalyse_.at<uchar>( keypoints_[i].pt );
+          colorFinal = (unsigned int)((((int)color)<<16)|((int)color<<8)|((int)color));
+          break;
+        }
+      case 2://short???
+        {
+          unsigned short color = imageToAnalyse_.at<unsigned short>( keypoints_[i].pt );
+          colorFinal = (unsigned int)((((int)color)<<16)|((int)color));
+          break;
+        }
+      case 3://RGB
+        {
+          uchar* ptr = (imageToAnalyse_.data +
+            (imageToAnalyse_.step*(int)keypoints_[i].pt.y) +
+            (int)keypoints_[i].pt.x * imageToAnalyse_.elemSize());
+          colorFinal = (unsigned int)((((int)ptr[2])<<16)|((int)ptr[1]<<8)|((int)ptr[0]));
+          break;
+        }
+      default://RGBA
+        {
+          colorFinal = imageToAnalyse_.at<unsigned int>( keypoints_[i].pt );
+          break;
+        }
+      }
+      RGB_values_.push_back(colorFinal);
+    }
+    return size_max;
   }
 
   void PointsToTrackWithImage::computeDescriptors( )

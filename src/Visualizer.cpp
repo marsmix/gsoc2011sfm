@@ -119,6 +119,41 @@ namespace OpencvSfM{
       triangles );
 
   }
+  void Visualizer::add3DPointsColored( const std::vector<cv::Vec3d>& points,
+     const std::vector<unsigned int>& colors, std::string name, int viewport )
+  {
+
+    // --------------------------------------------
+    // -----Open 3D viewer and add point cloud-----
+    // --------------------------------------------
+
+
+    pcl::PointCloud< pcl::PointXYZRGB >::Ptr my_cloud (
+      new pcl::PointCloud< pcl::PointXYZRGB > );
+    //process point per point (can't convert directly...)
+    unsigned int max_size = points.size();
+    for(unsigned int i = 0; i<max_size; i++)
+    {
+      pcl::PointXYZRGB p;
+      p.data[0] = points[i].val[0];
+      p.data[1] = points[i].val[1];
+      p.data[2] = points[i].val[2];
+      p.rgb = *((float*)&(colors[i]));
+      my_cloud->push_back(p);
+    }
+    pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(my_cloud);
+    viewer->addPointCloud<pcl::PointXYZRGB> (my_cloud, rgb, name, viewport );
+    viewer->setPointCloudRenderingProperties (
+      pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 2, name, viewport );
+
+    pcl::PolygonMesh triangles;
+    sensor_msgs::PointCloud2 msg;
+    pcl::toROSMsg( *my_cloud, msg );
+    triangles.cloud = msg;
+    pcl::io::saveVTKFile ( ((std::string)"test")+name+((std::string)".vtk"),
+      triangles );
+
+  }
 
   void Visualizer::runInteract( )
   {

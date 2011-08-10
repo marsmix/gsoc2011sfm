@@ -36,7 +36,8 @@ NEW_TUTO( Track_creation, "Learn how you can compute tracks from a list of pictu
   }
 
   //Configure input ( not needed, but show how we can do
-  mp.setProperty( CV_CAP_PROP_CONVERT_RGB,0 );//Only greyscale, due to SIFT
+  //mp.setProperty( CV_CAP_PROP_CONVERT_RGB,0 );//Only greyscale, due to SIFT
+  mp.setProperty( CV_CAP_PROP_CONVERT_RGB,-1 );//Keep the color as is.
 
   Ptr<FeatureDetector> detector;
   detector=Ptr<FeatureDetector>( new DETECTOR_METHOD( ) );
@@ -81,7 +82,7 @@ NEW_TUTO( Track_creation, "Learn how you can compute tracks from a list of pictu
   {
     int nbFrame=0;
     cout<<"Compute points and description for each frame..."<<endl;
-    cout<<"This can take time so be patient ; )"<<endl;
+    cout<<"This can take time so be patient ;)"<<endl;
     while ( !currentImage.empty( ) )
     {
       //if the image is loaded, find the points:
@@ -119,7 +120,7 @@ NEW_TUTO( Track_creation, "Learn how you can compute tracks from a list of pictu
 
   pathFileTracks = FROM_SRC_ROOT( "Medias/tracks_points_"POINT_METHOD"/motion_tracks1.yml" );
   cout<<"Compute matches between each frames..."<<endl<<endl;
-  cout<<"The complexity is O( scary ), so be patient but once done "
+  cout<<"The complexity is O( scary ) (approx fact(n)), so be patient...\nOnce done "
     "you will not have to do it again, everything will be saved in:\n"<<
     pathFileTracks<<"..."<<endl;
   motion_estim.computeMatches( );

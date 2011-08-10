@@ -25,9 +25,8 @@ namespace OpencvSfM{
     pos_in_loading_process_ = 0;
     wantedWidth_=-1;
     wantedHeight_=-1;
-    convertToRGB_=false;
+    convertToRGB_=-1;
   }
-
 
   MotionProcessor::~MotionProcessor( void )
   {
@@ -51,7 +50,7 @@ namespace OpencvSfM{
     {
       this->type_of_input_=IS_WEBCAM;
       //if we have some properties, set them to the webcam:
-      this->capture_.set( CV_CAP_PROP_CONVERT_RGB,this->convertToRGB_ );
+      this->capture_.set( CV_CAP_PROP_CONVERT_RGB,this->convertToRGB_>0 );
       if( wantedHeight_>0 )
         this->capture_.set( CV_CAP_PROP_FRAME_HEIGHT,this->wantedHeight_ );
       if( wantedWidth_>0 )
@@ -183,10 +182,11 @@ namespace OpencvSfM{
     {
       //now we ensure the file as the good properties:
       //First the colors:
-      if( (( convertToRGB_&&imgTmp.channels( )<=1 )||( !convertToRGB_&&imgTmp.channels( )!=1 )) )
+      if( (( (convertToRGB_>0) && imgTmp.channels( )<=1 ) ||
+        ( (convertToRGB_==0) && imgTmp.channels( )!=1 )) )
       {
         Mat correctImg;
-        if( convertToRGB_ )
+        if( convertToRGB_==0 )
           cvtColor( imgTmp,correctImg,CV_RGB2GRAY );
         else
           cvtColor( imgTmp,correctImg,CV_GRAY2RGB );
@@ -223,13 +223,13 @@ namespace OpencvSfM{
     switch ( _idProp )
     {
     case CV_CAP_PROP_CONVERT_RGB://Boolean flags indicating whether images should be converted to RGB
-      convertToRGB_ = ( _value>0 );
+      convertToRGB_ = ( int )_value;
       break;
     case CV_CAP_PROP_FRAME_HEIGHT://Height of the frames in the video stream
-      wantedHeight_=( int )_value;
+      wantedHeight_= ( int )_value;
       break;
     case CV_CAP_PROP_FRAME_WIDTH://Width of the frames in the video stream
-      wantedWidth_=( int )_value;
+      wantedWidth_= ( int )_value;
       break;
     case CV_CAP_PROP_POS_FRAMES:// 0-based index of the frame to be decoded/captured next
       {
@@ -262,9 +262,11 @@ namespace OpencvSfM{
         //else, do nothing as the property is already assigned
       }
       break;
-    case CV_CAP_PROP_POS_AVI_RATIO://Relative position of the video file ( 0 - start of the film, 1 - end of the film )
+    case CV_CAP_PROP_POS_AVI_RATIO:
+      //Relative position of the video file ( 0 - start of the film, 1 - end of the film )
       {
-        if( type_of_input_==IS_LIST_FILES||type_of_input_==IS_SINGLE_FILE )
+        if( (type_of_input_==IS_LIST_FILES && suffix_ != "Not a dynamic list" )||
+          type_of_input_== IS_SINGLE_FILE )
           return false;
         else
         {
