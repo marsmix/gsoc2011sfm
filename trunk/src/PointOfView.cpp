@@ -82,6 +82,7 @@ namespace OpencvSfM{
 
     //transform points into pixel coordinates using camera intra parameters:
     pointsOut = device_->normImageToPixelCoordinates( pointsOut );
+    Vec2d pointOut = pointsOut[ 0 ];
     return pointsOut[ 0 ];
   }
   vector<Vec2d> PointOfView::project3DPointsIntoImage( vector<Vec3d> points ) const

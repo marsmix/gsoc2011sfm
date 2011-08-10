@@ -26,6 +26,9 @@ namespace OpencvSfM{
       std::string name = "camera", int viewport = 0 );
     void add3DPoints( const std::vector<cv::Vec3d>& points,
       std::string name = "cloud", int viewport = 0 );
+    void add3DPointsColored( const std::vector<cv::Vec3d>& points,
+      const std::vector<unsigned int>& colors,
+      std::string name = "cloud", int viewport = 0 );
 
     void runInteract( );
   };

@@ -50,6 +50,8 @@ else( )
     set( SfM_lib_DEBUG_POSTFIX )
 endif( )
 
+SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules/)#because some "find...cmake" are in CMakeModules folder...
+
 include( LibraryAdd.cmake REQUIRED )
 include( ProjectAdd.cmake REQUIRED )
 
@@ -83,42 +85,47 @@ else( )
 	DOC "The path to Boost root directory ( before boost_1_XX_X )" )
 	message( STATUS " ** Warning: Boost library Could NOT be found, you will not be able to process automatically a folder full of images /!\\" )
 endif( )
-#set( SFM_LINKER_LIBS ${SFM_LINKER_LIBS} ${Boost_LIBRARIES} )
 
 
 add_definitions("-DEIGEN2_SUPPORT")
 
-find_path( EIGEN_DIR "Eigen/Core"
-	PATHS "/usr/local/include/" "/opt/include/" "/usr/include/"
-	PATH_SUFFIXES "eigen2" "eigen3" "eigen"
-	DOC "The path to Eigen2/Eigen3 headers" )
-#Generate the source list:
-#include_directories( "${PROJECT_SOURCE_DIR}/src" )
-#include_directories( "${PROJECT_SOURCE_DIR}/tutorials" )
-
-include_directories( ${EIGEN_DIR} )
-
 find_package( PCL 1.1 )
-
 set( SFM_LINKER_LIBS ${SFM_LINKER_LIBS} ${PCL_LIBRARIES} )
 include_directories( ${PCL_INCLUDE_DIRS} )
 link_directories( ${PCL_LIBRARY_DIRS} )
 add_definitions( ${PCL_DEFINITIONS} )
 
-#find_package( libmv ) not possible now :(
-find_path( LIBMV_HEADER_DIR "libmv/multiview"
-	PATH_SUFFIXES "src"
-	DOC "The path to LIBMV headers" )
-find_path( LIBMV_LIB_DIR "lib"
-	DOC "The path to LIBMV lib" )
-if( WIN32 )
-SET ( LIBMV_LIB debug "multiview_d" "numeric_d" "V3D" "ldl" "colamd" optimized "multiview" "numeric" "V3D" "ldl" "colamd" )
+find_package( Libmv COMPONENTS multiview numeric )
+if( LIBMV_FOUND )
+	include_directories( ${LIBMV_INCLUDE_DIRS} )
+	link_directories( ${LIBMV_LIBRARY_DIR} )
+	#as we don't want all libraries, we don't use ${LIBMV_LIBRARIES}
+	SET( SFM_LINKER_LIBS ${SFM_LINKER_LIBS} "multiview" "numeric")
 else( )
-SET ( LIBMV_LIB "libmultiview.a" "libnumeric.a" "libtools.a" "libV3D.a" "libldl.a" "libcolamd.a" "libglog.a" "libgflags.a" "libgtest.a" )
+  find_path( LIBMV_ROOT camera/camera.h
+	PATHS "/usr/local/include/" "/opt/include/" "/usr/include/"
+	PATH_SUFFIXES "inlude/libmv/"
+	DOC "The path to libmv's directory" )
 endif( )
-include_directories( ${LIBMV_HEADER_DIR} )
-link_directories( ${LIBMV_LIB_DIR} )
-SET( SFM_LINKER_LIBS ${SFM_LINKER_LIBS} ${LIBMV_LIB} )
+
+#sba library:
+FIND_PACKAGE(F2C REQUIRED)
+include_directories( ${F2C_INCLUDE_DIR} )
+SET( SFM_LINKER_LIBS ${SFM_LINKER_LIBS} ${F2C_LIBRARY} )
+
+find_library( BLAS_LIBRARIES NAMES blas DOC "The path to BLAS library" )
+SET( SFM_LINKER_LIBS ${SFM_LINKER_LIBS} ${BLAS_LIBRARIES} )
+
+find_library( LAPACK_LIBRARIES NAMES lapack DOC "The path to LAPACK library" )
+SET( SFM_LINKER_LIBS ${SFM_LINKER_LIBS} ${LAPACK_LIBRARIES} )
+
+find_path(SBA_INCLUDE_DIR sba.h
+    PATH_SUFFIXES
+    sba )
+include_directories( ${SBA_INCLUDE_DIR} )
+find_library( SBA_LIBRARIES NAMES sba DOC "The path to SBA library" )
+SET( SFM_LINKER_LIBS ${SFM_LINKER_LIBS} ${SBA_LIBRARIES} )
+
 
 # Allow the developer to select if Dynamic or Static libraries are built
 OPTION ( BUILD_STATIC_LIBS "Build Static Libraries" OFF )

@@ -35,6 +35,12 @@ namespace OpencvSfM{
     * Destructor...
     */
     virtual ~PointsMatcher( );
+
+    static cv::Ptr<PointsMatcher> create( std::string match_algo )
+    {
+      return cv::Ptr<PointsMatcher>( new PointsMatcher(
+        cv::DescriptorMatcher::create( match_algo ) ) );
+    };
     /**
     * Use this function to add data used to find matches
     * @param pointCollection points computed using various methods. Please be carful to get compatible points ( that is with descriptors if matcher need some )
