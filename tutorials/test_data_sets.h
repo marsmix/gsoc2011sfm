@@ -2,12 +2,11 @@
 #ifndef _GSOC_SFM_TUTORIALS_H
 #define _GSOC_SFM_TUTORIALS_H
 
-#include "config.h"
+#include "config_SFM.h"
 #include "../src/PointOfView.h"
 #include "../src/CameraPinhole.h"
 #include <opencv2/core/core.hpp>
 
-#include INCLUDE_MUTEX
 
 #include <iostream>
 #include <fstream>

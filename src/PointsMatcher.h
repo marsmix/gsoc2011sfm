@@ -2,11 +2,9 @@
 #define _GSOC_SFM_POINTSMATCHED_H 1
 
 #include "macro.h" //SFM_EXPORTS
-#include "config.h" //SEMAPHORE
+#include "config_SFM.h"  //SEMAPHORE
 
 #include "PointsToTrack.h"
-
-#include INCLUDE_MUTEX
 
 #include "opencv2/features2d/features2d.hpp"
 #include <vector>

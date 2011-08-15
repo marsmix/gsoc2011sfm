@@ -1,8 +1,7 @@
 #include "SequenceAnalyzer.h"
 
-#include "config.h" //SEMAPHORE
+#include "config_SFM.h"  //SEMAPHORE
 
-#include INCLUDE_MUTEX
 #include <boost/thread/thread.hpp>
 
 #include <iostream>
@@ -174,7 +173,7 @@ namespace OpencvSfM{
           matches_i_j.size( ) > mininum_points_matches )
         {
           fundam = cv::findFundamentalMat( srcP, destP, status, cv::FM_RANSAC, 1.5 );
-          
+
           //refine the mathing :
           nbErrors =0 ;
           size_match = status.size( );
@@ -199,7 +198,7 @@ namespace OpencvSfM{
         matches_i_j.clear( );
         point_matcher->matchWithFundamental( point_matcher1,fundam,images_[ i ],
           matches_i_j,masks );*/
-        
+
 
 //////////////////////////////////////////////////////////////////////////
         if( matches_i_j.size( ) > mininum_points_matches && nb_iter < 4 )
@@ -625,7 +624,7 @@ namespace OpencvSfM{
   {
     vector<TrackOfPoints>::size_type key_size = me.tracks_.size( );
     int idImage=-1, idPoint=-1;
-    
+
     fs << "SequenceAnalyzer" << "{";
     fs << "nbPictures" << ( int )me.points_to_track_.size( );
     fs << "nbPoints" << ( int )key_size;
@@ -681,7 +680,7 @@ namespace OpencvSfM{
   void SequenceAnalyzer::constructImagesGraph( )
   {
     images_graph_.initStructure( points_to_track_.size( ) );
-    
+
     //for each points:
     vector<TrackOfPoints>::size_type key_size = tracks_.size( );
     vector<TrackOfPoints>::size_type i;
@@ -690,7 +689,7 @@ namespace OpencvSfM{
     {
       TrackOfPoints &track = tracks_[ i ];
       unsigned int nviews = track.images_indexes_.size( );
-      
+
       for( unsigned int cpt=0;cpt<nviews;cpt++ )
       {
         unsigned int imgSrc = track.images_indexes_[ cpt ];

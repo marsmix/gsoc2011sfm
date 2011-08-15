@@ -1,8 +1,8 @@
 
-#include "config.h"
+#include "config_SFM.h"
 #include "../src/PointsMatcher.h"
 #include "../src/MotionProcessor.h"
-#include "../src/CameraPinholeDistor.h"EuclideanEstimator
+#include "../src/CameraPinholeDistor.h"
 #include "../src/StructureEstimator.h"
 #include "../src/EuclideanEstimator.h"
 #include "../src/Visualizer.h"
@@ -117,7 +117,7 @@ NEW_TUTO( Model_House_test, "Using Model house data, run a SFM algorithm",
 
 
     //motion_estim.keepOnlyCorrectMatches( 3, 0 );
-  
+
     vector<TrackOfPoints> &tracks=motion_estim.getTracks( );
     cout<<"numbers of correct tracks loaded:"<<tracks.size( )<<endl;
 
@@ -136,7 +136,7 @@ NEW_TUTO( Model_House_test, "Using Model house data, run a SFM algorithm",
 
     cout<<"Bundle adjustement..."<<endl;
     EuclideanEstimator pe( motion_estim, cameras );
-  
+
     for(unsigned int d = 0;d<cameras.size(); d++)
       pe.camera_computed_[d] = true;/*
     TrackOfPoints::keepTrackWithImage(0, tracks);

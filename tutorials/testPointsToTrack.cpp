@@ -1,5 +1,5 @@
 
-#include "config.h"
+#include "config_SFM.h"
 #include "../src/PointsToTrackWithImage.h"
 #include "../src/MotionProcessor.h"
 #include "../src/SequenceAnalyzer.h"
@@ -27,7 +27,7 @@ NEW_TUTO( Points_Definitions, "How features can be defined",
   //Here we will a folder with a lot of images, but we can do the same thing with any other type of input
   mp.setInputSource( FROM_SRC_ROOT( "Medias/temple/" ),IS_DIRECTORY );
 
-  //Configure input ( not needed, but show how we can do 
+  //Configure input ( not needed, but show how we can do
   mp.setProperty( CV_CAP_PROP_CONVERT_RGB,0 );//Only greyscale, due to SIFT
   mp.setProperty( CV_CAP_PROP_FRAME_WIDTH,1024 );//for test
   mp.setProperty( CV_CAP_PROP_FRAME_HEIGHT,768 );//idem...
@@ -43,7 +43,7 @@ NEW_TUTO( Points_Definitions, "How features can be defined",
   else
   {
     //if the images are loaded, find the points:
-    
+
     cout<<"creation of two detection algorithm..."<<endl;
     Ptr<FeatureDetector> fastDetect;
     fastDetect=Ptr<FeatureDetector>( new SurfFeatureDetector( ) );
@@ -62,7 +62,7 @@ NEW_TUTO( Points_Definitions, "How features can be defined",
 
     //The matches vector is:
     vector<DMatch> matchesVector;
-    
+
     //The point matcher will now be created like this:
     PointsMatcher matches( matcher );
 
@@ -142,7 +142,7 @@ void main( ){
   //mp.setInputSource( 0 );
   mp.setInputSource( "../Medias/temple/temple0001.png",IS_SINGLE_FILE );
 
-  //Configure input ( not needed, but show how we can do 
+  //Configure input ( not needed, but show how we can do
   mp.setProperty( CV_CAP_PROP_CONVERT_RGB,0 );//Only greyscale, due to SIFT
   mp.setProperty( CV_CAP_PROP_FRAME_WIDTH,600 );//for test
   mp.setProperty( CV_CAP_PROP_FRAME_HEIGHT,450 );//idem...

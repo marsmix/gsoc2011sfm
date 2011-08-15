@@ -1,5 +1,5 @@
 
-#include "config.h"
+#include "config_SFM.h"
 #include "../src/SequenceAnalyzer.h"
 #include "../src/PointsMatcher.h"
 #include "../src/PointsToTrackWithImage.h"
@@ -139,5 +139,5 @@ NEW_TUTO( Triangulation_tests, "Compute of 3D points from 2D position and camera
   }
 
   cout<<endl<<"Triangulation error: "<<estim_error<<endl<<endl;
-  
+
 }

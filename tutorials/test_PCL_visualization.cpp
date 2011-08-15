@@ -1,4 +1,4 @@
-#include "config.h"
+#include "config_SFM.h"
 #include "../src/PointsToTrackWithImage.h"
 #include "../src/MotionProcessor.h"
 #include "../src/StructureEstimator.h"

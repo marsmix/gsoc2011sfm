@@ -1,5 +1,5 @@
 
-#include "config.h"
+#include "config_SFM.h"
 #include "../src/PointsToTrackWithImage.h"
 #include "../src/MotionProcessor.h"
 #include "../src/SequenceAnalyzer.h"
@@ -29,7 +29,7 @@ NEW_TUTO( YAML_Tuto, "Learn how you can load/save object using YAML file format"
   //Here we will a folder with a lot of images, but we can do the same thing with any other type of input
   mp.setInputSource( FROM_SRC_ROOT( "Medias/temple/" ),IS_DIRECTORY );
 
-  //Configure input ( not needed, but show how we can do 
+  //Configure input ( not needed, but show how we can do
   mp.setProperty( CV_CAP_PROP_CONVERT_RGB,0 );//Only greyscale, due to SIFT
   mp.setProperty( CV_CAP_PROP_FRAME_WIDTH,1024 );//for test
   mp.setProperty( CV_CAP_PROP_FRAME_HEIGHT,768 );//idem...

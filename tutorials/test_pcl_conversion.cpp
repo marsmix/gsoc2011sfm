@@ -1,5 +1,5 @@
 
-#include "config.h"
+#include "config_SFM.h"
 #include "../src/macro.h"
 #include "../src/PCL_mapping.h"
 

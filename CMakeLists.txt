@@ -113,24 +113,30 @@ else( )
 	DOC "The path to libmv's directory" )
 endif( )
 
-#sba library:
+
+SET ( BLAS_NAME_LIB "blas" )
+SET ( CLAPACK_NAME_LIB "lapack" )
+
+#sba library (first dependencies):
+find_library( CLAPACK_LIBRARIES NAMES ${CLAPACK_NAME_LIB} DOC "The path to CLAPACK library" )
+SET( SFM_LINKER_LIBS ${SFM_LINKER_LIBS} ${CLAPACK_LIBRARIES} )
+
 FIND_PACKAGE(F2C REQUIRED)
 include_directories( ${F2C_INCLUDE_DIR} )
 SET( SFM_LINKER_LIBS ${SFM_LINKER_LIBS} ${F2C_LIBRARY} )
 
-find_library( BLAS_LIBRARIES NAMES blas DOC "The path to BLAS library" )
-SET( SFM_LINKER_LIBS ${SFM_LINKER_LIBS} ${BLAS_LIBRARIES} )
+GET_FILENAME_COMPONENT(CLAPACK_DIR ${CLAPACK_LIBRARIES} PATH)
 
-find_library( LAPACK_LIBRARIES NAMES lapack DOC "The path to LAPACK library" )
-SET( SFM_LINKER_LIBS ${SFM_LINKER_LIBS} ${LAPACK_LIBRARIES} )
+find_library( BLAS_LIBRARIES NAMES ${BLAS_NAME_LIB} HINTS ${CLAPACK_DIR} PATH_SUFFIXES "BLAS/SRC/" "../BLAS/SRC/" DOC "The path to BLAS library" )
+SET( SFM_LINKER_LIBS ${SFM_LINKER_LIBS} ${BLAS_LIBRARIES} )
 
 find_path(SBA_INCLUDE_DIR sba.h
     PATH_SUFFIXES
     sba )
 include_directories( ${SBA_INCLUDE_DIR} )
 find_library( SBA_LIBRARIES NAMES sba DOC "The path to SBA library" )
-SET( SFM_LINKER_LIBS ${SFM_LINKER_LIBS} ${SBA_LIBRARIES} )
 
+SET( SFM_LINKER_LIBS ${SFM_LINKER_LIBS} ${SBA_LIBRARIES} )
 
 # Allow the developer to select if Dynamic or Static libraries are built
 OPTION ( BUILD_STATIC_LIBS "Build Static Libraries" OFF )
@@ -141,6 +147,6 @@ IF ( BUILD_STATIC_LIBS )
   SET ( LIB_TYPE STATIC )
 ENDIF ( BUILD_STATIC_LIBS )
 
-configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_BINARY_DIR}/config.h IMMEDIATE )
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config_SFM.h.in ${CMAKE_BINARY_DIR}/config_SFM.h IMMEDIATE )
 add_subdirectory( src )
 add_subdirectory( tutorials )

@@ -161,7 +161,7 @@ namespace OpencvSfM{
         cv::Vec2d projP = cameras[ num_camera ].project3DPointIntoImage( points3D );
 
         //compute back-projection
-        distance += sqrt( (p.pt.x-projP[ 0 ] )*( p.pt.x-projP[ 0 ] ) + 
+        distance += sqrt( (p.pt.x-projP[ 0 ] )*( p.pt.x-projP[ 0 ] ) +
           ( p.pt.y-projP[ 1 ] )*( p.pt.y-projP[ 1 ] ) );
         real_views++;
       }
@@ -200,7 +200,7 @@ namespace OpencvSfM{
           cv::Ptr<PointsToTrack> points2D = points_to_track[ num_camera ];
           const KeyPoint& p=points2D->getKeypoint( num_point );
 
-          design( cv::Range( 3*i,3*i+3 ), cv::Range( 0,4 )) = 
+          design( cv::Range( 3*i,3*i+3 ), cv::Range( 0,4 )) =
             -cameras[ num_camera ].getProjectionMatrix( );
           design.at<double>( 3*i + 0, 4 + i ) = p.pt.x;
           design.at<double>( 3*i + 1, 4 + i ) = p.pt.y;
@@ -265,7 +265,7 @@ namespace OpencvSfM{
       while( nb_vals<2 )
       {
         int valTmp = rng( nviews );
-        while( !( masks[ valTmp ] == 0 && 
+        while( !( masks[ valTmp ] == 0 &&
           ( !has_mask || masksValues[ valTmp ] ) ) )
         {
           valTmp = (valTmp + 1) % nviews;
@@ -296,17 +296,17 @@ namespace OpencvSfM{
 
   void TrackOfPoints::removeOutliers( std::vector<PointOfView>& cameras,
     const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
-    double reproj_error, std::vector<bool> &masksValues )
+    double reproj_error, std::vector<bool> *masksValues )
   {
     unsigned int nviews = images_indexes_.size( );
     vector<bool> masks;
 
     int ptSize = 0;
-    bool has_mask = masksValues.size( ) == nviews;
+    bool has_mask = (masksValues == NULL);
     if( !has_mask )
       good_values.assign(nviews , true);
     else
-      good_values = masksValues;
+      good_values = *masksValues;
 
     int nb_vals=0;
     for ( unsigned int cpt = 0; cpt < nviews; cpt++ ) {
@@ -321,7 +321,7 @@ namespace OpencvSfM{
           cv::Vec2d projP = cameras[ num_camera ].project3DPointIntoImage( *point3D );
 
           //compute error:
-          double error = sqrt( (p.pt.x-projP[ 0 ] )*( p.pt.x-projP[ 0 ] ) + 
+          double error = sqrt( (p.pt.x-projP[ 0 ] )*( p.pt.x-projP[ 0 ] ) +
             ( p.pt.y-projP[ 1 ] )*( p.pt.y-projP[ 1 ] ) );
 
           if(error>reproj_error)
@@ -383,7 +383,7 @@ namespace OpencvSfM{
     if( cpt_Link[cpt]<2 )
       tracks.pop_back();
   }
-  
+
   int ImagesGraphConnection::getHighestLink( int &first_image, int &second_image,
     int max_number )
   {
