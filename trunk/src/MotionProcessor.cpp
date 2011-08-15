@@ -1,3 +1,13 @@
+
+#include "macro.h" //SFM_EXPORTS
+
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#ifdef HAVE_BOOST
+#include <boost/filesystem.hpp>   // includes all needed Boost.Filesystem declarations
+#endif
+#include <sstream>
+
 #include "MotionProcessor.h"
 
 using cv::Mat;

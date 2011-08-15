@@ -52,7 +52,6 @@ endif( )
 
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules/)#because some "find...cmake" are in CMakeModules folder...
 
-include( LibraryAdd.cmake REQUIRED )
 include( ProjectAdd.cmake REQUIRED )
 
 FIND_PACKAGE( OpenCV REQUIRED )
@@ -122,7 +121,8 @@ find_library( CLAPACK_LIBRARIES NAMES ${CLAPACK_NAME_LIB} DOC "The path to CLAPA
 SET( SFM_LINKER_LIBS ${SFM_LINKER_LIBS} ${CLAPACK_LIBRARIES} )
 
 FIND_PACKAGE(F2C REQUIRED)
-include_directories( ${F2C_INCLUDE_DIR} )
+#not needed. Moreover, seems to have some conflicts on windows systems...
+#include_directories( ${F2C_INCLUDE_DIR} )
 SET( SFM_LINKER_LIBS ${SFM_LINKER_LIBS} ${F2C_LIBRARY} )
 
 GET_FILENAME_COMPONENT(CLAPACK_DIR ${CLAPACK_LIBRARIES} PATH)
@@ -146,6 +146,7 @@ IF ( BUILD_STATIC_LIBS )
   # User wants to build Static Libraries, so change the LIB_TYPE variable to CMake keyword 'STATIC'
   SET ( LIB_TYPE STATIC )
 ENDIF ( BUILD_STATIC_LIBS )
+
 
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config_SFM.h.in ${CMAKE_BINARY_DIR}/config_SFM.h IMMEDIATE )
 add_subdirectory( src )

@@ -3,16 +3,9 @@
 
 #include "macro.h" //SFM_EXPORTS
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#ifdef HAVE_BOOST
-#include <boost/filesystem.hpp>   // includes all needed Boost.Filesystem declarations
-#endif
-
+#include "opencv2/highgui/highgui.hpp"
 #include <vector>
 #include <string>
-#include <sstream>
 
 
 namespace OpencvSfM{

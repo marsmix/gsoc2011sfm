@@ -2,14 +2,14 @@
 #define _GSOC_SFM_POINTSMATCHED_H 1
 
 #include "macro.h" //SFM_EXPORTS
-#include "config_SFM.h"  //SEMAPHORE
-
-#include "PointsToTrack.h"
 
 #include "opencv2/features2d/features2d.hpp"
 #include <vector>
 
+#include "config_SFM.h"  //SEMAPHORE
+
 namespace OpencvSfM{
+  class SFM_EXPORTS PointsToTrack;
   /*! \brief A class used for matching descriptors that can be described as vectors in a finite-dimensional space
   *
   * Any Matcher that inherit from DescriptorMatcher can be used ( For example, you can use FlannBasedMatcher or BruteForceMatcher ).
@@ -164,11 +164,7 @@ namespace OpencvSfM{
 
     static void write( cv::FileStorage& fs, const PointsMatcher& points );
 
-    inline const cv::KeyPoint &getKeypoint( int numKey ) const
-    {
-      CV_DbgAssert( pointCollection_.size( )>0 );
-      return pointCollection_[ 0 ]->getKeypoint( numKey );
-    }
+    const cv::KeyPoint &getKeypoint( int numKey ) const;
 
   protected:
 

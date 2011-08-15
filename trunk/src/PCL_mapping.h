@@ -2,11 +2,11 @@
 #ifndef PCL_MAPPING_H
 #define PCL_MAPPING_H
 
-#include <vector>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/features2d/features2d.hpp>
+#include <vector>
 /*
 type not yet taken into account:
 Normal : float[ 4 ] + float[ 4 ]

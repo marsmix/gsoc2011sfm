@@ -1,6 +1,10 @@
 
 #include "TracksOfPoints.h"
 
+#include "PointsToTrack.h"
+#include "PointOfView.h"
+#include "Camera.h"
+
 namespace OpencvSfM{
   using cv::KeyPoint;
   using std::vector;
@@ -42,6 +46,11 @@ namespace OpencvSfM{
         quickSort( outLinks, arr, left, j );
       if ( i < right )
         quickSort( outLinks, arr, i, right );
+  }
+
+  TrackOfPoints::~TrackOfPoints()
+  {
+    point3D.release();
   }
 
   bool TrackOfPoints::addMatch( const int image_src, const int point_idx1 )

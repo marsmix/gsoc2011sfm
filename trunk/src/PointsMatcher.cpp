@@ -1,5 +1,10 @@
-#include "PointsMatcher.h"
+
+#include "macro.h" //SFM_EXPORTS
+
 #include <opencv2/imgproc/imgproc.hpp>
+
+#include "PointsMatcher.h"
+#include "PointsToTrack.h"
 
 namespace OpencvSfM{
   using cv::Mat;
@@ -27,6 +32,11 @@ namespace OpencvSfM{
   PointsMatcher::~PointsMatcher( void )
   {
     //TODO!!!!
+  }
+  const cv::KeyPoint &PointsMatcher::getKeypoint( int numKey ) const
+  {
+    CV_DbgAssert( pointCollection_.size( )>0 );
+    return pointCollection_[ 0 ]->getKeypoint( numKey );
   }
 
   void PointsMatcher::add( Ptr<PointsToTrack> pointCollection )

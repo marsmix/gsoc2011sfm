@@ -1,12 +1,19 @@
-#include "PointOfView.h"
 
-//#include "libmv_mapping.h"
-#include "PCL_mapping.h"
-#include "CameraPinhole.h"
-#include "libmv/multiview/projection.h"
+#include "macro.h" //SFM_EXPORTS & remove annoying warnings
+
+#include "opencv2/highgui/highgui.hpp"
+#include "pcl/visualization/pcl_visualizer.h"
 #include <iostream>
 #include <pcl/io/vtk_io.h>
 #include "opencv2/core/eigen.hpp"
+#include "libmv/multiview/projection.h"
+
+#include "PointOfView.h"
+
+#include "Camera.h"
+#include "TracksOfPoints.h"
+#include "PCL_mapping.h"
+#include "CameraPinhole.h"
 
 using cv::Mat;
 using cv::Vec4d;
@@ -183,16 +190,19 @@ namespace OpencvSfM{
     vector<TrackOfPoints>::iterator point=points.begin( );
     while( point!=points.end( ) )
     {
-      Vec3d convert_from_track = ( *point );
-      point3DNorm[ 0 ] = convert_from_track[ 0 ];
-      point3DNorm[ 1 ] = convert_from_track[ 1 ];
-      point3DNorm[ 2 ] = convert_from_track[ 2 ];
-      point3DNorm[ 3 ] = 1;
+      cv::Ptr<Vec3d> convert_from_track = point->get3DPosition();
+      if( !convert_from_track.empty() )
+      {
+        point3DNorm[ 0 ] = (*convert_from_track)[ 0 ];
+        point3DNorm[ 1 ] = (*convert_from_track)[ 1 ];
+        point3DNorm[ 2 ] = (*convert_from_track)[ 2 ];
+        point3DNorm[ 3 ] = 1;
 
-      //transform points into camera's coordinates:
-      mat2DNorm = ( projection_matrix_ * mat3DNorm );
+        //transform points into camera's coordinates:
+        mat2DNorm = ( projection_matrix_ * mat3DNorm );
 
-      pointsOut.push_back( Vec2d( point2DNorm[ 0 ]/point2DNorm[ 2 ],point2DNorm[ 1 ]/point2DNorm[ 2 ] ));
+        pointsOut.push_back( Vec2d( point2DNorm[ 0 ]/point2DNorm[ 2 ],point2DNorm[ 1 ]/point2DNorm[ 2 ] ));
+      }
 
       point++;
     }

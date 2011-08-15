@@ -1,11 +1,8 @@
 
 #include "config_SFM.h"
 #include "../src/SequenceAnalyzer.h"
-#include "../src/PointsMatcher.h"
-#include "../src/PointsToTrackWithImage.h"
 #include "../src/StructureEstimator.h"
-#include "../src/PointOfView.h"
-#include "../src/CameraPinhole.h"
+
 #include <opencv2/calib3d/calib3d.hpp>
 #include <fstream>
 
@@ -119,7 +116,7 @@ NEW_TUTO( Triangulation_tests, "Compute of 3D points from 2D position and camera
   }
   motion_estim.addTracks( tracks );
 
-  StructureEstimator structure ( motion_estim, cameras );
+  StructureEstimator structure ( &motion_estim, &cameras );
   tracks.clear( );
   vector<char> values_OK = structure.computeStructure( );
 

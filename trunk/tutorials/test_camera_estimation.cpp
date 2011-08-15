@@ -1,11 +1,8 @@
 
 #include "config_SFM.h"
 #include "../src/PointsToTrackWithImage.h"
-#include "../src/MotionProcessor.h"
 #include "../src/SequenceAnalyzer.h"
-#include "../src/CameraPinhole.h"
 #include "../src/StructureEstimator.h"
-//#include "../src/libmv_mapping.h"
 #include "../src/EuclideanEstimator.h"
 
 #include <opencv2/calib3d/calib3d.hpp>
@@ -72,7 +69,7 @@ NEW_TUTO( Proj_Rec, "Euclidean reconstruction",
     fsRead.release( );
 
     cout<<"A little help ;) Keep only good matches using triangulation."<<endl;
-    StructureEstimator structure ( motion_estim_loaded, myCamerasReal );
+    StructureEstimator structure ( &motion_estim_loaded, &myCamerasReal );
     vector<char> mask =  structure.computeStructure( );
     vector<TrackOfPoints> &tracks=motion_estim_loaded.getTracks( );
     //remove bad tracks:
