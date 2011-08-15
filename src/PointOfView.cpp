@@ -2,8 +2,11 @@
 
 //#include "libmv_mapping.h"
 #include "PCL_mapping.h"
+#include "CameraPinhole.h"
+#include "libmv/multiview/projection.h"
 #include <iostream>
 #include <pcl/io/vtk_io.h>
+#include "opencv2/core/eigen.hpp"
 
 using cv::Mat;
 using cv::Vec4d;
@@ -31,6 +34,52 @@ namespace OpencvSfM{
 
     this->translation_ = projection_matrix_( Range::all( ),Range( 3,4 ));
     Mat( translation ).copyTo( this->translation_ );
+
+    this->config_=0;//everything should be estimated...
+
+    //as we are a new point of view related to a device, we should add our address into device_:
+    device_->pointsOfView_.push_back( this );
+  };
+
+  PointOfView::PointOfView( cv::Mat projection_matrix )
+    : projection_matrix_( 3, 4, CV_64F )
+  {
+    //convert to libmv matrix:
+    libmv::Mat34 proj;
+    cv::cv2eigen( projection_matrix, proj );
+    libmv::Mat3 K, R;
+    libmv::Vec3 t;
+    libmv::KRt_From_P( proj, &K, &R, &t );
+    
+    if( abs(1 - R.determinant()) > 0.1  )
+    {//R is not a rotation matrix....
+      //Improper rotation
+      proj = proj * -1;//probably due to bad proj matrix. try this.
+      libmv::KRt_From_P( proj, &K, &R, &t );
+      //TODO: handle such case in a different way!
+
+      double tmp = K(1,1);
+      K(1,1) = K(0,0);
+      K(0,0) = tmp;
+
+    }
+    //enforce the rotation matrix.
+    //TODO find the closest rotation matrix...
+    Eigen::Quaterniond tmp = (Eigen::Quaterniond)R;
+    tmp.normalize();
+    R = tmp.toRotationMatrix();
+
+    //create the device:
+    cv::Mat K_cv;
+    cv::eigen2cv( K, K_cv );
+    device_ = cv::Ptr<Camera>( new CameraPinhole( K_cv ) );
+
+    proj<<R,t;
+    cv::eigen2cv( proj, projection_matrix_ );
+
+    this->rotation_=projection_matrix_( Range::all( ),Range( 0,3 ));
+
+    this->translation_ = projection_matrix_( Range::all( ),Range( 3,4 ));
 
     this->config_=0;//everything should be estimated...
 

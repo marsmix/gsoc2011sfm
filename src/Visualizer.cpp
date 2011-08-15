@@ -100,6 +100,8 @@ namespace OpencvSfM{
   void Visualizer::add3DPoints( const std::vector<cv::Vec3d>& points,
     std::string name, int viewport )
   {
+    if(points.size() == 0)
+      return;
     pcl::PointCloud< pcl::PointXYZ >::Ptr my_cloud (
       new pcl::PointCloud< pcl::PointXYZ > );
     mapping::convert_OpenCV_vector( points, *my_cloud );
@@ -122,6 +124,8 @@ namespace OpencvSfM{
   void Visualizer::add3DPointsColored( const std::vector<cv::Vec3d>& points,
      const std::vector<unsigned int>& colors, std::string name, int viewport )
   {
+    if(points.size() == 0)
+      return;
 
     // --------------------------------------------
     // -----Open 3D viewer and add point cloud-----

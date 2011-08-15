@@ -27,7 +27,7 @@ namespace OpencvSfM{
     * Project previously 2D points matches using cameras parameters
     * @return the mask of correct points ( 0 if the point can't be triangulate )
     */
-    std::vector<char> computeStructure( );
+    std::vector<char> computeStructure( unsigned int max_error = 10 );
     /**
     * Project previously 2D points matches for only two views
     * @param img1 first image to use
@@ -35,8 +35,13 @@ namespace OpencvSfM{
     * @return output of tracks triangulated ( contain 3D point )
     */
     std::vector<TrackOfPoints> computeStructure(
-      const std::vector<int>& list_of_images );
-
+      const std::vector<int>& list_of_images,
+       unsigned int max_error = 10 );
+    /**
+    * Remove projections from tracks whoses error > max_error 
+    * @param min_error maximum error of back projection allowed
+    */
+    void removeOutliersTracks( double max_error = 10 );
   };
 
 }

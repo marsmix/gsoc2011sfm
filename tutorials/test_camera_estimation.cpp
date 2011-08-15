@@ -35,7 +35,7 @@ NEW_TUTO( Proj_Rec, "Euclidean reconstruction",
 
   vector<PointOfView> myCameras =
     loadCamerasFromFile( FROM_SRC_ROOT( "Medias/temple/temple_par.txt" ),
-    LOAD_FULL);//LOAD_INTRA );
+    LOAD_FULL );//LOAD_INTRA );
   vector<PointOfView> myCamerasReal =
     loadCamerasFromFile( FROM_SRC_ROOT( "Medias/temple/temple_par.txt" ),
     LOAD_FULL );
@@ -50,44 +50,71 @@ NEW_TUTO( Proj_Rec, "Euclidean reconstruction",
     images.push_back( imgTmp );
   }
 
-  string pathFileTracks = FROM_SRC_ROOT( "Medias/tracks_points_"
-    POINT_METHOD"/motion_tracks.yml" );
-
+  string pathFileTracks = FROM_SRC_ROOT( "Medias/motion_track_no_error.yml" );
   std::ifstream inPoints( pathFileTracks.c_str( ) );
   if( !inPoints.is_open( ) )
   {
-    cout<<"you have to run an other tutorial before being able to run this one!"<<endl;
-    bool worked = Tutorial_Handler::ask_to_run_tuto( "Track_creation" );
-    if( !worked )
-      return;
+    inPoints.close( );
+    pathFileTracks = FROM_SRC_ROOT( "Medias/tracks_points_"
+      POINT_METHOD"/motion_tracks1.yml" );
+    inPoints.open( pathFileTracks.c_str( ) );
+    if( !inPoints.is_open( ) )
+    {
+      cout<<"you have to run an other tutorial before being able to run this one!"<<endl;
+      bool worked = Tutorial_Handler::ask_to_run_tuto( "Track_creation" );
+      if( !worked )
+        return;
+    }
+
+    FileStorage fsRead( pathFileTracks, FileStorage::READ );
+    FileNode myPtt = fsRead.getFirstTopLevelNode( );
+    SequenceAnalyzer motion_estim_loaded( images, myPtt );
+    fsRead.release( );
+
+    cout<<"A little help ;) Keep only good matches using triangulation."<<endl;
+    StructureEstimator structure ( motion_estim_loaded, myCamerasReal );
+    vector<char> mask =  structure.computeStructure( );
+    vector<TrackOfPoints> &tracks=motion_estim_loaded.getTracks( );
+    //remove bad tracks:
+    for(unsigned int d = 0, d_idx=0;d<mask.size(); d++,d_idx++)
+      if(mask[d]==0)
+      {
+        //remove this bad match:
+        tracks[d_idx] = tracks[tracks.size()-1];
+        d_idx--;
+        tracks.pop_back();
+      }
+      structure.removeOutliersTracks( 2 );
+      //save these correct points:
+      pathFileTracks = FROM_SRC_ROOT( "Medias/motion_track_no_error.yml" );
+      FileStorage fsOutMotion1( pathFileTracks, FileStorage::WRITE );
+      SequenceAnalyzer::write( fsOutMotion1,motion_estim_loaded );
+      fsOutMotion1.release( );
   }
   inPoints.close( );
+
 
   FileStorage fsRead( pathFileTracks, FileStorage::READ );
   FileNode myPtt = fsRead.getFirstTopLevelNode( );
   SequenceAnalyzer motion_estim_loaded( images, myPtt );
   fsRead.release( );
 
-
-  motion_estim_loaded.keepOnlyCorrectMatches();
+  motion_estim_loaded.keepOnlyCorrectMatches(2,0);
   vector<TrackOfPoints> &tracks=motion_estim_loaded.getTracks( );
   cout<<"numbers of correct tracks loaded:"<<tracks.size( )<<endl;
 
-  /*/////////////////////////////////////////////////////////////////////////
-
-  cout<<"triangulation of points."<<endl;
-  StructureEstimator structure ( motion_estim_loaded, myCameras );
-  vector<char> mask =  structure.computeStructure( );
-
-  /////////////////////////////////////////////////////////////////////////*/
-    
   //myCameras contains only intra value. I will use motion_estim_loaded to
   //compute position of cameras:
   EuclideanEstimator pe( motion_estim_loaded, myCameras );
-  
+
   pe.computeReconstruction( );/*
-  for(int d = 0;d<pe.camera_computed_.size(); d++)
+  vector<int> idx_keep;
+  for(int d = 0;d<myCameras.size(); d++){
+    idx_keep.push_back(d);
     pe.camera_computed_[d] = true;
+  }
+
+  TrackOfPoints::keepTrackWithImages(idx_keep,tracks);
   pe.point_computed_ = tracks;
   pe.bundleAdjustement();
   pe.viewEstimation();

@@ -165,7 +165,7 @@ namespace OpencvSfM{
       if( track.containImage( corresponding_image_ ) &&
         track.containImage( otherImage ) )
       {
-        const KeyPoint &kp = keypoints_[ track.getIndexPoint( corresponding_image_ ) ];
+        const KeyPoint &kp = keypoints_[ track.getPointIndex( corresponding_image_ ) ];
         pointsVals.push_back( cv::Point2f( kp.pt.x,kp.pt.y ));
       }
     }
