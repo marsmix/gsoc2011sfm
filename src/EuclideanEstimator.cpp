@@ -1,9 +1,5 @@
-#include "EuclideanEstimator.h"
-#include "StructureEstimator.h"
-#include <opencv2/core/eigen.hpp>
 
-#include "Visualizer.h"
-#include "PCL_mapping.h"
+
 #include <pcl/point_types.h>
 #include "libmv/multiview/five_point.h"
 #include "libmv/multiview/affine.h"
@@ -11,11 +7,18 @@
 #include "libmv/multiview/robust_fundamental.h"
 #include "libmv/multiview/robust_euclidean_resection.h"
 #include "libmv/multiview/bundle.h"
+#include <sba.h>
+
+#include <Eigen/Eigenvalues>
 
 #include <pcl/io/vtk_io.h>
 #include <sstream>
-#include <sba.h>
-#include <Eigen/Eigenvalues>
+
+#include "EuclideanEstimator.h"
+#include "StructureEstimator.h"
+#include "Camera.h"
+#include "Visualizer.h"
+#include "PCL_mapping.h"
 
 using std::vector;
 using cv::Ptr;
@@ -121,6 +124,22 @@ namespace OpencvSfM{
   EuclideanEstimator::~EuclideanEstimator( void )
   {
     //TODO!!!!
+  }
+
+  void EuclideanEstimator::addNewPointOfView( const PointOfView& camera )
+  {
+    libmv::Mat3 intra_param;
+    cv::Ptr<Camera> intra=camera.getIntraParameters( );
+    //transpose because libmv needs intra params this way...
+    cv::cv2eigen( intra->getIntraMatrix( ).t(), intra_param );
+    intra_params_.push_back( intra_param );
+    libmv::Mat3 rotation_mat;
+    cv::cv2eigen( camera.getRotationMatrix( ), rotation_mat );
+    rotations_.push_back( rotation_mat );
+    libmv::Vec3 translation_vec;
+    cv::cv2eigen( camera.getTranslationVector( ), translation_vec );
+    translations_.push_back( translation_vec );
+    camera_computed_.push_back( false );
   }
 
   struct bundle_datas
@@ -1124,7 +1143,7 @@ namespace OpencvSfM{
     camera_computed_[ image2 ] = true;
 
     //Triangulate the points:
-    StructureEstimator se( sequence_, this->cameras_ );
+    StructureEstimator se( &sequence_, &this->cameras_ );
     vector<int> images_to_compute;
     images_to_compute.push_back( image1 );
     images_to_compute.push_back( image2 );

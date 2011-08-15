@@ -4,7 +4,7 @@
 #include "../src/StructureEstimator.h"
 #include "../src/PointOfView.h"
 #include "../src/CameraPinhole.h"
-//#include "../src/libmv_mapping.h"
+#include "../src/SequenceAnalyzer.h"
 #include "../src/PCL_mapping.h"
 #include "../src/Visualizer.h"
 

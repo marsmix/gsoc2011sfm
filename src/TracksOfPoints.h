@@ -2,18 +2,15 @@
 #ifndef _GSOC_SFM_TRACKS_OF_POINTS_H
 #define _GSOC_SFM_TRACKS_OF_POINTS_H 1
 
-
 #include "macro.h" //SFM_EXPORTS
-#include "PointsToTrack.h"
-#include "PointOfView.h"
-#include "opencv2/calib3d/calib3d.hpp"
 
 #include <numeric>
+#include "opencv2/calib3d/calib3d.hpp"
 
 namespace OpencvSfM{
   class SFM_EXPORTS PointsToTrack;
   class SFM_EXPORTS PointOfView;
-  //class SequenceAnalyzer;
+
   /**
   * \brief This class store the track of keypoints.
   * A track is a connected set of matching keypoints across multiple images
@@ -51,6 +48,7 @@ namespace OpencvSfM{
       return *point3D;
     }
     TrackOfPoints( ):track_consistance( 0 ),color(0){};
+    ~TrackOfPoints();
     /**
     * This function add matches to track
     * @param image_src index of source matches image

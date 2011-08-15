@@ -1,13 +1,14 @@
 #ifndef _GSOC_SFM_POINTS_3D_EUCLIDEAN_ESTIMATION_H
 #define _GSOC_SFM_POINTS_3D_EUCLIDEAN_ESTIMATION_H 1
 
+#include <iostream>
+#include "libmv/base/vector.h"
+#include "libmv/numeric/numeric.h"
+#include "opencv2/core/eigen.hpp"
+
 #include "macro.h" //SFM_EXPORTS
 #include "SequenceAnalyzer.h"
 #include "PointOfView.h"
-#include "opencv2/core/eigen.hpp"
-#include "libmv/base/vector.h"
-#include "libmv/numeric/numeric.h"
-#include <iostream>
 
 namespace OpencvSfM{
 
@@ -40,21 +41,7 @@ namespace OpencvSfM{
     * Add a new camera to the estimator
     * @param camera new point of view to add for reconstruction
     */
-    inline void addNewPointOfView( const PointOfView& camera )
-    {
-      libmv::Mat3 intra_param;
-      cv::Ptr<Camera> intra=camera.getIntraParameters( );
-      //transpose because libmv needs intra params this way...
-      cv::cv2eigen( intra->getIntraMatrix( ).t(), intra_param );
-      intra_params_.push_back( intra_param );
-      libmv::Mat3 rotation_mat;
-      cv::cv2eigen( camera.getRotationMatrix( ), rotation_mat );
-      rotations_.push_back( rotation_mat );
-      libmv::Vec3 translation_vec;
-      cv::cv2eigen( camera.getTranslationVector( ), translation_vec );
-      translations_.push_back( translation_vec );
-      camera_computed_.push_back( false );
-    }
+    void addNewPointOfView( const PointOfView& camera );
 
     /**
     * comptue cameras and structure if intra parameters are known.

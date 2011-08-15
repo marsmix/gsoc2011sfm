@@ -1,4 +1,5 @@
 #include "PointsToTrackWithImage.h"
+#include "TracksOfPoints.h"
 
 
 namespace OpencvSfM

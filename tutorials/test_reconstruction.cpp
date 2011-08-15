@@ -1,12 +1,8 @@
 
 #include "config_SFM.h"
-#include "../src/PointsToTrackWithImage.h"
-#include "../src/MotionProcessor.h"
 #include "../src/StructureEstimator.h"
 #include "../src/PointOfView.h"
-#include "../src/CameraPinhole.h"
-//#include "../src/libmv_mapping.h"
-#include "../src/PCL_mapping.h"
+#include "../src/SequenceAnalyzer.h"
 
 #include <boost/thread/thread.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
@@ -85,7 +81,7 @@ NEW_TUTO( Triangulation_tuto, "Learn how you can triangulate 2D points",
   int maxImg=motion_estim_loaded->getNumViews( );
 
   cout<<"triangulation of points."<<endl;
-  StructureEstimator structure ( *motion_estim_loaded, myCameras );
+  StructureEstimator structure ( motion_estim_loaded, &myCameras );
   vector<char> mask =  structure.computeStructure( );
   cout<<std::accumulate( mask.begin( ), mask.end( ), 0 )<<" 3D points found."<<endl;
 

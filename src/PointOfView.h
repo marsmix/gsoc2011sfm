@@ -1,15 +1,13 @@
 #ifndef _GSOC_SFM_FIELD_OF_VIEW_H
 #define _GSOC_SFM_FIELD_OF_VIEW_H 1
-
-#include "macro.h" //SFM_EXPORTS
-#include "opencv2/core/core.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "pcl/visualization/pcl_visualizer.h"
-
-#include "Camera.h"
-#include "TracksOfPoints.h"
 #include <vector>
 #include <string>
+
+#include "opencv2/core/core.hpp"
+
+#include "macro.h" //SFM_EXPORTS
+//#include "Camera.h"
+//#include "TracksOfPoints.h"
 
 
 namespace OpencvSfM{

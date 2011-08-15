@@ -1,4 +1,5 @@
 #include "PointsToTrack.h"
+#include "TracksOfPoints.h"
 
 using cv::Mat;
 using cv::Scalar;

@@ -2,13 +2,14 @@
 #define _GSOC_SFM_VISUALIZER_H 1
 
 #include "macro.h" //SFM_EXPORTS
-#include "PointOfView.h"
 
+#include "opencv2/core/core.hpp"
 #include <pcl/point_types.h>
+
 #include <pcl/visualization/pcl_visualizer.h>
 
 namespace OpencvSfM{
-
+  class SFM_EXPORTS PointOfView;
   /**
   * @brief This class can be used to view the differents object involved in current
   * structure from motion process.

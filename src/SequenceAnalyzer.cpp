@@ -1,11 +1,14 @@
-#include "SequenceAnalyzer.h"
-
-#include "config_SFM.h"  //SEMAPHORE
 
 #include <boost/thread/thread.hpp>
 
 #include <iostream>
 #include <sstream>
+
+#include "SequenceAnalyzer.h"
+#include "Camera.h"
+
+#include "config_SFM.h"  //SEMAPHORE
+
 using cv::Ptr;
 using cv::Mat;
 using cv::DMatch;

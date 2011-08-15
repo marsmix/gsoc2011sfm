@@ -1,11 +1,10 @@
 #ifndef _GSOC_SFM_POINTS_TO_TRACK_H
 #define _GSOC_SFM_POINTS_TO_TRACK_H 1
 
-#include "macro.h" //SFM_EXPORTS
-#include "opencv2/features2d/features2d.hpp"
-#include "TracksOfPoints.h"
+#include "macro.h" //SFM_EXPORTS and remove annoying warnings
 
 #include <vector>
+#include "opencv2/features2d/features2d.hpp"
 
 
 namespace OpencvSfM{

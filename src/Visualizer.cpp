@@ -1,8 +1,11 @@
 
+#include <pcl/io/vtk_io.h>
+#include <iostream>
+
 #include "Visualizer.h"
 #include "PCL_mapping.h"
-#include <iostream>
-#include <pcl/io/vtk_io.h>
+#include "PointOfView.h"
+#include "Camera.h"
 
 using cv::Vec3d;
 using cv::Mat;

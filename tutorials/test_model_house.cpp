@@ -1,8 +1,6 @@
 
 #include "config_SFM.h"
-#include "../src/PointsMatcher.h"
 #include "../src/MotionProcessor.h"
-#include "../src/CameraPinholeDistor.h"
 #include "../src/StructureEstimator.h"
 #include "../src/EuclideanEstimator.h"
 #include "../src/Visualizer.h"
@@ -122,7 +120,7 @@ NEW_TUTO( Model_House_test, "Using Model house data, run a SFM algorithm",
     cout<<"numbers of correct tracks loaded:"<<tracks.size( )<<endl;
 
     cout<<"triangulation of points."<<endl;
-    StructureEstimator structure ( motion_estim, cameras );
+    StructureEstimator structure ( &motion_estim, &cameras );
     vector<char> mask =  structure.computeStructure( );
     //remove bad points:
     for(unsigned int d = 0, d_idx=0;d<mask.size(); d++,d_idx++)

@@ -2,9 +2,8 @@
 #define _GSOC_SFM_CAMERA_H 1
 
 #include "macro.h" //SFM_EXPORTS
+
 #include "opencv2/core/core.hpp"
-//#include "../otherProjects/libmv_core/estimator/fundamental_estimator.h"
-#include "PointOfView.h"
 #include <vector>
 
 namespace OpencvSfM{
