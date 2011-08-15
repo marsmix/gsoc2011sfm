@@ -17,10 +17,10 @@ namespace OpencvSfM{
   /**
   * \brief This class store the track of keypoints.
   * A track is a connected set of matching keypoints across multiple images
-  * 
+  *
   * This class can be used as a Vec3d because it's the projection of a 3D points
   * Of course, use triangulate method before to create this 3D point!
-  * 
+  *
   * Discussion: Store index of points or 2D position?
   */
   class SFM_EXPORTS TrackOfPoints
@@ -59,7 +59,7 @@ namespace OpencvSfM{
     * Snavely's rules.
     */
     bool addMatch( const int image_src, const int point_idx );
-    
+
     /**
     * This function is used to know if the track contains the image
     * @param image_wanted index of query image
@@ -141,7 +141,7 @@ namespace OpencvSfM{
     void removeOutliers( std::vector<PointOfView>& cameras,
       const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
       double reproj_error = 4,
-      std::vector<bool> &masks = std::vector<bool>( ) );
+      std::vector<bool> *masks = NULL );
 
 
     inline void set3DPosition( cv::Vec3d newPoint )
@@ -167,19 +167,19 @@ namespace OpencvSfM{
       cv::Vec3d& points3D,
       const std::vector<bool> &masks = std::vector<bool>( ) ) const;
   };
-  
-  
+
+
   /**
   * @brief This structure store an image link ( two image ids )...
   */
-  typedef struct  
+  typedef struct
   {
     int imgSrc;
     int imgDest;
   } ImageLink;
   /**
   * \brief This class modelizes the images graph connections
-  * 
+  *
   */
   class SFM_EXPORTS ImagesGraphConnection
   {
@@ -218,7 +218,7 @@ namespace OpencvSfM{
         images_graph_.size( )[ 0 ] == nbImages &&
         images_graph_.size( )[ 1 ] == nbImages;
     }
-    
+
     /**
     * Prepare this structure to store the graph of correspondances
     * @param nb_images number of images to store

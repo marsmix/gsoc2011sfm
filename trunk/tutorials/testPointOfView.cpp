@@ -1,5 +1,5 @@
 
-#include "config.h"
+#include "config_SFM.h"
 #include "../src/CameraPinhole.h"
 #include "../src/PointOfView.h"
 #include <iostream>
