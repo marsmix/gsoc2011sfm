@@ -44,17 +44,16 @@ namespace OpencvSfM{
         quickSort( outLinks, arr, i, right );
   }
 
-  void TrackOfPoints::set3DPosition( cv::Vec3d newPoint )
-  {
-    if( !point3D )
-      point3D = new cv::Vec3d( newPoint );
-    else
-      *point3D = newPoint;
-  }
   bool TrackOfPoints::addMatch( const int image_src, const int point_idx1 )
   {
     if( track_consistance<0 )
+    {//add to track to remember us about this problem....
+      images_indexes_.push_back( image_src );
+      point_indexes_.push_back( point_idx1 );
+      good_values.push_back(false);
       return false;
+    }
+    good_values.push_back(true);
 
     //If a track contains more than one keypoint in the same image but
     //a different keypoint, it is deemed inconsistent.
@@ -95,7 +94,7 @@ namespace OpencvSfM{
       if ( *indexImg == image_src )
       {
         if( point_indexes_[ index ] == point_idx1 )
-          return true;
+          return good_values[ index ];
       }
       index++;
       indexImg++;
@@ -293,6 +292,96 @@ namespace OpencvSfM{
     else
       *point3D = points3D;
     return best_distance;
+  }
+
+  void TrackOfPoints::removeOutliers( std::vector<PointOfView>& cameras,
+    const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
+    double reproj_error, std::vector<bool> &masksValues )
+  {
+    unsigned int nviews = images_indexes_.size( );
+    vector<bool> masks;
+
+    int ptSize = 0;
+    bool has_mask = masksValues.size( ) == nviews;
+    if( !has_mask )
+      good_values.assign(nviews , true);
+    else
+      good_values = masksValues;
+
+    int nb_vals=0;
+    for ( unsigned int cpt = 0; cpt < nviews; cpt++ ) {
+      if(good_values[cpt])
+      {
+          int num_camera=images_indexes_[ cpt ];
+          int num_point=point_indexes_[ cpt ];
+          cv::Ptr<PointsToTrack> points2D = points_to_track[ num_camera ];
+          const KeyPoint& p=points2D->getKeypoint( num_point );
+
+          //project 3D point:
+          cv::Vec2d projP = cameras[ num_camera ].project3DPointIntoImage( *point3D );
+
+          //compute error:
+          double error = sqrt( (p.pt.x-projP[ 0 ] )*( p.pt.x-projP[ 0 ] ) + 
+            ( p.pt.y-projP[ 1 ] )*( p.pt.y-projP[ 1 ] ) );
+
+          if(error>reproj_error)
+            good_values[cpt] = false;
+      }
+    }
+  }
+
+  void TrackOfPoints::keepTrackHavingImage( unsigned int idx_image,
+    vector<TrackOfPoints>& tracks )
+  {
+    unsigned int cpt = 0,
+      end = tracks.size();
+    for(cpt = 0; cpt<end-1; ++cpt)
+    {
+      if( !tracks[cpt].containImage(idx_image) )
+      {
+        tracks[cpt] = tracks[ end-1 ];
+        end--;tracks.pop_back();
+        cpt--;
+      }
+    }
+    //last one:
+    if( !tracks[cpt].containImage(idx_image) )
+      tracks.pop_back();
+  }
+
+  void TrackOfPoints::keepTrackWithImages( const
+    std::vector<int>& imgList,
+    std::vector<TrackOfPoints>& tracks )
+  {
+    std::vector<int> cpt_Link;
+    unsigned int cpt = 0, cpt1 = 0,
+      end = tracks.size(),
+      endImgL = imgList.size();
+    cpt_Link.assign(end,0);
+    for(cpt = 0; cpt<end; ++cpt)
+    {
+      for(cpt1 = 0; cpt1<endImgL; ++cpt1)
+      {
+        if( tracks[cpt].containImage(cpt1) )
+        {
+          cpt_Link[cpt]++;
+        }
+      }
+    }
+    //remove bad tracks:
+    cpt1 = 0;
+    for(cpt = 0; cpt<end-1; ++cpt)
+    {
+      if( cpt_Link[cpt]<2 )
+      {
+        tracks[cpt1] = tracks[ tracks.size()-1 ];
+        cpt1--;tracks.pop_back();
+      }
+      cpt1++;
+    }
+    //last one:
+    if( cpt_Link[cpt]<2 )
+      tracks.pop_back();
   }
   
   int ImagesGraphConnection::getHighestLink( int &first_image, int &second_image,

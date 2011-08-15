@@ -15,6 +15,10 @@ using std::vector;
 using cv::Point3d;
 
 namespace OpencvSfM{
+
+  int SequenceAnalyzer::mininum_points_matches = 20;
+  int SequenceAnalyzer::mininum_image_matches = 2;
+
   SequenceAnalyzer::SequenceAnalyzer( MotionProcessor input_sequence,
     cv::Ptr<cv::FeatureDetector> feature_detector,
     cv::Ptr<cv::DescriptorExtractor> descriptor_extractor,
@@ -309,15 +313,16 @@ namespace OpencvSfM{
     }
   }
 
-  void SequenceAnalyzer::keepOnlyCorrectMatches( )
+  void SequenceAnalyzer::keepOnlyCorrectMatches(
+    unsigned int min_matches, unsigned int min_consistance )
   {
     unsigned int tracks_size = tracks_.size( );
     unsigned int index=0;
 
     while ( index < tracks_size )
     {
-      if( ( tracks_[ index ].getNbTrack( ) <= mininum_image_matches ) ||
-        ( tracks_[ index ].track_consistance <= 3 ) )
+      if( ( tracks_[ index ].getNbTrack( ) <= min_matches ) ||
+        ( tracks_[ index ].track_consistance <= (int)min_consistance ) )
       {
         //problem with this track, too small to be consistent
         // or inconsistant...
@@ -354,7 +359,14 @@ namespace OpencvSfM{
           is_found=true;
         }
         else
-          tracks_it++;
+        {
+          if( track.containPoint( img2,point_matcher.queryIdx ))
+          {
+            track.addMatch( img1,point_matcher.trainIdx );
+            is_found=true;
+          }
+        }
+        tracks_it++;
       }
       if( !is_found )
       {
@@ -388,7 +400,6 @@ namespace OpencvSfM{
     if( points_to_track_.size( ) == 0 )
       return;//nothing to do...
 
-    //First compute missing features descriptors:
     unsigned int it=0,it1=0;
     unsigned int end_iter = points_to_track_.size( ) - 1 ;
     if( images_.size( ) - 1 < end_iter )
@@ -414,22 +425,119 @@ namespace OpencvSfM{
           match_it++;
         }
 
-        Mat firstImg=images_[ it ];
-        Mat outImg;
+        if( matches_to_print.size()>0 )
+        {
+          Mat firstImg=images_[ it ];
+          Mat outImg;
 
-        PointsMatcher::drawMatches( firstImg, points_to_track_[ it ]->getKeypoints( ),
-          points_to_track_[ it1 ]->getKeypoints( ),
-          matches_to_print, outImg,
-          cv::Scalar::all( -1 ), cv::Scalar::all( -1 ), vector<char>( ),
-          cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
+          PointsMatcher::drawMatches( firstImg, points_to_track_[ it ]->getKeypoints( ),
+            points_to_track_[ it1 ]->getKeypoints( ),
+            matches_to_print, outImg,
+            cv::Scalar::all( -1 ), cv::Scalar::all( -1 ), vector<char>( ),
+            cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
 
-      imshow( "showTracks",outImg );
-      cv::waitKey( timeBetweenImg );
+          imshow( "showTracks",outImg );
+          cv::waitKey( timeBetweenImg );
+        }
 
         it1++;
       }
       it++;
     }
+    cvDestroyWindow( "showTracks" );
+  }
+  void SequenceAnalyzer::showTracks( int img_to_show,
+    const std::vector< TrackOfPoints >& points )
+  {
+    if( points.size( ) == 0 )
+      return;//nothing to do...
+
+    unsigned int it=0,it1=0;
+    unsigned int end_iter = points_to_track_.size( ) - 1 ;
+    if( images_.size( ) - 1 < end_iter )
+      end_iter = images_.size( ) - 1;
+    vector< vector<DMatch> > matches_to_print;
+    matches_to_print.assign( points_to_track_.size( ), vector<DMatch>() );
+    //add to matches_to_print only points of img it and it+1:
+
+    vector<TrackOfPoints>::iterator match_it = tracks_.begin( );
+    vector<TrackOfPoints>::iterator match_it_end = tracks_.end( );
+    unsigned int i = 0;
+    while ( match_it != match_it_end )
+    {
+      if( match_it->containImage( img_to_show ) )
+      {
+        for(i = 0; i<match_it->images_indexes_.size(); i++)
+        {
+          if(match_it->images_indexes_[i] != img_to_show)
+          {
+            matches_to_print[ match_it->images_indexes_[i] ].
+              push_back( match_it->toDMatch( img_to_show, match_it->images_indexes_[i] ));
+          }
+        }
+      }
+      match_it++;
+    }
+
+    for(i = 0; i<matches_to_print.size(); i++)
+    {
+      if( matches_to_print[i].size()>0 )
+      {
+        Mat firstImg=images_[ it ];
+        Mat outImg;
+
+        PointsMatcher::drawMatches( firstImg, points_to_track_[ img_to_show ]->getKeypoints( ),
+          points_to_track_[ i ]->getKeypoints( ),
+          matches_to_print[i], outImg,
+          cv::Scalar::all( -1 ), cv::Scalar::all( -1 ), vector<char>( ),
+          cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
+
+        imshow( "showTracks",outImg );
+        cv::waitKey( 0 );
+      }
+    }
+    cvDestroyWindow( "showTracks" );
+  }
+
+  void SequenceAnalyzer::showTracksBetween( unsigned int img1, unsigned int img2 )
+  {
+    CV_Assert( points_to_track_.size( ) != 0 );
+    CV_Assert( images_.size( ) > img1 && images_.size( ) > img2 );
+
+    vector<DMatch> matches_to_print,matches_to_print1;
+    //add to matches_to_print only points of img1 and img2:
+
+    vector<TrackOfPoints>::iterator match_it = tracks_.begin( );
+    vector<TrackOfPoints>::iterator match_it_end = tracks_.end( );
+
+    while ( match_it != match_it_end )
+    {
+      if( match_it->containImage( img1 ) &&
+        match_it->containImage( img2 ) )
+      {
+        matches_to_print.push_back( match_it->toDMatch( img1,img2 ));
+        matches_to_print1.push_back( match_it->toDMatch( img2,img1 ));
+      }
+      match_it++;
+    }
+
+    Mat outImg,outImg1;
+    PointsMatcher::drawMatches( images_[ img1 ], points_to_track_[ img1 ]->getKeypoints( ),
+      points_to_track_[ img2 ]->getKeypoints( ),
+      matches_to_print, outImg,
+      cv::Scalar::all( -1 ), cv::Scalar::all( -1 ), vector<char>( ),
+      cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
+    imshow( "showTracks Img1-Img2",outImg );
+
+    PointsMatcher::drawMatches( images_[ img2 ], points_to_track_[ img2 ]->getKeypoints( ),
+      points_to_track_[ img1 ]->getKeypoints( ),
+      matches_to_print1, outImg1,
+      cv::Scalar::all( -1 ), cv::Scalar::all( -1 ), vector<char>( ),
+      cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
+
+    imshow( "showTracks Img2-Img1",outImg1 );
+    cv::waitKey( 0 );
+
     cvDestroyWindow( "showTracks" );
   }
 
@@ -539,25 +647,29 @@ namespace OpencvSfM{
         fs << "color" << color;
 
         fs << "list_of_points" << "[:";
+        nbPoints = track.images_indexes_.size();
         for ( unsigned int j = 0; j < nbPoints ; j++ )
         {
-          idImage = track.images_indexes_[ j ];
-          idPoint = track.point_indexes_[ j ];
-          if( idImage>=0 && idPoint>=0 )
+          if( track.good_values[j] )
           {
-            fs << idImage;
-            fs  << "[:";
+            idImage = track.images_indexes_[ j ];
+            idPoint = track.point_indexes_[ j ];
+            if( idImage>=0 && idPoint>=0 )
+            {
+              fs << idImage;
+              fs  << "[:";
 
-            const cv::KeyPoint kpt = me.points_to_track_[ idImage ]->
-              getKeypoints( )[ idPoint ];
-            cv::write( fs, kpt.pt.x );
-            cv::write( fs, kpt.pt.y );
-            cv::write( fs, kpt.size );
-            cv::write( fs, kpt.angle );
-            cv::write( fs, kpt.response );
-            cv::write( fs, kpt.octave );
-            cv::write( fs, kpt.class_id );
-            fs << "]" ;
+              const cv::KeyPoint kpt = me.points_to_track_[ idImage ]->
+                getKeypoints( )[ idPoint ];
+              cv::write( fs, kpt.pt.x );
+              cv::write( fs, kpt.pt.y );
+              cv::write( fs, kpt.size );
+              cv::write( fs, kpt.angle );
+              cv::write( fs, kpt.response );
+              cv::write( fs, kpt.octave );
+              cv::write( fs, kpt.class_id );
+              fs << "]" ;
+            }
           }
         }
         fs << "]" << "}" ;

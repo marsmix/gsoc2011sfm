@@ -64,6 +64,14 @@ namespace OpencvSfM{
     */
     PointOfView( cv::Ptr<Camera> device,cv::Mat rotation=cv::Mat::eye( 3, 3, CV_64F ),cv::Vec3d translation=cv::Vec3d( 0.0,0.0,0.0 ));
     /**
+    * To create a point of view using a projection matrix.
+    * We will extract intra, rotation and translation from this projection matrix.
+    * @param device address of existing Camera. This camera can be calibrated or not...
+    * @param rotation Matrix of the known rotation ( optional )...
+    * @param translation Vector of the known translation ( optional )...
+    */
+    PointOfView( cv::Mat projection_matrix );
+    /**
     * Destructor of PointOfView, release all vectors... TODO: define how we should release the vectors...
     */
     virtual ~PointOfView( void );

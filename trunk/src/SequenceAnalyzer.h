@@ -25,8 +25,8 @@ namespace OpencvSfM{
   class SFM_EXPORTS SequenceAnalyzer
   {
   protected:
-    static const int mininum_points_matches = 20;
-    static const int mininum_image_matches = 3;
+    static int mininum_points_matches;
+    static int mininum_image_matches;
     /**
     * optional, method to use for feature detection
     */
@@ -112,7 +112,9 @@ namespace OpencvSfM{
     /**
     * This method keep only tracks with more than mininum_image_matches
     */
-    void keepOnlyCorrectMatches( );
+    void keepOnlyCorrectMatches(
+      unsigned int min_matches = 20,
+      unsigned int min_consistance = 3);
     /**
     * This method can be used to get the tracks
     */
@@ -134,6 +136,15 @@ namespace OpencvSfM{
     * @param timeBetweenImg see cv::waitKey for the value
     */
     void showTracks( int timeBetweenImg=25 );
+    /**
+    * Use this function to print the sequence of matches
+    * @param timeBetweenImg see cv::waitKey for the value
+    */
+    void showTracks( int img_to_show,  const std::vector< TrackOfPoints >& points );
+    /**
+    * Use this function to print the matches between two images
+    */
+    void showTracksBetween( unsigned int img1, unsigned int img2 );
 
     static void read( const cv::FileNode& node, SequenceAnalyzer& points );
 

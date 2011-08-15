@@ -8,6 +8,8 @@
 #include "PointOfView.h"
 #include "opencv2/calib3d/calib3d.hpp"
 
+#include <numeric>
+
 namespace OpencvSfM{
   class SFM_EXPORTS PointsToTrack;
   class SFM_EXPORTS PointOfView;
@@ -30,6 +32,11 @@ namespace OpencvSfM{
     std::vector<unsigned int> images_indexes_;
     std::vector<unsigned int> point_indexes_;
     unsigned int color;
+    /**
+    * Sometimes a 2d point is not good...
+    * This vector help us to know which points are correct...
+    */
+    std::vector<bool> good_values;
     /**
     * if <0 the track is inconsistent
     * if >0 represent the degree of consistence ( higher is better )
@@ -60,8 +67,11 @@ namespace OpencvSfM{
     */
     inline bool containImage( const int image_wanted ) const
     {
-      return std::find( images_indexes_.begin( ),images_indexes_.end( ),
-        image_wanted ) != images_indexes_.end( );
+      std::vector<unsigned int>::const_iterator idx = std::find(
+        images_indexes_.begin( ),images_indexes_.end( ),
+        image_wanted );
+      return (idx != images_indexes_.end( ) &&
+        good_values[idx - images_indexes_.begin( ) ]==true );
     }
     /**
     * This function is used to know if the track contains the query point
@@ -75,7 +85,10 @@ namespace OpencvSfM{
     * @return 0 if inconsistent, >= 2 else
     */
     inline unsigned int getNbTrack( ) const
-    {return track_consistance<0?0:images_indexes_.size( );};
+    {
+      return track_consistance<0 ? 0 : std::accumulate(
+    good_values.begin( ), good_values.end( ), 0 );
+    };
     /**
     * use this function to create a DMatch value from this track
     * @param img1 train match image
@@ -96,7 +109,7 @@ namespace OpencvSfM{
     * @param image index of wanted image
     * @return index of point
     */
-    inline int getIndexPoint( const unsigned int image ) const
+    inline int getPointIndex( const unsigned int image ) const
     {
       std::vector<unsigned int>::const_iterator result =
         std::find( images_indexes_.begin( ),images_indexes_.end( ),image );
@@ -125,10 +138,29 @@ namespace OpencvSfM{
       double reproj_error = 4,
       const std::vector<bool> &masks = std::vector<bool>( ) );
 
+    void removeOutliers( std::vector<PointOfView>& cameras,
+      const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
+      double reproj_error = 4,
+      std::vector<bool> &masks = std::vector<bool>( ) );
 
-    void set3DPosition( cv::Vec3d newPoint );
+
+    inline void set3DPosition( cv::Vec3d newPoint )
+    {
+      if( !point3D )
+        point3D = new cv::Vec3d( newPoint );
+      else
+        *point3D = newPoint;
+    }
+    inline cv::Ptr<cv::Vec3d> get3DPosition(){ return point3D; };
+
     inline unsigned int getColor() const {return color;};
     inline void setColor(unsigned int c) {color = c;};
+
+    static void keepTrackHavingImage( unsigned int idx_image,
+      std::vector<TrackOfPoints>& tracks );
+    static void keepTrackWithImages( const
+      std::vector<int>& imgList,
+      std::vector<TrackOfPoints>& tracks );
   protected:
     double errorEstimate( std::vector< PointOfView >& cameras,
       const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,

@@ -100,7 +100,12 @@ if( LIBMV_FOUND )
 	include_directories( ${LIBMV_INCLUDE_DIRS} )
 	link_directories( ${LIBMV_LIBRARY_DIR} )
 	#as we don't want all libraries, we don't use ${LIBMV_LIBRARIES}
-	SET( SFM_LINKER_LIBS ${SFM_LINKER_LIBS} "multiview" "numeric")
+	if( WIN32 )
+	SET ( LIBMV_LIB debug "multiview_d" "numeric_d" optimized "multiview" "numeric" )
+	else( )
+	SET ( LIBMV_LIB "libmultiview.a" "libnumeric.a" "libtools.a" "libV3D.a" "libldl.a" "libcolamd.a" "libglog.a" "libgflags.a" "libgtest.a" )
+	endif( )
+	SET( SFM_LINKER_LIBS ${SFM_LINKER_LIBS} ${LIBMV_LIB})
 else( )
   find_path( LIBMV_ROOT camera/camera.h
 	PATHS "/usr/local/include/" "/opt/include/" "/usr/include/"
