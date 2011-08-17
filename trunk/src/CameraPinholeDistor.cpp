@@ -73,9 +73,40 @@ namespace OpencvSfM{
 
   vector<Vec2d> CameraPinholeDistor::normImageToPixelCoordinates( std::vector<cv::Vec2d> points ) const
   {
-    vector<Vec2d> pointsPixelCoord=CameraPinhole::normImageToPixelCoordinates( points );
-    //TODO: remove the distortion!
-    //CV_Error( CV_StsBadFunc, "This function is not yet implemented!\nFor now use the CameraPinhole::normImageToPixelCoordinates" );
+
+    vector<Vec2d> redistortedPoints;
+
+    double r2, icdist, deltaX, deltaY;
+    double xn, yn, xc, yc;
+
+    for (unsigned int i = 0; i < points.size(); i++) {
+        // Extract normalized, undistorted point co-ordinates
+        xn = points.at(i)[0];
+        yn = points.at(i)[1];
+
+        //printf("%s << (xn, yn) = (%f, %f)\n", __FUNCTION__, xn, yn);
+
+        // Determine radial distance from centre
+        r2 = xn*xn + yn*yn;
+
+        // Determine distortion factors (might only work for rational model at this stage)
+        icdist = (1 + ((radial_dist_[5]*r2 + radial_dist_[4])*r2 + radial_dist_[3])*r2)/(1 + ((radial_dist_[2]*r2 + radial_dist_[1])*r2 + radial_dist_[0])*r2);
+        deltaX = 2*tangential_dist_[0]*xn*yn + tangential_dist_[1]*(r2 + 2*xn*xn);
+        deltaY = tangential_dist_[0]*(r2 + 2*yn*yn) + 2*tangential_dist_[1]*xn*yn;
+
+        // Distort the points, but keep them in normalized co-ordinate system
+        xc = (xn/icdist) + deltaX;
+        yc = (yn/icdist) + deltaY;
+
+        redistortedPoints.push_back(cv::Point2d(xc, yc));
+
+        //printf("%s << (xc, yc) = (%f, %f)\n", __FUNCTION__, xc, yc);
+
+    }
+
+    // Convert these re-distorted but normalized points back to pixel co-ordinates
+    vector<Vec2d> pointsPixelCoord=CameraPinhole::normImageToPixelCoordinates( redistortedPoints );
+
     return pointsPixelCoord;
   }
 }
