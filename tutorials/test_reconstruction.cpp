@@ -32,6 +32,20 @@ NEW_TUTO( Triangulation_tuto, "Learn how you can triangulate 2D points",
 {
   vector<Mat> images;
 
+
+  cout<<"First load the cameras from Medias/temple/temple_par.txt"<<endl;
+  vector<PointOfView> myCameras=loadCamerasFromFile( FROM_SRC_ROOT( "Medias/temple/temple_par.txt" ) );
+
+
+  FileStorage fsStore( "cameras.yml", FileStorage::WRITE );
+
+  fsStore<<"vector_PointOfView"<<"[";
+  for(int i=0;i<myCameras.size(); i++)
+    PointOfView::write(fsStore, myCameras[i]);
+  fsStore<<"]";
+
+  fsStore.release( );
+
   SequenceAnalyzer *motion_estim_loaded;
   stringstream pathFile;
   pathFile<<FROM_SRC_ROOT( "Medias/" );
@@ -52,8 +66,6 @@ NEW_TUTO( Triangulation_tuto, "Learn how you can triangulate 2D points",
   }
   test_file_exist.close( );
 
-  cout<<"First load the cameras from Medias/temple/temple_par.txt"<<endl;
-  vector<PointOfView> myCameras=loadCamerasFromFile( FROM_SRC_ROOT( "Medias/temple/temple_par.txt" ));
   MotionProcessor mp;
   mp.setInputSource( FROM_SRC_ROOT( "Medias/temple/" ),IS_DIRECTORY );
 

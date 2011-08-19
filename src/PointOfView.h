@@ -150,6 +150,10 @@ namespace OpencvSfM{
       rotation_ *= R;
     }
 
+    static cv::Ptr<PointOfView> read( const cv::FileNode& node );
+
+    static void write( cv::FileStorage& fs, const PointOfView& points );
+
   };
 
 }

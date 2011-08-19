@@ -210,6 +210,7 @@ namespace OpencvSfM{
           should_remove=true;//convert_to_float create a buffer
         }
       };
+
       Point( cv::KeyPoint& kp ){
         initData( this, 6, reinterpret_cast< float* >( &kp ) );
       };

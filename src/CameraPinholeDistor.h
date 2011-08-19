@@ -28,9 +28,7 @@ namespace OpencvSfM{
     cv::Vec<double, 2> tangential_dist_;///<used to store tangential dist parameters ( /f$p_1/f$ and /f$p_2/f$ )
     unsigned char nb_tangent_params_;
     cv::Mat distortionVector;///<vector of distortion coefficients ( k_1, k_2, p_1, p_2[ , k_3[ , k_4, k_5, k_6 ]] ) of 4, 5 or 8 elements
-    cv::Mat undistMapX;///<Undistortion and rectification transformation map
-    cv::Mat undistMapY;///<Undistortion and rectification transformation map
-
+ 
   public:
     /**
     * Constructor with ( or not ) intra parameters.
@@ -88,6 +86,11 @@ namespace OpencvSfM{
     * @return 2D points in pixel image coordinates.
     */
     virtual std::vector<cv::Vec2d> normImageToPixelCoordinates( std::vector<cv::Vec2d> points ) const;
+
+    static cv::Ptr<Camera> read( const cv::FileNode& node );
+
+    virtual void write( cv::FileStorage& fs ) const;
+
   };
 
 }

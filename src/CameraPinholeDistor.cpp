@@ -26,7 +26,9 @@ namespace OpencvSfM{
     //TODO
   }
 
-  void CameraPinholeDistor::updateDistortionParameters( const cv::Vec6d& radial_dist, unsigned char nbRadialParam,const cv::Vec2d& tangential_dist,unsigned char wantedEstimation )
+  void CameraPinholeDistor::updateDistortionParameters(
+    const cv::Vec6d& radial_dist, unsigned char nbRadialParam,
+    const cv::Vec2d& tangential_dist,unsigned char wantedEstimation )
   {
     this->estimation_needed_= ( this->estimation_needed_ & 0x0F ) | ( wantedEstimation & 0xF0 );
     this->radial_dist_=radial_dist;
@@ -108,5 +110,56 @@ namespace OpencvSfM{
     vector<Vec2d> pointsPixelCoord=CameraPinhole::normImageToPixelCoordinates( redistortedPoints );
 
     return pointsPixelCoord;
+  }
+
+  cv::Ptr<Camera> CameraPinholeDistor::read( const cv::FileNode& node )
+  {
+    std::string myName=node.name( );
+    if( myName != "CameraPinholeDistor" )
+    {
+      std::string error = "CameraPinholeDistor FileNode is not correct!\nExpected \"CameraPinholeDistor\", got ";
+      error += node.name();
+      CV_Error( CV_StsError, error.c_str() );
+    }
+
+    Mat intra_params;
+    Vec6d radial_dist;
+    unsigned char nbRadialParam;
+    cv::Vec2d tangential_dist;
+
+    //load intra parameters:
+    cv::Ptr<Camera> cam_tmp = CameraPinhole::read( node["CameraPinhole"] );
+
+    node[ "nb_radial_params_" ] >> nbRadialParam;
+    for(int i=0;i<nbRadialParam;i++)
+      radial_dist[i] = node[ "radial_dist_" ][i];
+    for(int i=nbRadialParam;i<6;i++)
+      radial_dist[i] = 0;
+
+    for(int i=0;i<2;i++)
+      tangential_dist[i] = node[ "tangential_dist_" ][i];
+
+    return cv::Ptr<Camera>( new CameraPinholeDistor(
+      ((CameraPinhole*)((Camera*)cam_tmp))->getIntraMatrix(),
+      radial_dist, nbRadialParam, tangential_dist) );
+  }
+
+  void CameraPinholeDistor::write( cv::FileStorage& fs ) const
+  {
+    fs << "CameraPinholeDistor" << "{";
+
+    ((CameraPinhole*)this)->write( fs );
+
+    fs << "radial_dist_" << "[:";
+    for(int i=0;i<6;i++)
+      fs << this->radial_dist_[i];
+    fs << "]";
+
+    fs << "nb_radial_params_" << this->nb_radial_params_;
+    fs << "tangential_dist_" << "[:";
+    for(int i=0;i<2;i++)
+      fs << this->tangential_dist_[i];
+    fs << "]";
+    fs << "}";
   }
 }

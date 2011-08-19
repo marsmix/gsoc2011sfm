@@ -46,7 +46,7 @@ namespace OpencvSfM{
       const std::vector<int>& list_of_images,
        unsigned int max_error = 10 );
     /**
-    * Remove projections from tracks whoses error > max_error 
+    * Remove points from track when projection error > max_error 
     * @param min_error maximum error of back projection allowed
     */
     void removeOutliersTracks( double max_error = 10 );

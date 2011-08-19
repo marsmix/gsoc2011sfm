@@ -547,8 +547,11 @@ namespace OpencvSfM{
   {
     std::string myName=node.name( );
     if( myName != "SequenceAnalyzer" )
-      CV_Error( CV_StsError, "SequenceAnalyzer FileNode is not correct!" );
-
+    {
+      std::string error = "FileNode is not correct!\nExpected \"SequenceAnalyzer\", got ";
+      error += node.name();
+      CV_Error( CV_StsError, error.c_str() );
+    }
     if( node.empty( ) || !node.isMap( ) )
       CV_Error( CV_StsError, "SequenceAnalyzer FileNode is not correct!" );
 

@@ -86,6 +86,11 @@ namespace OpencvSfM{
     * @return focal lenght
     */
     virtual double getFocal( ) const=0;
+
+    static cv::Ptr<Camera> read( const cv::FileNode& node );
+
+    virtual void write( cv::FileStorage& fs ) const = 0;
+
   };
 
 }

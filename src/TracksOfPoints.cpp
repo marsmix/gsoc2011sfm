@@ -92,11 +92,12 @@ namespace OpencvSfM{
     return track_consistance>=0;
   }
 
-  bool TrackOfPoints::containPoint( const int image_src, const int point_idx1 )
+  bool TrackOfPoints::containPoint( const int image_src,
+    const int point_idx1 ) const
   {
     //we don't use find here because we want the number instead of iterator...
-    vector<unsigned int>::iterator indexImg = images_indexes_.begin( );
-    vector<unsigned int>::iterator end_iter = images_indexes_.end( );
+    vector<unsigned int>::const_iterator indexImg = images_indexes_.begin( );
+    vector<unsigned int>::const_iterator end_iter = images_indexes_.end( );
     unsigned int index=0;
     while( indexImg != end_iter )
     {
@@ -308,11 +309,9 @@ namespace OpencvSfM{
     double reproj_error, std::vector<bool> *masksValues )
   {
     unsigned int nviews = images_indexes_.size( );
-    vector<bool> masks;
 
     int ptSize = 0;
-    bool has_mask = (masksValues == NULL);
-    if( !has_mask )
+    if(masksValues == NULL)
       good_values.assign(nviews , true);
     else
       good_values = *masksValues;
@@ -356,6 +355,52 @@ namespace OpencvSfM{
     //last one:
     if( !tracks[cpt].containImage(idx_image) )
       tracks.pop_back();
+  }
+
+
+  void TrackOfPoints::mixTracks( const std::vector<TrackOfPoints>& list_tracks,
+    std::vector<TrackOfPoints>* mixed_tracks )
+  {
+    //add to mixed_tracks the new tracks from list_tracks who are not in mixed_tracks:
+    vector<TrackOfPoints>::const_iterator track_it = list_tracks.begin( );
+    vector<TrackOfPoints>::const_iterator track_end = list_tracks.end( );
+
+    unsigned int mixed_size = mixed_tracks->size();
+
+    while ( track_it != track_end )
+    {
+      const TrackOfPoints& track = ( *track_it );
+
+      unsigned int cpt = 0;
+
+      bool is_found=false;
+      while ( cpt<mixed_size && !is_found )
+      {
+        TrackOfPoints& track1 = (*mixed_tracks)[ cpt ];
+        for(int i=0; i<track1.images_indexes_.size()&&!is_found; ++i)
+        {
+          if( track.containPoint( track1.images_indexes_[i],
+            track1.point_indexes_[i]) )//the same keypoint is found!
+            is_found = true;
+        }
+        cpt++;
+      }
+
+      if( is_found )
+      {
+        cpt--;
+        TrackOfPoints& track1 = (*mixed_tracks)[ cpt ];
+        for(int i=0; i<track.images_indexes_.size()&&!is_found; ++i)
+        {//check of consistency is done via addMatch...
+          track1.addMatch( track.images_indexes_[i],
+            track.point_indexes_[i] );
+        }
+      }
+      else
+        mixed_tracks->push_back( track );
+
+      track_it++;
+    }
   }
 
   void TrackOfPoints::keepTrackWithImages( const
