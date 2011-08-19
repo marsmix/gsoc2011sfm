@@ -77,7 +77,7 @@ namespace OpencvSfM{
     * @param point_idx1 index of point in query image
     * @return true if this track contain the point from the query image
     */
-    bool containPoint( const int image_src, const int point_idx1 );
+    bool containPoint( const int image_src, const int point_idx1 ) const;
     /**
     * This function is used to get the numbers of image for this track
     * @return 0 if inconsistent, >= 2 else
@@ -159,6 +159,17 @@ namespace OpencvSfM{
     static void keepTrackWithImages( const
       std::vector<int>& imgList,
       std::vector<TrackOfPoints>& tracks );
+
+    /**
+    * add to mixed_tracks the new tracks from list_tracks who are not in mixed_tracks.
+    * Of course, as a track of points contains only indexes, be careful to mix
+    * two compatible vectors (i.e. share the same points indexes)
+    * @param list_tracks first list of tracks to add into mixed_tracks
+    * @param mixed_tracks output list of tracks
+    **/
+    static void mixTracks( const std::vector<TrackOfPoints>& list_tracks,
+      std::vector<TrackOfPoints>* mixed_tracks);
+
   protected:
     double errorEstimate( std::vector< PointOfView >& cameras,
       const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,

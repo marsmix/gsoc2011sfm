@@ -13,7 +13,7 @@
 #include "Camera.h"
 #include "TracksOfPoints.h"
 #include "PCL_mapping.h"
-#include "CameraPinhole.h"
+#include "CameraPinholeDistor.h"
 
 using cv::Mat;
 using cv::Vec4d;
@@ -224,5 +224,42 @@ namespace OpencvSfM{
   {
     return device_->getIntraMatrix( ) * projection_matrix_;
   };
+
+
+  cv::Ptr<PointOfView> PointOfView::read( const cv::FileNode& node )
+  {
+    std::string myName=node.name( );
+    if( myName != "PointOfView" )
+    {
+      std::string error = "FileNode is not correct!\nExpected \"PointOfView\", got ";
+      error += node.name();
+      CV_Error( CV_StsError, error.c_str() );
+    }
+    cv::FileNodeIterator it = node.begin();
+    cv::Mat rot,trans;
+    cv::Ptr<Camera> device;
+
+    while( it != node.end() )
+    {
+      if((*it).name()=="rotation_")
+        (*it)>>rot;
+      if((*it).name()=="translation_")
+        (*it)>>trans;
+      if((*it).name()=="CameraPinhole")
+        device = CameraPinhole::read( *it );
+      if((*it).name()=="CameraPinholeDistor")
+        device = CameraPinholeDistor::read( *it );
+      it++;
+    }
+    return cv::Ptr<PointOfView>( new PointOfView(device, rot, trans) );
+  }
+
+  void PointOfView::write( cv::FileStorage& fs, const PointOfView& pov )
+  {
+    fs <<"{" << "PointOfView" <<"{" << "rotation_" << pov.rotation_;
+    fs << "translation_" << pov.translation_;
+    pov.device_->write( fs );
+    fs << "}" << "}";
+  }
 
 }

@@ -61,7 +61,6 @@ namespace OpencvSfM{
     }
   }
 
-
   vector<Vec4d> CameraPinhole::convertFromImageTo3Dray( vector<Vec3d> points )
   {
     //TODO
@@ -147,4 +146,34 @@ namespace OpencvSfM{
 
     return origin_y / tan( angle );
   }
+
+
+  cv::Ptr<Camera> CameraPinhole::read( const cv::FileNode& node )
+  {
+    std::string myName=node.name( );
+    if( myName != "CameraPinhole" )
+    {
+      std::string error = "CameraPinhole FileNode is not correct!\nExpected \"CameraPinhole\", got ";
+      error += node.name();
+      CV_Error( CV_StsError, error.c_str() );
+    }
+
+     Mat intra_params;
+     unsigned char wantedEstimation;
+    //load intra parameters:
+    node[ "intra_params_" ] >> intra_params;
+
+    node[ "estimation_needed_" ] >> wantedEstimation;
+
+    return cv::Ptr<Camera>( new CameraPinhole(intra_params, wantedEstimation) );
+  }
+
+  void CameraPinhole::write( cv::FileStorage& fs ) const
+  {
+    fs << "CameraPinhole" << "{";
+    fs << "intra_params_" << this->intra_params_;
+    fs << "estimation_needed_" << this->estimation_needed_;
+    fs << "}";
+  }
+
 }

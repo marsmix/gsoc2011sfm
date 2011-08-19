@@ -36,7 +36,7 @@ namespace OpencvSfM{
     */
     cv::Ptr<cv::DescriptorExtractor> descriptor_extractor_;
     /**
-    * One list of points for each picture
+    * A list of points for each picture
     */
     std::vector< cv::Ptr< PointsToTrack > > points_to_track_;
     /**
