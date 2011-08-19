@@ -116,19 +116,7 @@ namespace OpencvSfM{
     virtual void crossMatch( cv::Ptr<PointsMatcher> otherMatcher,
       std::vector<cv::DMatch>& matches,
       const std::vector<cv::Mat>& masks = std::vector<cv::Mat>( ) );
-    /**
-    * Using an other matchers given in parameters and a fundamental matrix, compute
-    * matches which agree with fundamental matrix ( Sampson distance is used )
-    * @param otherMatcher Query set of points and descriptors.
-    * @param fundamentalMat Matrix of fundamental equation.
-    * @param matches [ output ] matches.
-    * @param masks specifying permissible matches between input query and train matrices of descriptors.
-    */
-    void matchWithFundamental( cv::Ptr<PointsMatcher> otherMatcher,
-      cv::Mat fundamentalMat,
-      cv::Mat img1,
-      std::vector<cv::DMatch>& matches,
-      const std::vector<cv::Mat>& masks );
+
     /**
     * This function draw keypoints and matches.
     * Contrary to cv::drawMatches, only the first image is used

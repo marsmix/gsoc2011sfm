@@ -6,6 +6,8 @@
 #include <vector>
 #include "opencv2/features2d/features2d.hpp"
 
+#include "config_SFM.h"//semaphore...
+
 
 namespace OpencvSfM{
   class SFM_EXPORTS TrackOfPoints;
@@ -23,6 +25,12 @@ namespace OpencvSfM{
   class SFM_EXPORTS PointsToTrack
   {
   protected:
+    DECLARE_MUTEX(worker_exclusion);
+    /**
+    * To preserve memory, we need to know how many process
+    * are working with theses points...
+    */
+    unsigned int nb_workers_;
     /**
     * This attribute will store points coordinates
     * and sometimes orientation and size
@@ -40,6 +48,19 @@ namespace OpencvSfM{
     std::vector<unsigned int> RGB_values_;
     int corresponding_image_;///<index of frame when available
     static int glob_number_images_;///<total numbers of images!
+
+    /**
+    * This is the method you should implement when you create a new
+    * point detector algorithm.
+    * @return the number of points
+    */
+    virtual int impl_computeKeypoints_( ){return 0;};
+    /**
+    * This is the method you should implement when you create a new
+    * descriptors extractor...
+    */
+    virtual void impl_computeDescriptors_( ){};
+
   public:
     /**
     * this constructor create an object with available information...
@@ -53,6 +74,10 @@ namespace OpencvSfM{
     * Destructor : delete points and features vectors
     */
     virtual ~PointsToTrack( void );
+    /**
+    * To preserve memory, we use this method to free descriptors
+    */
+    void free_descriptors();
     
     /**
     * This method is used to compute both Keypoints and descriptors...
@@ -60,16 +85,16 @@ namespace OpencvSfM{
     * If false and if keypoints and descriptor exists, nothing is done.
     * @return the number of points
     */
-    virtual int computeKeypointsAndDesc( bool forcing_recalculation=false );
+    int computeKeypointsAndDesc( bool forcing_recalculation=false );
     /**
     * This method is used to compute only Keypoints...
     * @return the number of points
     */
-    virtual int computeKeypoints( );
+    int computeKeypoints( );
     /**
     * This method is used to compute only descriptors...
     */
-    virtual void computeDescriptors( );
+    void computeDescriptors( );
     /**
     * This method is used to add Keypoints...
     * @param keypoints Keypoints to add
