@@ -22,8 +22,22 @@ namespace OpencvSfM{
       corresponding_image_ = PointsToTrack::glob_number_images_;
 
     PointsToTrack::glob_number_images_++;
+    nb_workers_ = 0;
+    INIT_MUTEX(worker_exclusion);
   }
 
+  void PointsToTrack::free_descriptors()
+  {
+    P_MUTEX(worker_exclusion);
+    if(nb_workers_<=1)
+    {
+      nb_workers_ = 0;
+      descriptors_.release( );
+    }
+    else
+      nb_workers_--;
+    V_MUTEX(worker_exclusion);
+  }
 
   PointsToTrack::~PointsToTrack( void )
   {
@@ -34,35 +48,46 @@ namespace OpencvSfM{
   
   int PointsToTrack::computeKeypointsAndDesc( bool forcing_recalculation )
   {
-    int nbPoints;
+    P_MUTEX(worker_exclusion);
     if( !forcing_recalculation )
     {
-      if( keypoints_.empty( ) )
-        nbPoints=computeKeypoints( );
+      bool need_keypoints = keypoints_.empty( );
+      bool need_descriptors = need_keypoints || descriptors_.empty( );
+      if( need_keypoints )
+        impl_computeKeypoints_();
+      if( need_descriptors )
+      {
+        CV_Assert( nb_workers_ == 0 );
+        impl_computeDescriptors_();
+      }
       else
-        nbPoints=keypoints_.size( );
-
-      if( descriptors_.empty( ) )
-        computeDescriptors( );
+        nb_workers_++;
     }
     else
     {
-      nbPoints=computeKeypoints( );
-      computeDescriptors( );
+      impl_computeKeypoints_();
+      impl_computeDescriptors_();
     }
 
-    return nbPoints;
+    V_MUTEX(worker_exclusion);
+    return keypoints_.size( );
   }
 
 
   int PointsToTrack::computeKeypoints( )
-  {//we don't have data to compute keypoints...
+  {
+    P_MUTEX(worker_exclusion);
+    impl_computeKeypoints_();
+    V_MUTEX(worker_exclusion);
     return keypoints_.size( );
   }
 
 
   void PointsToTrack::computeDescriptors( )
-  {//we don't have data to compute descriptors...
+  {
+    P_MUTEX(worker_exclusion);
+    impl_computeDescriptors_();
+    V_MUTEX(worker_exclusion);
   }
 
   void PointsToTrack::addKeypoints( std::vector<cv::KeyPoint> keypoints,cv::Mat descriptors/*=cv::Mat( )*/,bool computeMissingDescriptor/*=false*/ )

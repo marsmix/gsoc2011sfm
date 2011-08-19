@@ -20,6 +20,16 @@ namespace OpencvSfM{
     cv::Ptr<cv::DescriptorExtractor> descriptor_detector_;///<class which will compute the descriptors
     cv::Mat imageToAnalyse_;///<Picture from where points are detected
     cv::Mat maskOfAnalyse_;///<Mask of analyse. Everything out of this mask is ignored.
+    
+    /**
+    * This method is used to compute only Keypoints...
+    * @return the number of points
+    */
+    int impl_computeKeypoints_( );
+    /**
+    * This method is used to compute only descriptors...
+    */
+    void impl_computeDescriptors_( );
   public:
     /**
     * First constructor used to create a list of points to track using a feature and a descriptor algorithm.
@@ -56,14 +66,9 @@ namespace OpencvSfM{
     */
     void setDescriptorExtractor( cv::Ptr<cv::DescriptorExtractor> descriptor_detector );
     /**
-    * This method is used to compute only Keypoints...
-    * @return the number of points
+    * This method is used to get color for each points...
     */
-    int computeKeypoints( );
-    /**
-    * This method is used to compute only descriptors...
-    */
-    void computeDescriptors( );
+    void PointsToTrackWithImage::getColorOfPoints();
 
     inline cv::Mat getImage( ){return imageToAnalyse_;};
   };
