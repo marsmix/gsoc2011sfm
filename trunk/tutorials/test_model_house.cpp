@@ -131,6 +131,7 @@ NEW_TUTO( Model_House_test, "Using Model house data, run a SFM algorithm",
         d_idx--;
         tracks.pop_back();
       }
+    structure.removeOutliersTracks(2);
 
     cout<<"Bundle adjustement..."<<endl;
     EuclideanEstimator pe( motion_estim, cameras );

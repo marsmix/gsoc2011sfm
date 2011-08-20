@@ -25,6 +25,10 @@ using cv::Ptr;
 using std::vector;
 using std::string;
 using cv::imread;
+using libmv::Mat34;
+using libmv::Mat3;
+using libmv::Vec3;
+using libmv::Vec;
 
 namespace OpencvSfM{
 
@@ -48,6 +52,7 @@ namespace OpencvSfM{
     device_->pointsOfView_.push_back( this );
   };
 
+
   PointOfView::PointOfView( cv::Mat projection_matrix )
     : projection_matrix_( 3, 4, CV_64F )
   {
@@ -58,18 +63,12 @@ namespace OpencvSfM{
     libmv::Vec3 t;
     libmv::KRt_From_P( proj, &K, &R, &t );
     
-    if( abs(1 - R.determinant()) > 0.1  )
-    {//R is not a rotation matrix....
-      //Improper rotation
-      proj = proj * -1;//probably due to bad proj matrix. try this.
-      libmv::KRt_From_P( proj, &K, &R, &t );
-      //TODO: handle such case in a different way!
-
-      double tmp = K(1,1);
-      K(1,1) = K(0,0);
-      K(0,0) = tmp;
-
+    if (R.determinant() < 0) {
+      K.col(0) = -K.col(0);
+      R.row(0) = -R.row(0);
+      t(0)     = -t(0);
     }
+    
     //enforce the rotation matrix.
     //TODO find the closest rotation matrix...
     Eigen::Quaterniond tmp = (Eigen::Quaterniond)R;
@@ -92,6 +91,9 @@ namespace OpencvSfM{
 
     //as we are a new point of view related to a device, we should add our address into device_:
     device_->pointsOfView_.push_back( this );
+
+    cv::Mat projection_matrix_comp = K_cv * projection_matrix_;
+    projection_matrix_comp=K_cv;
   };
 
   PointOfView::~PointOfView( void )
