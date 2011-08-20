@@ -4,8 +4,9 @@
 #include <crtdbg.h>
 #endif
 
-#include "test_data_sets.h"
 #include <iostream>
+
+#include "test_data_sets.h"
 
 using namespace std;
 using namespace OpencvSfM;
@@ -15,7 +16,7 @@ int main( )
 #if ( defined _DEBUG && defined _MSC_VER)
   _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
   cout<<"look for memory leak..."<<endl;
-  //_CrtSetBreakAlloc(269349);
+  //_CrtSetBreakAlloc(1134);
 #endif
   //usefull to hide libmv debug output...
   std::ofstream out("libmv_log.txt"); 

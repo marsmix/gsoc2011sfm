@@ -377,7 +377,7 @@ namespace OpencvSfM{
       while ( cpt<mixed_size && !is_found )
       {
         TrackOfPoints& track1 = (*mixed_tracks)[ cpt ];
-        for(int i=0; i<track1.images_indexes_.size()&&!is_found; ++i)
+        for(size_t i=0; i<track1.images_indexes_.size()&&!is_found; ++i)
         {
           if( track.containPoint( track1.images_indexes_[i],
             track1.point_indexes_[i]) )//the same keypoint is found!
@@ -390,7 +390,7 @@ namespace OpencvSfM{
       {
         cpt--;
         TrackOfPoints& track1 = (*mixed_tracks)[ cpt ];
-        for(int i=0; i<track.images_indexes_.size()&&!is_found; ++i)
+        for(size_t i=0; i<track.images_indexes_.size()&&!is_found; ++i)
         {//check of consistency is done via addMatch...
           track1.addMatch( track.images_indexes_[i],
             track.point_indexes_[i] );

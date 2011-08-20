@@ -145,7 +145,6 @@ namespace OpencvSfM{
         point_matcher1->train( );
 
         vector<DMatch> matches_i_j;
-
         point_matcher->crossMatch( point_matcher1, matches_i_j, masks );
 
         //First compute points matches:
@@ -340,8 +339,8 @@ namespace OpencvSfM{
 
     while ( index < tracks_size )
     {
-      if( ( tracks_[ index ].getNbTrack( ) <= min_matches ) ||
-        ( tracks_[ index ].track_consistance <= (int)min_consistance ) )
+      if( ( tracks_[ index ].getNbTrack( ) < min_matches ) ||
+        ( tracks_[ index ].track_consistance < (int)min_consistance ) )
       {
         //problem with this track, too small to be consistent
         // or inconsistant...

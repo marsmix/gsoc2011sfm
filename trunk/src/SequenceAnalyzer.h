@@ -113,7 +113,7 @@ namespace OpencvSfM{
     * This method keep only tracks with more than mininum_image_matches
     */
     void keepOnlyCorrectMatches(
-      unsigned int min_matches = 20,
+      unsigned int min_matches = 10,
       unsigned int min_consistance = 3);
     /**
     * This method can be used to get the tracks

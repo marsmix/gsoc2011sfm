@@ -7,6 +7,22 @@ namespace OpencvSfM{
   namespace tutorials{
     DECLARE_MUTEX( my_mutex_Tutorial_Handler );
 
+    void Intern_tutorial_list::addTuto(Tutorial_Handler* newTuto)
+    {
+      //order tuto list by filename order:
+      bool notFound = true;
+      size_t i = 0;
+      for( i = 0; i<list_of_tutos.size() && notFound; ++i )
+        notFound = ( list_of_tutos[i]->file_of_tuto<newTuto->file_of_tuto );
+
+      if( notFound )
+        list_of_tutos.push_back( newTuto );
+      else
+      {
+        list_of_tutos.insert( list_of_tutos.begin() + i, newTuto);
+      }
+    }
+
     vector<PointOfView> loadCamerasFromFile( string fileName, int flag_model )
     {
       vector<PointOfView> outVect;

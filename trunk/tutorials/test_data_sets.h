@@ -2,16 +2,17 @@
 #ifndef _GSOC_SFM_TUTORIALS_H
 #define _GSOC_SFM_TUTORIALS_H
 
-#include "config_SFM.h"
-#include "../src/PointOfView.h"
-#include "../src/CameraPinhole.h"
+#include "../src/macro.h" //SFM_EXPORTS and remove annoying warnings
+
 #include <opencv2/core/core.hpp>
-
-
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <string>
+
+#include "config_SFM.h"
+#include "../src/PointOfView.h"
+#include "../src/CameraPinhole.h"
 
 // Use this annotation at the end of a struct/class definition to
 // prevent the compiler from optimizing away instances that are never
@@ -45,6 +46,7 @@ namespace OpencvSfM{
         return ref_static;
       }
       friend class Tutorial_Handler;
+      void addTuto(Tutorial_Handler*);
     };
 
     // This class create an instance of tutorial...
@@ -82,12 +84,10 @@ namespace OpencvSfM{
       template <class TutoClass>
       static Tutorial_Handler* registerTuto( TutoFactoryImpl<TutoClass>* addTuto )
       {
-        Intern_tutorial_list *inst_tuto = Intern_tutorial_list::getInstance( );
         Tutorial_Handler* out = addTuto->CreateTest( );
+        Intern_tutorial_list *inst_tuto = Intern_tutorial_list::getInstance( );
         P_MUTEX( my_mutex_Tutorial_Handler );
-        std::vector<Tutorial_Handler*> &local_list_of_tutos =
-          inst_tuto->list_of_tutos;
-        local_list_of_tutos.push_back( out );
+        inst_tuto->addTuto( out );
         V_MUTEX( my_mutex_Tutorial_Handler );
         return out;
       }
