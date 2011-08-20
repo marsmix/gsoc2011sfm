@@ -68,7 +68,7 @@ namespace OpencvSfM{
     /**
     * This method is used to get color for each points...
     */
-    void PointsToTrackWithImage::getColorOfPoints();
+    void getColorOfPoints();
 
     inline cv::Mat getImage( ){return imageToAnalyse_;};
   };
