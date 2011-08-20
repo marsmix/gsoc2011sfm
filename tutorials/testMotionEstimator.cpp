@@ -14,9 +14,8 @@
 
 #include "test_data_sets.h"
 #define POINT_METHOD "SIFT"
-#define DETECTOR_METHOD SiftFeatureDetector
-#define DESCRIPTOR_METHOD SiftDescriptorExtractor
-#define MATCHER_METHOD FlannBasedMatcher
+#define DESCRIPTOR_METHOD "SIFT"
+#define MATCHER_METHOD "FlannBased"
 
 using namespace cv;
 using namespace OpencvSfM;
@@ -37,17 +36,17 @@ NEW_TUTO( Track_creation, "Learn how you can compute tracks from a list of pictu
 
   //Configure input ( not needed, but show how we can do
   //mp.setProperty( CV_CAP_PROP_CONVERT_RGB,0 );//Only greyscale, due to SIFT
-  mp.setProperty( CV_CAP_PROP_CONVERT_RGB,-1 );//Keep the color as is.
+  mp.setProperty( CV_CAP_PROP_CONVERT_RGB,0 );//convert to grayscal
 
   Ptr<FeatureDetector> detector;
-  detector=Ptr<FeatureDetector>( new DETECTOR_METHOD( ) );
+  detector = FeatureDetector::create( POINT_METHOD );
   Ptr<DescriptorExtractor> desc_extractor;
-  desc_extractor=Ptr<DescriptorExtractor>( new DESCRIPTOR_METHOD( ));
+  desc_extractor = DescriptorExtractor::create( DESCRIPTOR_METHOD );
   vector< Ptr< PointsToTrack > > vec_points_to_track;
   Ptr<PointsToTrack> ptrPoints_tmp;
 
   Ptr<DescriptorMatcher> matcher;
-  matcher=Ptr<DescriptorMatcher>( new MATCHER_METHOD( ));
+  matcher = DescriptorMatcher::create( MATCHER_METHOD );
   Ptr<PointsMatcher> matches_algo ( new PointsMatcher( matcher ) );
 
   //universal method to get the current image:
@@ -83,7 +82,7 @@ NEW_TUTO( Track_creation, "Learn how you can compute tracks from a list of pictu
     int nbFrame=0;
     cout<<"Compute points and description for each frame..."<<endl;
     cout<<"This can take time so be patient ;)"<<endl;
-    while ( !currentImage.empty( ) )
+    while ( !currentImage.empty( ) && nbFrame<10)
     {
       //if the image is loaded, find the points:
       cout<<"Create a new PointsToTrack..."<<endl;
@@ -141,7 +140,8 @@ NEW_TUTO( Track_creation, "Learn how you can compute tracks from a list of pictu
   fsOutMotion1.release( );
 
   cout<<"We will now remove bad points matches..."<<endl;
-  motion_estim.keepOnlyCorrectMatches( );
+  int min_point_sequence = MAX( images.size()/30, 3 );
+  motion_estim.keepOnlyCorrectMatches( min_point_sequence, 0 );
 
   tracks=motion_estim.getTracks( );
   cout<<"numbers of correct tracks:"<<tracks.size( )<<endl;

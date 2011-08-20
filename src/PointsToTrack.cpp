@@ -30,7 +30,7 @@ namespace OpencvSfM{
   {
     P_MUTEX(worker_exclusion);
     if(nb_workers_<=1)
-    {
+    {//if equal to 0, descriptors_ is already empty...
       nb_workers_ = 0;
       descriptors_.release( );
     }
@@ -149,6 +149,12 @@ namespace OpencvSfM{
       CV_Error( CV_StsError, "PointsToTrack FileNode is not correct!" );
     node_descriptors >> points.descriptors_;
 
+    CV_Assert( points.descriptors_.rows == points.keypoints_.size() );
+
+    //as the loaded PointsToTrack can't recompute the descriptors_, set the nbworkers
+    //to a high value (this will disable free_descriptors to release descriptor ;)
+    points.nb_workers_ = 1e5;
+
     cv::FileNode node_colors = node[ "colors" ];
     if( !node_colors.empty( ) )
     {
@@ -164,15 +170,19 @@ namespace OpencvSfM{
   };
   void PointsToTrack::write( cv::FileStorage& fs, const PointsToTrack& keypoints )
   {
-    fs << "{" << "PointsToTrack" << "{";
-    cv::write( fs, "keypoints", keypoints.keypoints_ );
+    PointsToTrack ppt = keypoints;
+    //as we want to save them, compute keypoints and descriptor:
+    ppt.computeKeypointsAndDesc();
 
-    fs << "descriptors" << keypoints.descriptors_;
+    fs << "{" << "PointsToTrack" << "{";
+    cv::write( fs, "keypoints", ppt.keypoints_ );
+
+    fs << "descriptors" << ppt.descriptors_;
     fs << "colors" <<"[:";
-    unsigned int size_max = keypoints.RGB_values_.size( );
+    unsigned int size_max = ppt.RGB_values_.size( );
     for(unsigned int i=0; i<size_max; ++i )
     {
-      fs << (int)(keypoints.RGB_values_[i] & 0x00FFFFFF);
+      fs << (int)(ppt.RGB_values_[i] & 0x00FFFFFF);
     }
     fs << "]" << "}" << "}";
   }
