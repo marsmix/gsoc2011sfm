@@ -62,7 +62,7 @@ NEW_TUTO( Model_House_test, "Using Model house data, run a SFM algorithm",
     inCams >> P[ 4 ] >> P[ 5 ] >> P[ 6 ] >> P[ 7 ];
     inCams >> P[ 8 ] >> P[ 9 ] >> P[10 ] >> P[11 ];
     //create the PointOfView:
-    cameras.push_back( PointOfView( Mat( 3,4,CV_64F,P ) ) );
+    cameras.push_back( PointOfView( Mat( 3, 4, CV_64F, P ) ) );
 
     idFile++;
     stringstream nameFile;

@@ -82,6 +82,8 @@ NEW_TUTO( Points_Definitions, "How features can be defined",
       ptt2->getKeypoints( ), matchesVector, outImg );
     imshow( "PointsMatcher key points",outImg );
     cv::waitKey( 0 );
+    destroyWindow( "PointsMatcher key points" );
+    
 
     //////////////////////////////////////////////////////////////////////////
     //For now we use fundamental function from OpenCV but soon use libmv !
@@ -124,6 +126,7 @@ NEW_TUTO( Points_Definitions, "How features can be defined",
       ptt2->getKeypoints( ), matchesVector, outImg1 );
     imshow( "PointsMatcher key points1",outImg1 );
     cv::waitKey( 0 );
+    destroyWindow( "PointsMatcher key points1" );
   }
 }
 
