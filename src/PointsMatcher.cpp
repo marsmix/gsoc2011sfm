@@ -143,7 +143,7 @@ namespace OpencvSfM{
 
     CV_DbgAssert( !keyPoints.empty( ) );
     CV_DbgAssert( !descMat.empty( ) );
-    
+
     P_MUTEX( thread_concurr );
     matcher_->radiusMatch( descMat, matches, maxDistance, masks, compactResult );
     V_MUTEX( thread_concurr );
@@ -166,7 +166,7 @@ namespace OpencvSfM{
 
     return outPointMatcher;
   }
-  
+
   void PointsMatcher::crossMatch( Ptr<PointsMatcher> otherMatcher,
     vector<DMatch>& matches,
     const std::vector<cv::Mat>& masks )
@@ -298,9 +298,7 @@ namespace OpencvSfM{
 
     for ( vector<PointsToTrack>::size_type i=0; i < key_size; i++ )
     {
-      fs  << "{";
       PointsToTrack::write( fs, *points.pointCollection_[ i ] );
-      fs  << "}";
     }
     fs << "]";
   }

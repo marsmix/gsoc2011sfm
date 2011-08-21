@@ -65,7 +65,7 @@ NEW_TUTO( Proj_Rec, "Euclidean reconstruction",
 
     FileStorage fsRead( pathFileTracks, FileStorage::READ );
     FileNode myPtt = fsRead.getFirstTopLevelNode( );
-    SequenceAnalyzer motion_estim_loaded( myPtt, images );
+    SequenceAnalyzer motion_estim_loaded( myPtt, &images );
     fsRead.release( );
 
     cout<<"A little help ;) Keep only good matches using triangulation."<<endl;
@@ -93,7 +93,7 @@ NEW_TUTO( Proj_Rec, "Euclidean reconstruction",
 
   FileStorage fsRead( pathFileTracks, FileStorage::READ );
   FileNode myPtt = fsRead.getFirstTopLevelNode( );
-  SequenceAnalyzer motion_estim_loaded( myPtt, images );
+  SequenceAnalyzer motion_estim_loaded( myPtt, &images );
   fsRead.release( );
 
   SequenceAnalyzer::keepOnlyCorrectMatches(motion_estim_loaded,2,0);

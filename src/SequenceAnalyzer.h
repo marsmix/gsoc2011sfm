@@ -85,14 +85,14 @@ namespace OpencvSfM{
     SequenceAnalyzer(
       std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
       cv::Ptr<PointsMatcher> match_algorithm,
-      const std::vector<cv::Mat> &images );
+      std::vector<cv::Mat> *images = NULL );
     /**
     * Constructor taking a list of images and a FileNode
     * @param images input images. Points should be in the same order!
     * @param file YAML file to get points and matches
     */
     SequenceAnalyzer( cv::FileNode file,
-      std::vector<cv::Mat> &images = std::vector<cv::Mat>() );
+      std::vector<cv::Mat> *images = NULL );
 
     /**
     * Destructor of SequenceAnalyzer (nothing is released!)
@@ -173,7 +173,7 @@ namespace OpencvSfM{
     * @param points output
     */
     static void read( const cv::FileNode& node, SequenceAnalyzer& points );
-    
+
     /**
     * Save the sequence into a YAML file.
     * @param fs Previously opened YAML file node
@@ -214,7 +214,7 @@ namespace OpencvSfM{
     * @param img1 index of source matches image
     * @param img2 index of destination matches image
     */
-    inline void addMatches( std::vector<cv::DMatch> &newMatches,
+    void addMatches( std::vector<cv::DMatch> &newMatches,
       unsigned int img1, unsigned int img2 );
     /**
     * This function add new Tracks
