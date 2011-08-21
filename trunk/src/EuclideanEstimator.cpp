@@ -30,17 +30,11 @@ namespace OpencvSfM{
   double SampsonDistance2( const libmv::Mat &F,
     const libmv::Mat2X &x1, const libmv::Mat2X &x2 ) {
     double error_total= 0.0;
-    libmv::Vec2 x1_i,x2_i;
-    unsigned int n_points = x1.rows( );
+    unsigned int n_points = x1.cols( );
     for( unsigned int i = 0; i < n_points ; ++i )
-    {
-      x1_i = x1.col( i );
-      x2_i = x2.col( i );
+      error_total += libmv::SymmetricEpipolarDistance( F, x1.col( i ), x2.col( i ) );
 
-      error_total += libmv::SampsonDistance( F, x1_i, x2_i );
-    }
-
-    return error_total;
+    return error_total;//not needed: don't change during evaluation... /(double)n_points;
   }
 
   /**Idea from Snavely : Modeling the World from Internet Photo Collections
@@ -58,7 +52,7 @@ namespace OpencvSfM{
     vector<int> masks( nPoints );
     double max_error = 1e9;
 
-    int num_iter=0, max_iter=1500;
+    int num_iter=0, max_iter=MIN(1000,nPoints*20);
     for( num_iter=0; num_iter<max_iter; ++num_iter )
     {
       masks.assign( nPoints, 0 );
@@ -73,8 +67,6 @@ namespace OpencvSfM{
           nb_vals++;
         }
       }
-      //mix the random generator:
-      rng( rng( nPoints ) );
       //create mask:
       libmv::Mat2X x1_tmp,x2_tmp;
       x1_tmp.resize( 2,nb_vals );
@@ -109,7 +101,6 @@ namespace OpencvSfM{
     }
     return max_error;
   }
-
 
   EuclideanEstimator::EuclideanEstimator( SequenceAnalyzer &sequence,
     vector<PointOfView>& cameras )
@@ -705,7 +696,7 @@ namespace OpencvSfM{
 
 
     //std::cout<<"E: "<<E<<std::endl;
-    //std::cout<<"max_error: "<<error<<std::endl;
+    std::cout<<"max_error: "<<error<<std::endl;
 
 
     //From this essential matrix extract relative motion:
@@ -739,6 +730,84 @@ namespace OpencvSfM{
     images_to_compute.push_back( image2 );
     point_computed_ = se.computeStructure( images_to_compute );
     //bundleAdjustement();
+  }
+
+  void EuclideanEstimator::addMoreMatches(int img1, int img2)
+  {
+    Ptr<PointsMatcher> point_matcher = sequence_.getMatchAlgo();
+
+    Ptr<PointsToTrack> pointCollection = Ptr<PointsToTrack>(
+      new PointsToTrackWithImage( img1, sequence_.getImage(img1), "FAST", "ORB" ));
+    Ptr<PointsToTrack> pointCollection1 = Ptr<PointsToTrack>(
+      new PointsToTrackWithImage( img2, sequence_.getImage(img2), "FAST", "ORB" ));
+    pointCollection->computeKeypointsAndDesc( true );
+    point_matcher->add( pointCollection );
+    point_matcher->train();
+
+    pointCollection1->computeKeypointsAndDesc( true );
+    Ptr<PointsMatcher> point_matcher1 = sequence_.getMatchAlgo();
+    point_matcher1->add( pointCollection1 );
+    point_matcher1->train( );
+
+    vector< cv::DMatch > matches_i_j = 
+      SequenceAnalyzer::simple_matching(point_matcher, point_matcher1 );
+    //matches don't use the same indices... set correct one:
+    vector<cv::KeyPoint>& kpImg1 = sequence_.getPointsToTrack()[img1]->getKeypoints();
+    vector<cv::KeyPoint>& kpImg2 = sequence_.getPointsToTrack()[img2]->getKeypoints();
+    int point_added = 0;
+    size_t nbK1 = kpImg1.size(), nbK2 = kpImg2.size(), cpt1;
+    for(size_t cpt=0; cpt<matches_i_j.size(); ++cpt)
+    {
+      const cv::KeyPoint &key1 = point_matcher->getKeypoint(
+        matches_i_j[ cpt ].trainIdx );
+      const cv::KeyPoint &key2 = point_matcher1->getKeypoint(
+        matches_i_j[ cpt ].queryIdx );
+      //now look for a close keypoint:
+      //first in img1:
+      bool found = false;
+      for(cpt1 = 0; cpt1<nbK1 && !found; ++cpt1)
+        found = (abs(kpImg1[cpt1].pt.x - key1.pt.x) +
+        abs(kpImg1[cpt1].pt.y - key1.pt.y) ) < 2;
+      if(found)
+        matches_i_j[ cpt ].trainIdx = --cpt1;
+      else
+      {
+        matches_i_j[ cpt ].trainIdx = nbK1++;
+        kpImg1.push_back( key1 );
+        point_added++;
+      }
+
+      found = false;
+      for(cpt1 = 0; cpt1<nbK2 && !found; ++cpt1)
+        found = (abs(kpImg2[cpt1].pt.x - key2.pt.x) +
+        abs(kpImg2[cpt1].pt.y - key2.pt.y) ) < 2;
+      if(found)
+        matches_i_j[ cpt ].queryIdx = --cpt1;
+      else
+      {
+        matches_i_j[ cpt ].queryIdx = nbK2++;
+        kpImg2.push_back( key2 );
+        point_added++;
+      }
+    }
+    sequence_.addMatches(matches_i_j,img1,img2);
+
+    SequenceAnalyzer::keepOnlyCorrectMatches( sequence_, 2, 0 );
+
+    //Triangulate the points:
+    StructureEstimator se( &sequence_, &this->cameras_ );
+
+    vector<int> images_to_compute;
+    unsigned int key_size = camera_computed_.size( );
+    for (unsigned int i=0; i < key_size; ++i )
+    {
+      if( camera_computed_[ i ] )
+        images_to_compute.push_back( i );
+    }
+
+    point_computed_ = se.computeStructure( images_to_compute, 2 );
+    //se.removeOutliersTracks( 5, &point_computed_ );
+    //SequenceAnalyzer::keepOnlyCorrectMatches(point_computed_,2,0);
   }
 
   void EuclideanEstimator::computeReconstruction( )
@@ -799,14 +868,20 @@ namespace OpencvSfM{
     images_computed.push_back( img2 );
     camera_computed_[ img1 ] = true;
     initialReconstruction( img1, img2 );
-    //bundleAdjustement();
+
+    //try to find more matches:
+    cout<<"before"<<point_computed_.size()<<endl;
+    addMoreMatches( img1, img2 );
+    cout<<"before"<<point_computed_.size()<<endl;
+
+    bundleAdjustement();
 
     //now we have updated the position of the camera which take img2
     //and 3D estimation from these 2 first cameras...
     //Find for other cameras position:
     vector<ImageLink> images_close;
-    int nbIter = 0 ;
-    //while( nbMatches>10 && images_computed.size()<cameras_.size()/2 && nbIter<4 )
+    int nbIter = 0;
+    /*while( nbMatches>10 && images_computed.size()<cameras_.size()/2 && nbIter<4 )
     {
       nbIter++;
       images_close.clear( );
@@ -840,28 +915,16 @@ namespace OpencvSfM{
         if( new_id_image >= 0 )
         {
           if( cameraResection( new_id_image ) )
+          {
             images_computed.push_back( new_id_image );
+            addMoreMatches( old_id_image, new_id_image );
+          }
         }
       }
-
-      //Triangulate the points:
-      StructureEstimator se( &sequence_, &this->cameras_ );
-
-      vector<int> images_to_compute;
-      unsigned int key_size = camera_computed_.size( );
-      for (unsigned int i=0; i < key_size; ++i )
-      {
-        if( camera_computed_[ i ] )
-          images_to_compute.push_back( i );
-      }
-
-      point_computed_ = se.computeStructure( images_to_compute, 2 );
-      se.removeOutliersTracks( 5, &point_computed_ );
-      SequenceAnalyzer::keepOnlyCorrectMatches(sequence_,2,0);
       // Performs a bundle adjustment
       //bundleAdjustement();
     }//*/
-    bundleAdjustement();
+    //bundleAdjustement();
     viewEstimation();
   }
 

@@ -22,20 +22,32 @@ using namespace OpencvSfM::tutorials;
 using namespace std;
 
 NEW_TUTO( Proj_Rec, "Euclidean reconstruction",
-  "Using points and intra parameters, try to compute motion and object" ){
+  "Using points and intra parameters, try to compute motion and object" )
+{
 
   //universal method to get the current image:
   vector<Mat> images;
+  cout<<"Which cameras would you load?\n"
+    "(0) Full temple dataset (>300 images)\n"
+    "(1) Sparse temple dataset (16images)\n";
+  int rep;
+  cin>>rep;
+  string inputDirectory,cameraFilename;
+  if( rep==0 ){
+    inputDirectory = FROM_SRC_ROOT( "Medias/temple/" );
+    cameraFilename = inputDirectory + "temple_par.txt";
+  }else{
+    inputDirectory = FROM_SRC_ROOT( "Medias/templeSparseRing/" );
+    cameraFilename = inputDirectory + "templeSR_par.txt";
+  }
 
   MotionProcessor mp;
-  mp.setInputSource( FROM_SRC_ROOT( "Medias/temple/" ),IS_DIRECTORY );
+  mp.setInputSource( inputDirectory,IS_DIRECTORY );
 
   vector<PointOfView> myCameras =
-    loadCamerasFromFile( FROM_SRC_ROOT( "Medias/temple/temple_par.txt" ),
-    LOAD_INTRA );//LOAD_INTRA );
+    loadCamerasFromFile( cameraFilename, LOAD_INTRA );//LOAD_INTRA );
   vector<PointOfView> myCamerasReal =
-    loadCamerasFromFile( FROM_SRC_ROOT( "Medias/temple/temple_par.txt" ),
-    LOAD_FULL );
+    loadCamerasFromFile( cameraFilename, LOAD_FULL );
   vector<PointOfView>::iterator itPoV=myCameras.begin( );
   int index_image=-1;
   while ( itPoV!=myCameras.end( ) )
@@ -65,7 +77,9 @@ NEW_TUTO( Proj_Rec, "Euclidean reconstruction",
 
     FileStorage fsRead( pathFileTracks, FileStorage::READ );
     FileNode myPtt = fsRead.getFirstTopLevelNode( );
-    SequenceAnalyzer motion_estim_loaded( myPtt, &images );
+    SequenceAnalyzer motion_estim_loaded( myPtt, &images,
+      new PointsMatcher( DescriptorMatcher::create( "BruteForce-HammingLUT" ) ) );
+
     fsRead.release( );
 
     cout<<"A little help ;) Keep only good matches using triangulation."<<endl;
@@ -93,7 +107,8 @@ NEW_TUTO( Proj_Rec, "Euclidean reconstruction",
 
   FileStorage fsRead( pathFileTracks, FileStorage::READ );
   FileNode myPtt = fsRead.getFirstTopLevelNode( );
-  SequenceAnalyzer motion_estim_loaded( myPtt, &images );
+  SequenceAnalyzer motion_estim_loaded( myPtt, &images,
+    new PointsMatcher( DescriptorMatcher::create( "BruteForce-HammingLUT" ) ) );
   fsRead.release( );
 
   SequenceAnalyzer::keepOnlyCorrectMatches(motion_estim_loaded,2,0);

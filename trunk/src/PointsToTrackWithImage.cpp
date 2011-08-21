@@ -18,9 +18,10 @@ namespace OpencvSfM
   using cv::circle;
 
   PointsToTrackWithImage::PointsToTrackWithImage( int corresponding_image,
-    cv::Mat imageToAnalyse, cv::Mat maskOfAnalyse,
+    cv::Mat imageToAnalyse,
     cv::Ptr<cv::FeatureDetector> feature_detector,
-    cv::Ptr<cv::DescriptorExtractor> descriptor_detector )
+    cv::Ptr<cv::DescriptorExtractor> descriptor_detector,
+    cv::Mat maskOfAnalyse )
     :PointsToTrack( corresponding_image ),imageToAnalyse_( imageToAnalyse ),
     maskOfAnalyse_( maskOfAnalyse ),feature_detector_( feature_detector ),
     descriptor_detector_( descriptor_detector )
@@ -28,8 +29,8 @@ namespace OpencvSfM
   }
 
   PointsToTrackWithImage::PointsToTrackWithImage( int corresponding_image,
-    cv::Mat imageToAnalyse, cv::Mat maskOfAnalyse,std::string feature_detector,
-    std::string descriptor_detector/*=""SIFT""*/ )
+    cv::Mat imageToAnalyse,std::string feature_detector,
+    std::string descriptor_detector/*=""SIFT""*/, cv::Mat maskOfAnalyse )
     :PointsToTrack( corresponding_image ),imageToAnalyse_( imageToAnalyse ),
     maskOfAnalyse_( maskOfAnalyse ),
     feature_detector_( FeatureDetector::create( feature_detector )),

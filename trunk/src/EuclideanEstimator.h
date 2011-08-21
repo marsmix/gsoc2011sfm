@@ -79,6 +79,13 @@ namespace OpencvSfM{
     * @param image index of the wanted camera
     */
     bool cameraResection( unsigned int image );
+
+    /**
+    * Find matches between img1 and img2 and add the to the reconstruction...
+    * @param img1 index of the first image
+    * @param img2 index of the second image
+    */
+    void addMoreMatches(int img1, int img2);
   };
 
 }

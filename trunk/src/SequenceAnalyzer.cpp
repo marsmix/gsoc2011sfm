@@ -56,22 +56,22 @@ namespace OpencvSfM{
   SequenceAnalyzer::SequenceAnalyzer(
     std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
     cv::Ptr<PointsMatcher> match_algorithm,
-    std::vector< cv::Mat > *images )
-    :points_to_track_( points_to_track ),
+    const std::vector< cv::Mat > &images )
+    :images_( images ),points_to_track_( points_to_track ),
     match_algorithm_( match_algorithm )
   {
-    if( images != NULL)
-      images_ = (*images);
   }
 
   using cv::DescriptorMatcher;
   using cv::FlannBasedMatcher;
   //by default, use flann based matcher
-  SequenceAnalyzer::SequenceAnalyzer( cv::FileNode file, std::vector<cv::Mat> *images )
-    :match_algorithm_( new PointsMatcher( Ptr<DescriptorMatcher>( new FlannBasedMatcher( ) )) )
+  SequenceAnalyzer::SequenceAnalyzer( cv::FileNode file,cv::Ptr<PointsMatcher> match_algorithm, std::vector<cv::Mat> &images )
+    :images_( images )
   {
-    if( images != NULL)
-      images_ = (*images);
+    if( match_algorithm.empty() )
+      match_algorithm_ = new PointsMatcher( Ptr<DescriptorMatcher>( new FlannBasedMatcher( ) ) );
+    else
+      match_algorithm_ = match_algorithm;
     read( file,*this );
   }
 
@@ -97,7 +97,7 @@ namespace OpencvSfM{
 
     images_.push_back( image );
   }
-
+  
   void SequenceAnalyzer::computeMatches( )
   {
     //First compute missing features descriptors:

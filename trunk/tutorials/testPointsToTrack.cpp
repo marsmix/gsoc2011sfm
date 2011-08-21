@@ -52,9 +52,9 @@ NEW_TUTO( Points_Definitions, "How features can be defined",
 
     cout<<"now create the two set of points with features..."<<endl;
     Ptr<PointsToTrack> ptt1;
-    ptt1=Ptr<PointsToTrack>( new PointsToTrackWithImage ( 0, firstImage,Mat( ),fastDetect,SurfDetect ));
+    ptt1=Ptr<PointsToTrack>( new PointsToTrackWithImage ( 0, firstImage,fastDetect,SurfDetect ));
     Ptr<PointsToTrack> ptt2;
-    ptt2=Ptr<PointsToTrack>( new PointsToTrackWithImage ( 1, secondImage,Mat( ),fastDetect,SurfDetect ));
+    ptt2=Ptr<PointsToTrack>( new PointsToTrackWithImage ( 1, secondImage,fastDetect,SurfDetect ));
 
     cout<<"now try to find matches, so we create a matcher ( classic bruteForce )"<<endl<<endl;
     Ptr<DescriptorMatcher> matcher;

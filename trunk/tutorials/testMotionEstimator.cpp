@@ -13,9 +13,11 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "test_data_sets.h"
+//FeatureDetector::create( "FAST" )
 #define POINT_METHOD "SIFT"
-#define DESCRIPTOR_METHOD "SIFT"
-#define MATCHER_METHOD "FlannBased"
+#define POINT_DETECTOR new DynamicAdaptedFeatureDetector (new FastAdjuster(), 1250, 2000 )
+#define DESCRIPTOR_METHOD "ORB"
+#define MATCHER_METHOD "BruteForce-HammingLUT"
 
 using namespace cv;
 using namespace OpencvSfM;
@@ -25,12 +27,22 @@ using namespace std;
 NEW_TUTO( Track_creation, "Learn how you can compute tracks from a list of pictures",
   "Using features detector and matcher, create a vector of tracks ( a track is a list of 2D points from the same 3D point ).\nYou will also learn how you can save an object using YAML!" )
 {
+  cout<<"Which dataset would you load?\n"
+    "(0) Full temple dataset (>300 images)\n"
+    "(1) Sparse temple dataset (16images)\n";
+  int rep;
+  cin>>rep;
+  string inputDirectory;
+  if( rep==0 )
+    inputDirectory = FROM_SRC_ROOT( "Medias/temple/" );
+  else
+    inputDirectory = FROM_SRC_ROOT( "Medias/templeSparseRing/" );
   MotionProcessor mp;
   //first load images:
   //Here we will a folder with a lot of images, but we can do the same thing with any other type of input
-  if( !mp.setInputSource( FROM_SRC_ROOT( "Medias/temple/" ),IS_DIRECTORY ) )
+  if( !mp.setInputSource( inputDirectory,IS_DIRECTORY ) )
   {
-    cout<<"Can't find \"Medias/temple/\" dataset"<<endl;
+    cout<<"Can't find dataset"<<endl;
     return;
   }
 
@@ -38,8 +50,7 @@ NEW_TUTO( Track_creation, "Learn how you can compute tracks from a list of pictu
   //mp.setProperty( CV_CAP_PROP_CONVERT_RGB,0 );//Only greyscale, due to SIFT
   mp.setProperty( CV_CAP_PROP_CONVERT_RGB,0 );//convert to grayscal
 
-  Ptr<FeatureDetector> detector;
-  detector = FeatureDetector::create( POINT_METHOD );
+  Ptr<FeatureDetector> detector = POINT_DETECTOR;
   Ptr<DescriptorExtractor> desc_extractor;
   desc_extractor = DescriptorExtractor::create( DESCRIPTOR_METHOD );
   vector< Ptr< PointsToTrack > > vec_points_to_track;
@@ -88,7 +99,7 @@ NEW_TUTO( Track_creation, "Learn how you can compute tracks from a list of pictu
       cout<<"Create a new PointsToTrack..."<<endl;
 
       ptrPoints_tmp = Ptr<PointsToTrack>( new PointsToTrackWithImage ( nbFrame,
-        currentImage, Mat( ), detector, desc_extractor ));
+        currentImage, detector, desc_extractor ));
       ptrPoints_tmp->computeKeypointsAndDesc( );
 
       vec_points_to_track.push_back( ptrPoints_tmp );
@@ -115,7 +126,7 @@ NEW_TUTO( Track_creation, "Learn how you can compute tracks from a list of pictu
   }
   cout<<"Create the sequence analyzer:"<<endl;
 
-  SequenceAnalyzer motion_estim( vec_points_to_track, matches_algo, &images );
+  SequenceAnalyzer motion_estim( vec_points_to_track, &images, matches_algo );
 
   pathFileTracks = FROM_SRC_ROOT( "Medias/tracks_points_"POINT_METHOD"/motion_tracks1.yml" );
   cout<<"Compute matches between each frames..."<<endl<<endl;
@@ -140,7 +151,7 @@ NEW_TUTO( Track_creation, "Learn how you can compute tracks from a list of pictu
   fsOutMotion1.release( );
 
   cout<<"We will now remove bad points matches..."<<endl;
-  int min_point_sequence = MAX( images.size()/30, 3 );
+  int min_point_sequence = MAX( images.size()/30, 2 );
   SequenceAnalyzer::keepOnlyCorrectMatches(motion_estim, min_point_sequence, 0 );
 
   tracks=motion_estim.getTracks( );

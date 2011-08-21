@@ -53,7 +53,7 @@ NEW_TUTO( YAML_Tuto, "Learn how you can load/save object using YAML file format"
     cout<<"now create the two set of points with features..."<<endl;
     Ptr<PointsToTrack> ptt1;
     ptt1=Ptr<PointsToTrack>( new PointsToTrackWithImage ( 0,
-      firstImage,Mat( ),fastDetect,SurfDetect ));
+      firstImage,fastDetect,SurfDetect ));
     ptt1->computeKeypointsAndDesc( true );
 
     Ptr<DescriptorMatcher> matcher;

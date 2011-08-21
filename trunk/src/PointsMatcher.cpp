@@ -51,7 +51,8 @@ namespace OpencvSfM{
   {
     P_MUTEX( thread_concurr );
     matcher_->clear( );
-    pointCollection_.clear( );
+    for(size_t i = 0; i<pointCollection_.size(); ++i)
+      pointCollection_[i]->free_descriptors();
     V_MUTEX( thread_concurr );
   }
 
