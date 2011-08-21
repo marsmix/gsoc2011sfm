@@ -10,7 +10,6 @@
 
 #include "PointOfView.h"
 
-#include "Camera.h"
 #include "TracksOfPoints.h"
 #include "PCL_mapping.h"
 #include "CameraPinholeDistor.h"
@@ -32,7 +31,9 @@ using libmv::Vec;
 
 namespace OpencvSfM{
 
-  PointOfView::PointOfView( cv::Ptr<Camera> device, Mat rotation /*=Mat::eye( 3, 3, CV_64F )*/, Vec3d translation /*=Vec( 0.0,0.0,0.0 )*/ )
+  PointOfView::PointOfView( cv::Ptr<Camera> device, 
+    cv::Mat rotation /*=Mat::eye( 3, 3, CV_64F )*/, 
+    cv::Vec3d translation /*=Vec( 0.0,0.0,0.0 )*/ )
     : projection_matrix_( 3, 4, CV_64F )
   {
     CV_DbgAssert( rotation.rows==3 && rotation.cols==3 );
@@ -113,7 +114,7 @@ namespace OpencvSfM{
     }
   }
 
-  Vec2d PointOfView::project3DPointIntoImage( Vec3d point ) const
+  cv::Vec2d PointOfView::project3DPointIntoImage( cv::Vec3d point ) const
   {
     //As we don't know what type of camera we use ( with/without disportion, fisheyes... )
     //we can't use classic projection matrix P = K . [ R|t ]
@@ -141,7 +142,8 @@ namespace OpencvSfM{
     Vec2d pointOut = pointsOut[ 0 ];
     return pointsOut[ 0 ];
   }
-  vector<Vec2d> PointOfView::project3DPointsIntoImage( vector<Vec3d> points ) const
+  std::vector< cv::Vec2d > PointOfView::project3DPointsIntoImage( 
+    std::vector< cv::Vec3d > points ) const
   {
     //As we don't know what type of camera we use ( with/without disportion, fisheyes... )
     //we can't use classic projection matrix P = K . [ R|t ]
@@ -173,7 +175,8 @@ namespace OpencvSfM{
     //transform points into pixel coordinates using camera intra parameters:
     return device_->normImageToPixelCoordinates( pointsOut );
   }
-  vector<Vec2d> PointOfView::project3DPointsIntoImage( vector<TrackOfPoints> points ) const
+  std::vector< cv::Vec2d > PointOfView::project3DPointsIntoImage(
+    std::vector<TrackOfPoints> points ) const
   {
     //As we don't know what type of camera we use ( with/without disportion, fisheyes... )
     //we can't use classic projection matrix P = K . [ R|t ]
@@ -213,7 +216,8 @@ namespace OpencvSfM{
   bool PointOfView::pointInFrontOfCamera( cv::Vec4d point ) const
   {
     Mat pointTranspose= ( Mat ) point;
-    double condition_1 = this->projection_matrix_.row( 2 ).dot( pointTranspose.t( ) ) * point[ 3 ];
+    double condition_1 = 
+      this->projection_matrix_.row( 2 ).dot( pointTranspose.t( ) ) * point[ 3 ];
     double condition_2 = point[ 2 ] * point[ 3 ];
     if( condition_1 > 0 && condition_2 > 0 )
       return true;

@@ -15,7 +15,7 @@ namespace OpencvSfM{
   using cv::Size;
   using cv::Rect;
 
-  PointsMatcher::PointsMatcher( const Ptr<cv::DescriptorMatcher>& matcher )
+  PointsMatcher::PointsMatcher( const cv::Ptr<cv::DescriptorMatcher>& matcher )
   {
     CV_DbgAssert( !matcher.empty( ) );
     matcher_ = matcher;

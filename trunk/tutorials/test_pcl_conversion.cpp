@@ -33,7 +33,7 @@ NEW_TUTO( PCL_tuto, "Learn how you can map values between PCL and OpenCV ",
 
   //both point share the same memory space:
   testPCL.x = 12.0;//change PCL point ( and OpenCV too )
-  testCV[ 1 ] = testCV[ 0 ] / 2.0;//Change OpenCV point ( Result: 6.0 )
+  testCV[ 1 ] = (float)(testCV[ 0 ] / 2.0);//Change OpenCV point ( Result: 6.0 )
   testPCL.y = 30;//change PCL point and Opencv too ( 30 )
 
   cout<<"As you will see, these points share the same memory space:"<<endl;
@@ -75,6 +75,7 @@ NEW_TUTO( PCL_tuto, "Learn how you can map values between PCL and OpenCV ",
   }catch( cv::Exception& e )
   {
     cout<<"Conversion error..."<<endl;
+    cout<<e.file<<" "<<e.func<<" "<<e.line<<endl;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -120,6 +121,6 @@ NEW_TUTO( PCL_tuto, "Learn how you can map values between PCL and OpenCV ",
   mapping::convert_PCL_vector( my_vector_converted, my_list_of_points );
   cout<<"The opencv matrix equal to:"<<endl<<my_list_of_points<<endl;
   //change one PCL point:
-  my_vector_converted[ 1 ].y = 250.54;
+  my_vector_converted[ 1 ].y = (float)250.54;
   cout<<"The opencv matrix is now equal to:"<<endl<<my_list_of_points<<endl;
 }

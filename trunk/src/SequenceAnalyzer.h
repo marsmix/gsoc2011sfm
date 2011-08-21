@@ -25,8 +25,8 @@ namespace OpencvSfM{
   class SFM_EXPORTS SequenceAnalyzer
   {
   protected:
-    static int mininum_points_matches;
-    static int mininum_image_matches;
+    static int mininum_points_matches;///<Minimum points detected into an image to keep this estimation (set to 20)
+    static int mininum_image_matches;///<Minimum images connections in a track to keep this estimation (usually set to 2)
     /**
     * optional, method to use for feature detection
     */
@@ -68,7 +68,7 @@ namespace OpencvSfM{
     * and descriptor to find matches.
     * @param input_sequence input images
     * @param feature_detector Algorithm to use for features detection ( see http://opencv.willowgarage.com/documentation/cpp/common_interfaces_for_feature_detection_and_descriptor_extraction.html#featuredetector )
-    * @param descriptor_detector Algorithm to use for descriptors detection ( see http://opencv.willowgarage.com/documentation/cpp/common_interfaces_for_feature_detection_and_descriptor_extraction.html#descriptorextractor )
+    * @param descriptor_extractor Algorithm to use for descriptors detection ( see http://opencv.willowgarage.com/documentation/cpp/common_interfaces_for_feature_detection_and_descriptor_extraction.html#descriptorextractor )
     * @param match_algorithm algorithm to match points of each images
     */
     SequenceAnalyzer( MotionProcessor input_sequence,
@@ -94,10 +94,14 @@ namespace OpencvSfM{
     SequenceAnalyzer( cv::FileNode file,
       std::vector<cv::Mat> &images = std::vector<cv::Mat>() );
 
+    /**
+    * Destructor of SequenceAnalyzer (nothing is released!)
+    */
     ~SequenceAnalyzer( void );
     /**
-    * This method add new image to track. When adding, the matches are not
-    * computed, use computeMatches to compute them!
+    * This method add new image to track. When adding, if the matches are not
+    * computed, use automatically computeMatches to compute them!
+    * @param image New image
     * @param points extracted points with features vectors.
     */
     void addNewImage( cv::Mat image,
@@ -137,6 +141,10 @@ namespace OpencvSfM{
     inline std::vector< cv::Ptr< PointsToTrack > > &getPoints( ){
       return points_to_track_;};
 
+    /**
+    * Get the graph of image connections
+    * @return graph of image connections
+    */
     inline ImagesGraphConnection& getImgGraph( )
     {
       if( !images_graph_.isGraphCreated( images_.size( ) ) )
@@ -150,18 +158,33 @@ namespace OpencvSfM{
     void showTracks( int timeBetweenImg=25 );
     /**
     * Use this function to print the sequence of matches
+    * @param img_to_show index of image whose tracks will be shown.
     * @param timeBetweenImg see cv::waitKey for the value
     */
-    void showTracks( int img_to_show,  const std::vector< TrackOfPoints >& points );
+    void showTracks( int img_to_show, int timeBetweenImg );
     /**
     * Use this function to print the matches between two images
     */
     void showTracksBetween( unsigned int img1, unsigned int img2 );
 
+    /**
+    * Load the sequence from a YAML file.
+    * @param node Previously opened YAML file node
+    * @param points output
+    */
     static void read( const cv::FileNode& node, SequenceAnalyzer& points );
-
+    
+    /**
+    * Save the sequence into a YAML file.
+    * @param fs Previously opened YAML file node
+    * @param points sequence to save...
+    */
     static void write( cv::FileStorage& fs, const SequenceAnalyzer& points );
 
+    /**
+    * Use this function to know how many images are stored into tracks...
+    * @return numbers of images (and cameras) stored into tracks.
+    */
     inline int getNumViews( ) const
     {
       unsigned int maxImg=0;
@@ -178,6 +201,11 @@ namespace OpencvSfM{
       return maxImg;
     }
 
+    /**
+    * get the ith image. No checks are performed!
+    * @param idx index of the wanted image
+    * @return Matrix of the wanted image
+    */
     inline cv::Mat getImage( int idx ) { return images_[ idx ]; };
 
     /**
@@ -215,6 +243,10 @@ namespace OpencvSfM{
     void showPointsOnImage(unsigned int i,
       const std::vector<cv::Vec2d>& pixelProjection);
 
+    /**
+    * Get the points for track from this sequence.
+    * @return points for track from this sequence.
+    */
     inline std::vector< cv::Ptr< PointsToTrack > > getPointsToTrack()
     { return points_to_track_; };
   };

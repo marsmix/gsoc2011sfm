@@ -87,9 +87,17 @@ namespace OpencvSfM{
     * @return focal lenght
     */
     virtual double getFocal( ) const;
-
+    
+    /**
+    * Create a new camera from a YAML file.
+    * @param node Previously opened YAML file node
+    */
     static cv::Ptr<Camera> read( const cv::FileNode& node );
-
+    
+    /**
+    * Save the camera intra parameters into a YAML file.
+    * @param fs Previously opened YAML file node
+    */
     virtual void write( cv::FileStorage& fs ) const;
 
   };

@@ -88,7 +88,7 @@ namespace OpencvSfM{
     * You can attach this motion handler to a video file or a single picture.
     * use this method to set it as the input source!
     * @param nameOfFile name of the media file ( picture or avi movie )
-    * @param type of input ( can be either IS_DIRECTORY, IS_VIDEO or IS_SINGLE_FILE )
+    * @param inputType type of input ( can be either IS_DIRECTORY, IS_VIDEO or IS_SINGLE_FILE )
     * @return true if input source opened without problems
     */
     bool setInputSource( std::string nameOfFile,TypeOfMotionProcessor inputType=IS_SINGLE_FILE );

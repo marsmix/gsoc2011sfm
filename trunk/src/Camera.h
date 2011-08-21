@@ -22,7 +22,7 @@ namespace OpencvSfM{
   * s  \begin{bmatrix} u \\ v \\ 1 \end{bmatrix} =  \begin{bmatrix}f_x & 0 & c_x \\ 0 & f_y & c_y \\ 0 & 0 & 1 \end{bmatrix}
   * \begin{bmatrix} r_{11} & r_{12} & r_{13} & t_1  \\ r_{21} & r_{22} & r_{23} & t_2  \\ r_{31} & r_{32} & r_{33} & t_3 \end{bmatrix}
   * \begin{bmatrix} X \\ Y \\ Z \\ 1  \end{bmatrix}
-  * \f ]
+  * \f]
   *
   * This leads to the following relation between local coordinates and global ones:
   * \f[
@@ -30,7 +30,7 @@ namespace OpencvSfM{
   * \begin{bmatrix} x \\ y \\ z \end{bmatrix} = R  \begin{bmatrix} X \\ Y \\ Z \end{bmatrix} + t \\
   * x' = x/z \\ y' = y/z \vspace{10pt} 
   * \end{array}
-  * \f ]
+  * \f]
   * 
   * Additionnal radial and tangeancial distortion are modelized like this:
   * \f[
@@ -38,7 +38,7 @@ namespace OpencvSfM{
   * \vspace{10pt} x'' = x'  \dfrac{1 + k_1 r^2 + k_2 r^4 + k_3 r^6}{1 + k_4 r^2 + k_5 r^4 + k_6 r^6} + 2 p_1 x' y' + p_2( r^2 + 2 x'^2 )  \\
   * \vspace{10pt} y'' = y'  \dfrac{1 + k_1 r^2 + k_2 r^4 + k_3 r^6}{1 + k_4 r^2 + k_5 r^4 + k_6 r^6} + p_1 ( r^2 + 2 y'^2 ) + 2 p_2 x' y'  \\
   * \text{where} \quad r^2 = x'^2 + y'^2  \\ u = f_x*x'' + c_x \\ v = f_y*y'' + c_y \end{array}
-  * \f ]
+  * \f]
   * radial_dist_ can be used to store \f$k_1\f$ to \f$k_6\f$
   * tangential_dist_ can be used to store \f$p_1\f$ and \f$p_2\f$
   *
@@ -51,8 +51,11 @@ namespace OpencvSfM{
   protected:
 
     std::vector<PointOfView*> pointsOfView_;///<vector of the differents positions of the camera.
-  public:
+    /**
+    * As this class is virtual, we can't create a new empty camera...
+    */
     Camera( );
+  public:
     virtual ~Camera( void );
 
     /**
@@ -86,9 +89,17 @@ namespace OpencvSfM{
     * @return focal lenght
     */
     virtual double getFocal( ) const=0;
-
+    
+    /**
+    * Create a new camera from a YAML file.
+    * @param node Previously opened YAML file node
+    */
     static cv::Ptr<Camera> read( const cv::FileNode& node );
-
+    
+    /**
+    * Save the camera intra parameters into a YAML file.
+    * @param fs Previously opened YAML file node
+    */
     virtual void write( cv::FileStorage& fs ) const = 0;
 
   };

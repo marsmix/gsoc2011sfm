@@ -139,9 +139,9 @@ namespace OpencvSfM{
     */
     struct EIGEN_ALIGN16 Point
     {
-      float *data_;//Max size of points in both library
-      unsigned char size_of_data;
-      bool should_remove;
+      float *data_;///<values of datas
+      unsigned char size_of_data;///<Size of data buffer
+      bool should_remove;///<Used to know if data were allocated
 
       /**
       * Copy constructor ( deep copy! )
@@ -189,6 +189,10 @@ namespace OpencvSfM{
         initData( this, sizeOfBuf, data );
       };
 
+      /**
+      * Init data using an opencv vector
+      * @param v input vector
+      */
       template<typename Type, int size>
       Point( cv::Vec<Type,size>& v ){
         if( sizeof( Type ) == sizeof( float ) )
@@ -199,73 +203,145 @@ namespace OpencvSfM{
           should_remove=true;//convert_to_float create a buffer
         }
       };
-
+      
+      /**
+      * Init data using an opencv matrix
+      * @param matX input matrix
+      */
       template<typename Type, int size>
-      Point( cv::Matx<Type,size,1>& v ){
+      Point( cv::Matx<Type,size,1>& matX ){
         if( sizeof( Type::value_type ) == sizeof( float ) )
-          initData( this, Type::rows, ( float* ) v.val );
+          initData( this, Type::rows, ( float* ) matX.val );
         else
         {
-          initData( this, Type::rows, convert_to_float( v ) );
+          initData( this, Type::rows, convert_to_float( matX ) );
           should_remove=true;//convert_to_float create a buffer
         }
       };
-
+      
+      /**
+      * Init data using an opencv KeyPoint
+      * @param kp input KeyPoint
+      */
       Point( cv::KeyPoint& kp ){
         initData( this, 6, reinterpret_cast< float* >( &kp ) );
       };
-
+      
+      /**
+      * Init data using a PCL KeyPoint
+      * @param pXY input KeyPoint
+      */
       Point( pcl::PointXY& pXY ){
         initData( this, 2, reinterpret_cast< float* >( &pXY ) );
       };
+      /**
+      * Init data using a PCL KeyPoint
+      * @param pXYZ input KeyPoint
+      */
       Point( pcl::PointXYZ& pXYZ ){ initData( this, 4, pXYZ.data ); };
+      /**
+      * Init data using a PCL KeyPoint
+      * @param pXYZi input KeyPoint
+      */
       Point( pcl::PointXYZI& pXYZi ){ initData( this, 8, pXYZi.data ); };
+      /**
+      * Init data using a PCL KeyPoint
+      * @param iP input KeyPoint
+      */
       Point( pcl::InterestPoint& iP ){ initData( this, 8, iP.data ); };
+      /**
+      * Init data using a PCL KeyPoint
+      * @param pPWR input KeyPoint
+      */
       Point( pcl::PointWithRange& pPWR ){ initData( this, 8, pPWR.data ); };
+      /**
+      * Init data using a PCL KeyPoint
+      * @param pXYZ1 input KeyPoint
+      */
       Point( pcl::PointXYZRGBA& pXYZ1 ){ initData( this, 8, pXYZ1.data ); };
+      /**
+      * Init data using a PCL KeyPoint
+      * @param pXYZ2 input KeyPoint
+      */
       Point( pcl::PointXYZRGB& pXYZ2 ){ initData( this, 8, pXYZ2.data ); };
 
+      /**
+      * Destructor of PCL point convertor.
+      * Free allocated data if needed.
+      */
       ~Point( ){ if( should_remove ) delete data_; };
 
 
-      //Conversions operators / to reference:
+      /**
+      * Conversions operators to opencv Matx:
+      */
       template<typename Type, int size>
       inline operator cv::Matx<Type,size,1>&( ) {
         CV_DbgAssert( sizeof( Type ) == sizeof( float ) );
         return * convert_without_cast< cv::Matx<Type,size,1> >( this );
       };
+      /**
+      * Conversions operators to opencv Vec:
+      */
       template<typename Type, int size>
       inline operator cv::Vec<Type,size>&( ) {
         CV_DbgAssert( sizeof( Type ) == sizeof( float ) );
         return * convert_without_cast< cv::Vec<Type,size> >( this );
       };
+      /**
+      * Conversions operators to opencv Point3_:
+      */
       template<typename Type>
       inline operator cv::Point3_<Type>&( ) {
         CV_DbgAssert( sizeof( Type ) == sizeof( float ) );
         return * convert_without_cast< cv::Point3_<Type> >( this );
       };
+      /**
+      * Conversions operators to opencv KeyPoint:
+      */
       inline operator cv::KeyPoint&( ) {
       return * convert_without_cast< cv::KeyPoint >( this );};
 
-
+      
+      /**
+      * Conversions operators to PCL KeyPoint:
+      */
       inline operator pcl::PointXY&( ) {
         return * convert_without_cast< pcl::PointXY >( this );
       };
+      /**
+      * Conversions operators to PCL KeyPoint:
+      */
       inline operator pcl::PointXYZ&( ) {
         return * convert_without_cast< pcl::PointXYZ >( this );
       };
+      /**
+      * Conversions operators to PCL KeyPoint:
+      */
       inline operator pcl::PointXYZI&( ) {
         return * convert_without_cast< pcl::PointXYZI >( this );
       };
+      /**
+      * Conversions operators to PCL KeyPoint:
+      */
       inline operator pcl::InterestPoint&( ) {
         return * convert_without_cast< pcl::InterestPoint >( this );
       };
+      /**
+      * Conversions operators to PCL KeyPoint:
+      */
       inline operator pcl::PointWithRange&( ) {
         return * convert_without_cast< pcl::PointWithRange >( this );
       };
+      /**
+      * Conversions operators to PCL KeyPoint:
+      */
       inline operator pcl::PointXYZRGBA&( ) {
         return * convert_without_cast< pcl::PointXYZRGBA >( this );
       };
+      /**
+      * Conversions operators to PCL KeyPoint:
+      */
       inline operator pcl::PointXYZRGB&( ) {
         return * convert_without_cast< pcl::PointXYZRGB >( this );
       };
@@ -273,7 +349,11 @@ namespace OpencvSfM{
 
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
-
+    
+      /**
+      * Conversions of an entire vector into a mapped one
+      * (for exemple from vector<cv::Vec4f> to vector<mapping::Point>)
+      */
     template<typename TypeFrom, typename TypeTo,
       typename allocatorFrom, typename allocatorTo>
     void convertToMappedVector(
@@ -299,7 +379,11 @@ namespace OpencvSfM{
         it++;
       }
     }
-
+    
+      /**
+      * Conversions from an entire mapped vector into a user type
+      * (for exemple from vector<mapping::Point> to vector<cv::Vec4f>)
+      */
     template<typename TypeFrom, typename TypeTo,
       typename allocatorFrom, typename allocatorTo>
     void convertFromMappedVector(
@@ -326,7 +410,10 @@ namespace OpencvSfM{
         it++;
       }
     }
-
+    
+      /**
+      * Conversions from an opencv vector into a PCL vector
+      */
     template<typename TypeFrom, typename TypeTo,
       typename allocatorFrom, typename allocatorTo>
     void convert_OpenCV_vector(
@@ -351,7 +438,10 @@ namespace OpencvSfM{
         it++;
       }
     }
-
+    
+      /**
+      * Conversions from a PCL vector into an opencv vector
+      */
     template<typename TypeFrom, typename TypeTo,
       typename allocatorFrom, typename allocatorTo>
     void convert_PCL_vector(
@@ -439,7 +529,10 @@ namespace OpencvSfM{
         it++;
       }
     }
-
+    
+      /**
+      * Conversions from a PCL vector into an opencv Matrix
+      */
     template<typename TypeFrom, typename allocatorFrom>
     void convert_PCL_vector(
       std::vector<TypeFrom,allocatorFrom>& vectFrom,
@@ -452,7 +545,10 @@ namespace OpencvSfM{
       if( copyValues )
         output = output.clone( );
     }
-
+    
+      /**
+      * Conversions from an opencv vector into a pcl::PointCloud
+      */
     template<typename TypeFrom, typename allocatorFrom,
       typename PCL_point>
     void convert_OpenCV_vector(

@@ -25,10 +25,10 @@ namespace OpencvSfM{
     friend class SequenceAnalyzer;
 
   protected:
-    cv::Ptr<cv::Vec3d> point3D;
-    std::vector<unsigned int> images_indexes_;
-    std::vector<unsigned int> point_indexes_;
-    unsigned int color;
+    cv::Ptr<cv::Vec3d> point3D;///<The corresponding 3D coordinates. If not available, Ptr is empty.
+    std::vector<unsigned int> images_indexes_;///<List of image indexes of unordered points
+    std::vector<unsigned int> point_indexes_;///<List of point indexes of unordered points
+    unsigned int color;///<Color of this point (computed using the mean of every 2D points projections
     /**
     * Sometimes a 2d point is not good...
     * This vector help us to know which points are correct...
@@ -125,23 +125,50 @@ namespace OpencvSfM{
     {
       return images_indexes_[ idx ];
     };
-
+    
+    /**
+    * Using cameras and 2D points, try to find the 3D coordinates
+    * @param cameras cameras used to compute projection of 3D point.
+    * @param points_to_track 2D points used to compute projection
+    * @param points3D 3D coordinates of this tracks
+    * @param masks used to knwo which point this function have to use.
+    */
     double triangulateLinear( std::vector<PointOfView>& cameras,
       const std::vector< cv::Ptr<PointsToTrack> > &points_to_track,
       cv::Vec3d& points3D,
       const std::vector<bool> &masks = std::vector<bool>( ) );
+    /**
+    * Using cameras and 2D points, try to find the best 3D coordinates
+    * which minimize the reprojection error using a RANSAC estimation
+    * @param cameras cameras used to compute projection of 3D point.
+    * @param points_to_track 2D points used to compute projection
+    * @param points3D 3D coordinates of the best estimation
+    * @param reproj_error Threshold used to reject outliners
+    * @param masks used to knwo which point this function have to use.
+    */
     double triangulateRobust( std::vector<PointOfView>& cameras,
       const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
       cv::Vec3d& points3D,
       double reproj_error = 4,
       const std::vector<bool> &masks = std::vector<bool>( ) );
 
+    /**
+    * From the list of points of this track, remove each 2D points when
+    * reprojection error > reproj_error
+    * @param cameras cameras used to compute projection of 3D point.
+    * @param points_to_track 2D points used to compute reprojection error
+    * @param reproj_error Threshold used to reject outliners
+    * @param masks used to knwo which point this function have to test.
+    */
     void removeOutliers( std::vector<PointOfView>& cameras,
       const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
       double reproj_error = 4,
       std::vector<bool> *masks = NULL );
-
-
+    
+    /**
+    * Use this function to change the 3D coordinates corresponding to this track
+    * @param newPoint new 3D coordinates
+    */
     inline void set3DPosition( cv::Vec3d newPoint )
     {
       if( !point3D )
@@ -149,13 +176,35 @@ namespace OpencvSfM{
       else
         *point3D = newPoint;
     }
+    /**
+    * Use this function to get the 3D point corresponding to this track
+    * @return pointer on the 3D coordinates (could be NULL!)
+    */
     inline cv::Ptr<cv::Vec3d> get3DPosition(){ return point3D; };
-
+    
+    /**
+    * Use this function to get the color of this track
+    * @return color of this track (ARGB packed into a int)
+    */
     inline unsigned int getColor() const {return color;};
+    /**
+    * Use this function to change the color of this track
+    * @param c new color (ARGB packed into a int)
+    */
     inline void setColor(unsigned int c) {color = c;};
-
+    
+    /**
+    * Use this function to keep only tracks having image from first parameter
+    * @param idx_image index of needed image
+    * @param tracks vector of matches to clean...
+    */
     static void keepTrackHavingImage( unsigned int idx_image,
       std::vector<TrackOfPoints>& tracks );
+    /**
+    * Use this function to keep only tracks having at least 2 images from first parameter
+    * @param imgList Needed images indexes
+    * @param tracks vector of matches to clean...
+    */
     static void keepTrackWithImages( const
       std::vector<int>& imgList,
       std::vector<TrackOfPoints>& tracks );
@@ -171,6 +220,14 @@ namespace OpencvSfM{
       std::vector<TrackOfPoints>* mixed_tracks);
 
   protected:
+    /**
+    * Comptue an estimation of 2D reprojection error
+    * @param cameras list of cameras
+    * @param points_to_track list of 2D points
+    * @param points3D 3d points to project with cameras
+    * @param masks wanted points
+    * @return estimation of distance detween projections and measures.
+    */
     double errorEstimate( std::vector< PointOfView >& cameras,
       const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
       cv::Vec3d& points3D,
@@ -183,8 +240,8 @@ namespace OpencvSfM{
   */
   typedef struct
   {
-    int imgSrc;
-    int imgDest;
+    int imgSrc;///<index of first image
+    int imgDest;///<index of second image
   } ImageLink;
   /**
   * \brief This class modelizes the images graph connections
@@ -200,6 +257,12 @@ namespace OpencvSfM{
     */
     cv::SparseMat images_graph_;
 
+    /**
+    * Use this function to create an ordered image index:
+    * @param i1 [in] first image index
+    * @param i2 [in] second image index
+    * @param idx [out] index of this image link where idx[0]<idx[1]
+    */
     inline void orderedIdx( int i1,int i2,int idx[ 2 ] )
     {
       if( i1<i2 )
@@ -214,6 +277,9 @@ namespace OpencvSfM{
       }
     }
   public:
+    /**
+    * Create an empty image graph
+    */
     ImagesGraphConnection( ){};
 
     /**

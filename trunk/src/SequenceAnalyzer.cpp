@@ -5,6 +5,7 @@
 #include <sstream>
 
 #include "SequenceAnalyzer.h"
+#include "Boost_Matching.h"
 #include "Camera.h"
 
 #include "config_SFM.h"  //SEMAPHORE
@@ -22,9 +23,9 @@ namespace OpencvSfM{
   int SequenceAnalyzer::mininum_image_matches = 2;
 
   SequenceAnalyzer::SequenceAnalyzer( MotionProcessor input_sequence,
-    cv::Ptr<cv::FeatureDetector> feature_detector,
-    cv::Ptr<cv::DescriptorExtractor> descriptor_extractor,
-    cv::Ptr<PointsMatcher> match_algorithm )
+    cv::Ptr< cv::FeatureDetector > feature_detector,
+    cv::Ptr< cv::DescriptorExtractor > descriptor_extractor,
+    cv::Ptr< PointsMatcher > match_algorithm )
     :match_algorithm_( match_algorithm ),
     feature_detector_( feature_detector ),
     descriptor_extractor_( descriptor_extractor )
@@ -53,9 +54,9 @@ namespace OpencvSfM{
   }
 
   SequenceAnalyzer::SequenceAnalyzer(
-    vector< Ptr< PointsToTrack > > &points_to_track,
-    Ptr<PointsMatcher> match_algorithm,
-    const std::vector<cv::Mat> &images )
+    std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
+    cv::Ptr<PointsMatcher> match_algorithm,
+    const std::vector< cv::Mat > &images )
     :images_( images ),points_to_track_( points_to_track ),
     match_algorithm_( match_algorithm )
   {
@@ -75,7 +76,7 @@ namespace OpencvSfM{
   {
   }
 
-  void SequenceAnalyzer::addNewImage( cv::Mat image, Ptr<PointsToTrack> points )
+  void SequenceAnalyzer::addNewImage( cv::Mat image, cv::Ptr<PointsToTrack> points )
   {
     if( points.empty( ) )
     {
@@ -94,183 +95,6 @@ namespace OpencvSfM{
     images_.push_back( image );
   }
   
-  //Boost thread:
-  struct MatchingThread{
-    unsigned int i;
-    vector< Ptr< PointsToTrack > >::iterator matches_it;
-    Ptr<SequenceAnalyzer> seq_analyser;
-
-    static vector< Ptr< PointsToTrack > >::iterator end_matches_it;
-    static vector<Mat> masks;
-    static unsigned int mininum_points_matches;
-    static PointsMatcher* match_algorithm;
-    //semaphore to synchronize threads:
-    CREATE_STATIC_MUTEX( thread_concurr );
-    CREATE_STATIC_MUTEX( thread_unicity );
-
-    //////////////////////////////////////////////////////////////////////////
-    MatchingThread(Ptr<SequenceAnalyzer> seq_analyser,unsigned int i,
-      vector< Ptr< PointsToTrack > >::iterator matches_it)
-    {
-      this->i = i;
-      this->matches_it = matches_it;
-      this->seq_analyser = seq_analyser;
-      this->seq_analyser.addref();//avoid ptr deletion...
-    }
-
-    void operator()()
-    {
-      Ptr<PointsToTrack> points_to_track_i=( *matches_it );
-
-      points_to_track_i->computeKeypointsAndDesc( false );
-
-      P_MUTEX( thread_unicity );
-      Ptr<PointsMatcher> point_matcher = match_algorithm->clone( true );
-      point_matcher->add( points_to_track_i );
-      V_MUTEX( thread_unicity );
-      point_matcher->train( );
-
-      vector< Ptr< PointsToTrack > >::iterator matches_it1 = matches_it+1;
-      unsigned int j=i+1;
-      while ( matches_it1 != end_matches_it )
-      {
-        Ptr<PointsToTrack> points_to_track_j=( *matches_it1 );
-
-        points_to_track_j->computeKeypointsAndDesc( false );
-
-        P_MUTEX( thread_unicity );
-        Ptr<PointsMatcher> point_matcher1 = match_algorithm->clone( true );
-        point_matcher1->add( points_to_track_j );
-        V_MUTEX( thread_unicity );
-        point_matcher1->train( );
-
-        vector<DMatch> matches_i_j;
-        point_matcher->crossMatch( point_matcher1, matches_i_j, masks );
-
-        //First compute points matches:
-        int size_match=matches_i_j.size( );
-        vector<cv::Point2f> srcP;
-        vector<cv::Point2f> destP;
-        vector<uchar> status;
-
-        //vector<KeyPoint> points1 = point_matcher->;
-        for( int cpt = 0; cpt < size_match; ++cpt ){
-          const KeyPoint &key1 = point_matcher1->getKeypoint(
-            matches_i_j[ cpt ].queryIdx );
-          const KeyPoint &key2 = point_matcher->getKeypoint(
-            matches_i_j[ cpt ].trainIdx );
-          srcP.push_back( cv::Point2f( key1.pt.x,key1.pt.y ) );
-          destP.push_back( cv::Point2f( key2.pt.x,key2.pt.y ) );
-          status.push_back( 1 );
-        }
-
-        //free some memory:
-        point_matcher1->clear();
-        points_to_track_j->free_descriptors();
-
-        Mat fundam = cv::findFundamentalMat( srcP, destP, status, cv::FM_RANSAC, 1 );
-
-        unsigned int nbErrors = 0, nb_iter=0;
-        //refine the mathing :
-        size_match = status.size( );
-        for( int cpt = 0; cpt < size_match; ++cpt ){
-          if( status[ cpt ] == 0 )
-          {
-            size_match--;
-            status[ cpt ] = status[ size_match ];
-            status.pop_back( );
-            srcP[ cpt ] = srcP[ size_match ];
-            srcP.pop_back( );
-            destP[ cpt ] = destP[ size_match ];
-            destP.pop_back( );
-            matches_i_j[ cpt ] = matches_i_j[ size_match ];
-            matches_i_j.pop_back( );
-            cpt--;
-            ++nbErrors;
-          }
-        }
-
-        while( nbErrors > size_match/10 && nb_iter < 4 &&
-          matches_i_j.size( ) > mininum_points_matches )
-        {
-          fundam = cv::findFundamentalMat( srcP, destP, status, cv::FM_RANSAC, 1.5 );
-
-          //refine the mathing :
-          nbErrors =0 ;
-          size_match = status.size( );
-          for( int cpt = 0; cpt < size_match; ++cpt ){
-            if( status[ cpt ] == 0 )
-            {
-              size_match--;
-              status[ cpt ] = status[ size_match ];
-              status.pop_back( );
-              srcP[ cpt ] = srcP[ size_match ];
-              srcP.pop_back( );
-              destP[ cpt ] = destP[ size_match ];
-              destP.pop_back( );
-              matches_i_j[ cpt ] = matches_i_j[ size_match ];
-              matches_i_j.pop_back( );
-              cpt--;
-              ++nbErrors;
-            }
-          }
-          nb_iter++;
-        };
-
-        //refine the mathing:
-        fundam = cv::findFundamentalMat( srcP, destP, status, cv::FM_LMEDS );
-
-        //refine the mathing :
-        size_match = status.size( );
-        for( int cpt = 0; cpt < size_match; ++cpt ){
-          if( status[ cpt ] == 0 )
-          {
-            size_match--;
-            status[ cpt ] = status[ size_match ];
-            status.pop_back( );
-            srcP[ cpt ] = srcP[ size_match ];
-            srcP.pop_back( );
-            destP[ cpt ] = destP[ size_match ];
-            destP.pop_back( );
-            matches_i_j[ cpt ] = matches_i_j[ size_match ];
-            matches_i_j.pop_back( );
-            cpt--;
-            ++nbErrors;
-          }
-        }
-
-        if( matches_i_j.size( ) > mininum_points_matches && nb_iter < 4 )
-        {
-          P_MUTEX( thread_unicity );
-          seq_analyser->addMatches( matches_i_j,i,j );
-          std::clog<<"find "<<matches_i_j.size( )<<
-            " matches between "<<i<<" "<<j<<std::endl;
-          V_MUTEX( thread_unicity );
-        }else
-        {
-          std::clog<<"can't find matches between "<<i<<" "<<j<<std::endl;
-        }
-        j++;
-        matches_it1++;
-      }
-
-      P_MUTEX( thread_unicity );
-      point_matcher->clear();
-      points_to_track_i->free_descriptors();//save memory...
-      V_MUTEX( thread_unicity );
-      V_MUTEX( MatchingThread::thread_concurr );//wake up waiting thread
-    }
-  };
-  vector< Ptr< PointsToTrack > >::iterator MatchingThread::end_matches_it;
-  vector<Mat> MatchingThread::masks;
-  unsigned int MatchingThread::mininum_points_matches=50;
-  PointsMatcher* MatchingThread::match_algorithm = NULL;
-
-  DECLARE_MUTEX( MatchingThread::thread_concurr );
-  DECLARE_MUTEX( MatchingThread::thread_unicity );
-
-  //////////////////////////////////////////////////////////////////////////
-
   void SequenceAnalyzer::computeMatches( )
   {
     //First compute missing features descriptors:
@@ -354,7 +178,7 @@ namespace OpencvSfM{
     }
   }
 
-  void SequenceAnalyzer::addMatches( vector<DMatch> &newMatches,
+  void SequenceAnalyzer::addMatches( std::vector< cv::DMatch > &newMatches,
     unsigned int img1, unsigned int img2 )
   {
     //add to tracks_ the new matches:
@@ -400,7 +224,7 @@ namespace OpencvSfM{
     }
   }
 
-  void SequenceAnalyzer::addTracks( vector<TrackOfPoints> &newTracks )
+  void SequenceAnalyzer::addTracks( std::vector< TrackOfPoints > &newTracks )
   {
 
     vector<TrackOfPoints>::iterator match_it = newTracks.begin( ),
@@ -465,12 +289,9 @@ namespace OpencvSfM{
     }
     cvDestroyWindow( "showTracks" );
   }
-  void SequenceAnalyzer::showTracks( int img_to_show,
-    const std::vector< TrackOfPoints >& points )
-  {
-    if( points.size( ) == 0 )
-      return;//nothing to do...
 
+  void SequenceAnalyzer::showTracks( int img_to_show, int timeBetweenImg )
+  {
     unsigned int it=0,it1=0;
     unsigned int end_iter = points_to_track_.size( ) - 1 ;
     if( images_.size( ) - 1 < end_iter )
@@ -512,7 +333,7 @@ namespace OpencvSfM{
           cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
 
         imshow( "showTracks",outImg );
-        cv::waitKey( 0 );
+        cv::waitKey( timeBetweenImg );
       }
     }
     cvDestroyWindow( "showTracks" );
@@ -724,7 +545,7 @@ namespace OpencvSfM{
     }
   }
 
-  vector<cv::Vec3d> SequenceAnalyzer::get3DStructure( )
+  std::vector< cv::Vec3d > SequenceAnalyzer::get3DStructure( )
   {
     vector<cv::Vec3d> out_vector;
     vector<TrackOfPoints>::iterator itTrack=tracks_.begin( );
@@ -737,7 +558,7 @@ namespace OpencvSfM{
     return out_vector;
   }
 
-  vector<unsigned int> SequenceAnalyzer::getColors( )
+  std::vector< unsigned int > SequenceAnalyzer::getColors( )
   {
     vector<unsigned int> out_vector;
     vector<TrackOfPoints>::iterator itTrack=tracks_.begin( );
@@ -750,7 +571,6 @@ namespace OpencvSfM{
     return out_vector;
   }
 
-
   void SequenceAnalyzer::showPointsOnImage(unsigned int i,
     const std::vector<cv::Vec2d>& pixelProjection)
   {
@@ -759,8 +579,8 @@ namespace OpencvSfM{
     std::vector<KeyPoint> keypoints;
     for(size_t cpt = 0; cpt<pixelProjection.size(); ++cpt)
     {
-      keypoints.push_back( cv::KeyPoint( pixelProjection[ cpt ][0],
-        pixelProjection[ cpt ][1], 1 ) );
+      keypoints.push_back( cv::KeyPoint( (float)pixelProjection[ cpt ][0],
+        (float)pixelProjection[ cpt ][1], 1.0 ) );
     }
     cv::Mat outImg;
     cv::drawKeypoints( images_[i], keypoints, outImg );

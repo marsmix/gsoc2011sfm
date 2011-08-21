@@ -44,7 +44,7 @@ namespace OpencvSfM{
   }
 
   std::vector< TrackOfPoints > StructureEstimator::computeStructure(
-    const vector<int>& list_of_images, unsigned int max_error )
+    const std::vector<int>& list_of_images, unsigned int max_error )
   {
     CV_Assert( list_of_images.size( ) > 1 );
 

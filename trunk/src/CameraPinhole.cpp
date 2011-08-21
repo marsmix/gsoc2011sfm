@@ -9,7 +9,7 @@ using cv::Range;
 
 namespace OpencvSfM{
 
-  CameraPinhole::CameraPinhole( Mat intra_params/*=Mat::eye( 3, 3, CV_64F )*/,unsigned char wantedEstimation/*=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM*/ )
+  CameraPinhole::CameraPinhole( cv::Mat intra_params/*=Mat::eye( 3, 3, CV_64F )*/,unsigned char wantedEstimation/*=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM*/ )
   {
     CV_DbgAssert( intra_params.rows==3 && intra_params.cols==3 );
 
@@ -18,7 +18,9 @@ namespace OpencvSfM{
     this->estimation_needed_ = wantedEstimation;
   }
 
-  CameraPinhole::CameraPinhole( const vector<vector<cv::Point3f> >& objectPoints, const vector<vector<cv::Point2f> >& imagePoints, cv::Size imageSize, double aspectRatio/*=1.*/,unsigned char wantedEstimation )
+  CameraPinhole::CameraPinhole( const std::vector< std::vector< cv::Point3f > >& objectPoints,
+    const std::vector< std::vector<cv::Point2f > >& imagePoints,
+    cv::Size imageSize, double aspectRatio/*=1.*/,unsigned char wantedEstimation )
   {
     Mat intra=initCameraMatrix2D( objectPoints,imagePoints,imageSize,aspectRatio );
     //to be sure that newParams has correct type:
@@ -31,7 +33,8 @@ namespace OpencvSfM{
     //TODO
   }
 
-  void CameraPinhole::updateIntrinsicMatrix( cv::Mat newParams,unsigned char intraValues/*=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM*/ )
+  void CameraPinhole::updateIntrinsicMatrix( cv::Mat newParams,
+    unsigned char intraValues/*=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM*/ )
   {
 
     CV_DbgAssert( !newParams.empty( ) || ( newParams.rows==3 ) || ( newParams.cols==3 ) );
@@ -61,13 +64,13 @@ namespace OpencvSfM{
     }
   }
 
-  vector<Vec4d> CameraPinhole::convertFromImageTo3Dray( vector<Vec3d> points )
+  vector<Vec4d> CameraPinhole::convertFromImageTo3Dray( std::vector< cv::Vec3d > points )
   {
     //TODO
     return vector<Vec4d>( );
   }
 
-  vector<Vec2d> CameraPinhole::pixelToNormImageCoordinates( vector<Vec2d> points ) const
+  vector<Vec2d> CameraPinhole::pixelToNormImageCoordinates( std::vector< cv::Vec2d > points ) const
   {
     vector<Vec2d> newCoordinates;
     double* ptrIntraParam=( double* )inv_intra_params_.data;
@@ -97,7 +100,7 @@ namespace OpencvSfM{
     return newCoordinates;
   }
 
-  vector<Vec2d> CameraPinhole::normImageToPixelCoordinates( std::vector<cv::Vec2d> points ) const
+  vector<Vec2d> CameraPinhole::normImageToPixelCoordinates( std::vector< cv::Vec2d > points ) const
   {
     vector<Vec2d> newCoordinates;
     //for each 2D point, use intra params to compute 2D point:

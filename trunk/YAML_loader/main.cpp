@@ -50,7 +50,7 @@ void triangul_tracks(vector< PointOfView >& cameras,
       nbGoodTrack++;
 
   structure.removeOutliersTracks( 3 );//remove points whose reprojection err>3
-  struct_loaded.keepOnlyCorrectMatches( 3, 0 );
+  SequenceAnalyzer::keepOnlyCorrectMatches( struct_loaded, 3, 0 );
 
   cout<<struct_loaded.getTracks().size()<<" 3D points found."<<endl;
 
@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
 
   Visualizer my_viewer ( "3D Viewer" );
 
-  for(int i=0; i<colors.size(); ++i)
+  for(size_t i=0; i<colors.size(); ++i)
   {
     stringstream nameOfCloud;
     nameOfCloud<<"Structure "<<i<<" triangulated";
