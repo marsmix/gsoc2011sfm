@@ -115,7 +115,7 @@ NEW_TUTO( Track_creation, "Learn how you can compute tracks from a list of pictu
   }
   cout<<"Create the sequence analyzer:"<<endl;
 
-  SequenceAnalyzer motion_estim( vec_points_to_track,matches_algo,images );
+  SequenceAnalyzer motion_estim( vec_points_to_track, matches_algo, &images );
 
   pathFileTracks = FROM_SRC_ROOT( "Medias/tracks_points_"POINT_METHOD"/motion_tracks1.yml" );
   cout<<"Compute matches between each frames..."<<endl<<endl;

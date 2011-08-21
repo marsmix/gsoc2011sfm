@@ -27,12 +27,11 @@ using cv::imread;
 using libmv::Mat34;
 using libmv::Mat3;
 using libmv::Vec3;
-using libmv::Vec;
 
 namespace OpencvSfM{
 
-  PointOfView::PointOfView( cv::Ptr<Camera> device, 
-    cv::Mat rotation /*=Mat::eye( 3, 3, CV_64F )*/, 
+  PointOfView::PointOfView( cv::Ptr<Camera> device,
+    cv::Mat rotation /*=Mat::eye( 3, 3, CV_64F )*/,
     cv::Vec3d translation /*=Vec( 0.0,0.0,0.0 )*/ )
     : projection_matrix_( 3, 4, CV_64F )
   {
@@ -63,13 +62,13 @@ namespace OpencvSfM{
     libmv::Mat3 K, R;
     libmv::Vec3 t;
     libmv::KRt_From_P( proj, &K, &R, &t );
-    
+
     if (R.determinant() < 0) {
       K.col(0) = -K.col(0);
       R.row(0) = -R.row(0);
       t(0)     = -t(0);
     }
-    
+
     //enforce the rotation matrix.
     //TODO find the closest rotation matrix...
     Eigen::Quaterniond tmp = (Eigen::Quaterniond)R;
@@ -142,7 +141,7 @@ namespace OpencvSfM{
     Vec2d pointOut = pointsOut[ 0 ];
     return pointsOut[ 0 ];
   }
-  std::vector< cv::Vec2d > PointOfView::project3DPointsIntoImage( 
+  std::vector< cv::Vec2d > PointOfView::project3DPointsIntoImage(
     std::vector< cv::Vec3d > points ) const
   {
     //As we don't know what type of camera we use ( with/without disportion, fisheyes... )
@@ -155,7 +154,7 @@ namespace OpencvSfM{
     double* point3DNorm=( double* )mat3DNorm.data;
     Mat mat2DNorm( 3,1,CV_64F );
     double* point2DNorm=( double* )mat2DNorm.data;
-    
+
     vector<Vec2d> pointsOut;
     vector<Vec3d>::iterator point=points.begin( );
     while( point!=points.end( ) )
@@ -188,7 +187,7 @@ namespace OpencvSfM{
     double* point3DNorm=( double* )mat3DNorm.data;
     Mat mat2DNorm( 3,1,CV_64F );
     double* point2DNorm=( double* )mat2DNorm.data;
-    
+
     vector<Vec2d> pointsOut;
     vector<TrackOfPoints>::iterator point=points.begin( );
     while( point!=points.end( ) )
@@ -216,7 +215,7 @@ namespace OpencvSfM{
   bool PointOfView::pointInFrontOfCamera( cv::Vec4d point ) const
   {
     Mat pointTranspose= ( Mat ) point;
-    double condition_1 = 
+    double condition_1 =
       this->projection_matrix_.row( 2 ).dot( pointTranspose.t( ) ) * point[ 3 ];
     double condition_2 = point[ 2 ] * point[ 3 ];
     if( condition_1 > 0 && condition_2 > 0 )

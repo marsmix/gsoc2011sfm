@@ -62,22 +62,28 @@ NEW_TUTO( YAML_Tuto, "Learn how you can load/save object using YAML file format"
 
     matches_algo->add( ptt1 );
 
-    //now save the points:
+    cout<<"now save the points..."<<endl;
     FileStorage fsOut( FROM_SRC_ROOT( "Medias/test.yml" ), FileStorage::WRITE );
-    //Can't find a way to enable the following notation:
-    //fs << *ptt1;
-    PointsMatcher::write( fsOut,*matches_algo );
-    fsOut.release( );
+    if(fsOut.isOpened())
+    {
+      //Can't find a way to enable the following notation:
+      PointsMatcher::write( fsOut,*matches_algo );
+      fsOut.release( );
 
-    //and create a new PointsToTrack using this file:
-    Ptr<PointsMatcher> matches_new ( new PointsMatcher( matcher->clone( true )) );
-    //ptt_New=Ptr<PointsToTrack>( new PointsToTrack ( ) );
-    FileStorage fsRead( FROM_SRC_ROOT( "Medias/test.yml" ), FileStorage::READ );
-    FileNode myPtt = fsRead.getFirstTopLevelNode( );
-    //Can't find a way to enable the following notation:
-    //myPtt >> ptt_New;
-    PointsMatcher::read( myPtt, *matches_new );
-    fsRead.release( );
+      cout<<"and create a new PointsToTrack using this file..."<<endl;
+      Ptr<PointsMatcher> matches_new ( new PointsMatcher( matcher->clone( true )) );
+      //ptt_New=Ptr<PointsToTrack>( new PointsToTrack ( ) );
+      FileStorage fsRead( FROM_SRC_ROOT( "Medias/test.yml" ), FileStorage::READ );
+      FileNode myPtt = fsRead.getFirstTopLevelNode( );
+      //Can't find a way to enable the following notation:
+      //myPtt >> ptt_New;
+      PointsMatcher::read( myPtt, *matches_new );
+      fsRead.release( );
+    }
+    else
+    {
+      cout<<"can't save points in "<<FROM_SRC_ROOT( "Medias/test.yml" )<<endl;
+    }
   }
 
 }
