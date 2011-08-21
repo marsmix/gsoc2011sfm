@@ -25,6 +25,11 @@ namespace OpencvSfM{
   class SFM_EXPORTS PointsToTrack
   {
   protected:
+    /**
+    * As we want to be able to compute points using parallel execution,
+    * and as not every Opencv functions are thread safe,
+    * use this mutex to take care of critical portions.
+    */
     DECLARE_MUTEX(worker_exclusion);
     /**
     * To preserve memory, we need to know how many process
@@ -104,7 +109,7 @@ namespace OpencvSfM{
     void addKeypoints( std::vector<cv::KeyPoint> keypoints,cv::Mat descriptors=cv::Mat( ),bool computeMissingDescriptor=false );
     /**
     * This method is used to add a keypoint at the end of the points vector...
-    * @param keypoints Keypoints to add
+    * @param point Keypoints to add
     * @return index of the keypoint.
     */
     inline unsigned int addKeypoint( cv::KeyPoint point )
@@ -115,8 +120,10 @@ namespace OpencvSfM{
     */
     inline const std::vector<cv::KeyPoint>& getKeypoints( ) const {return keypoints_;};
     /**
-    * this method return the points coordinates corresponding to tracks
+    * This method update the points coordinates (last parameter) corresponding
+    * to tracks containing image index "otherImage"
     * @param matches list of tracks. Only points found in tracks are returned
+    * @param otherImage index of wanted image
     * @param pointsVals [ out ] points found in tracks
     */
     void getKeyMatches( const std::vector<TrackOfPoints>& matches, int otherImage,
@@ -146,15 +153,30 @@ namespace OpencvSfM{
     //
     void printPointsOnImage( const cv::Mat &image, cv::Mat& outImg, const cv::Scalar& color=cv::Scalar::all( -1 ), int flags=cv::DrawMatchesFlags::DEFAULT ) const;
 
+    /**
+    * Use this function to get the color of a point
+    * @param index of the wanted point
+    * @return color packed into the ARGB format
+    */
     inline unsigned int getColor( unsigned int index ) const{
       if( index<RGB_values_.size() )
         return RGB_values_[index];
       else
         return 0;
     }
-
+    
+    /**
+    * Load the points from a YAML file.
+    * @param node Previously opened YAML file node
+    * @param points output
+    */
     static void read( const cv::FileNode& node, PointsToTrack& points );
-
+    
+    /**
+    * Save the points into a YAML file.
+    * @param fs Previously opened YAML file node
+    * @param points sequence to save...
+    */
     static void write( cv::FileStorage& fs, const PointsToTrack& points );
   };
 }

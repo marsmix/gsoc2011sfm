@@ -70,6 +70,9 @@ namespace OpencvSfM{
     */
     void getColorOfPoints();
 
+    /**
+    * Get the image used to compute points
+    */
     inline cv::Mat getImage( ){return imageToAnalyse_;};
   };
 

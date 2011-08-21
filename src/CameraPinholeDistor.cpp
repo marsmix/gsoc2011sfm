@@ -9,14 +9,20 @@ using cv::Vec6d;
 
 namespace OpencvSfM{
 
-  CameraPinholeDistor::CameraPinholeDistor( Mat intra_params,Vec6d radial_dist,unsigned char nbRadialParam,cv::Vec2d tangential_dist,unsigned char wantedEstimation )
+  CameraPinholeDistor::CameraPinholeDistor( cv::Mat intra_params,
+    cv::Vec6d radial_dist, unsigned char nbRadialParam,
+    cv::Vec2d tangential_dist, unsigned char wantedEstimation )
     :CameraPinhole( intra_params,wantedEstimation )
   {
     updateDistortionParameters( radial_dist,nbRadialParam,tangential_dist );
   }
 
-  CameraPinholeDistor::CameraPinholeDistor( const vector<vector<cv::Point3f> >& objectPoints, const vector<vector<cv::Point2f> >& imagePoints, cv::Size imageSize, double aspectRatio/*=1.*/,
-    Vec6d radial_dist, unsigned char nbRadialParam, Vec2d tangential_dist, unsigned char wantedEstimation )
+  CameraPinholeDistor::CameraPinholeDistor( 
+    const std::vector< std::vector< cv::Point3f> >& objectPoints,
+    const std::vector< std::vector< cv::Point2f> >& imagePoints,
+    cv::Size imageSize, double aspectRatio/*=1.*/,
+    cv::Vec6d radial_dist, unsigned char nbRadialParam,
+    cv::Vec2d tangential_dist, unsigned char wantedEstimation )
     :CameraPinhole( objectPoints,imagePoints,imageSize,aspectRatio,wantedEstimation )
   {
     updateDistortionParameters( radial_dist,nbRadialParam,tangential_dist );
@@ -59,13 +65,15 @@ namespace OpencvSfM{
     }
   }
 
-  vector<Vec4d> CameraPinholeDistor::convertFromImageTo3Dray( vector<Vec3d> points )
+  std::vector< cv::Vec4d > CameraPinholeDistor::convertFromImageTo3Dray( 
+    std::vector< cv::Vec3d > points )
   {
     //TODO
     return vector<Vec4d>( );
   }
 
-  vector<Vec2d> CameraPinholeDistor::pixelToNormImageCoordinates( vector<Vec2d> points ) const
+  vector<Vec2d> CameraPinholeDistor::pixelToNormImageCoordinates(
+    std::vector< cv::Vec2d > points ) const
   {
     vector<Vec2d> undistordedPoints;
     //rectify the distorion, but keep points in pixels coordinates:
@@ -73,7 +81,8 @@ namespace OpencvSfM{
     return undistordedPoints;
   }
 
-  vector<Vec2d> CameraPinholeDistor::normImageToPixelCoordinates( std::vector<cv::Vec2d> points ) const
+  vector<Vec2d> CameraPinholeDistor::normImageToPixelCoordinates( 
+    std::vector<cv::Vec2d> points ) const
   {
 
     vector<Vec2d> redistortedPoints;
@@ -92,7 +101,8 @@ namespace OpencvSfM{
         r2 = xn*xn + yn*yn;
 
         // Determine distortion factors (might only work for rational model at this stage)
-        icdist = (1 + ((radial_dist_[5]*r2 + radial_dist_[4])*r2 + radial_dist_[3])*r2)/(1 + ((radial_dist_[2]*r2 + radial_dist_[1])*r2 + radial_dist_[0])*r2);
+        icdist = (1 + ((radial_dist_[5]*r2 + radial_dist_[4])*r2 + radial_dist_[3])*r2)/
+          (1 + ((radial_dist_[2]*r2 + radial_dist_[1])*r2 + radial_dist_[0])*r2);
         deltaX = 2*tangential_dist_[0]*xn*yn + tangential_dist_[1]*(r2 + 2*xn*xn);
         deltaY = tangential_dist_[0]*(r2 + 2*yn*yn) + 2*tangential_dist_[1]*xn*yn;
 
@@ -107,7 +117,8 @@ namespace OpencvSfM{
     }
 
     // Convert these re-distorted but normalized points back to pixel co-ordinates
-    vector<Vec2d> pointsPixelCoord=CameraPinhole::normImageToPixelCoordinates( redistortedPoints );
+    vector<Vec2d> pointsPixelCoord =
+      CameraPinhole::normImageToPixelCoordinates( redistortedPoints );
 
     return pointsPixelCoord;
   }
@@ -117,7 +128,8 @@ namespace OpencvSfM{
     std::string myName=node.name( );
     if( myName != "CameraPinholeDistor" )
     {
-      std::string error = "CameraPinholeDistor FileNode is not correct!\nExpected \"CameraPinholeDistor\", got ";
+      std::string error = "CameraPinholeDistor FileNode is not correct!\n"
+        "Expected \"CameraPinholeDistor\", got ";
       error += node.name();
       CV_Error( CV_StsError, error.c_str() );
     }

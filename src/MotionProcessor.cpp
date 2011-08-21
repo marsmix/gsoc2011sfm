@@ -70,7 +70,7 @@ namespace OpencvSfM{
     return false;
   };
 
-  bool MotionProcessor::setInputSource( vector<string> list_images )
+  bool MotionProcessor::setInputSource( std::vector< std::string > list_images )
   {
     this->type_of_input_=IS_LIST_FILES;
     nameOfFiles_ = list_images;
@@ -78,7 +78,8 @@ namespace OpencvSfM{
     return true;
   };
 
-  bool MotionProcessor::setInputSource( string nameOfFile,TypeOfMotionProcessor inputType/*=IS_VIDEO*/ )
+  bool MotionProcessor::setInputSource( std::string nameOfFile,
+    TypeOfMotionProcessor inputType/*=IS_VIDEO*/ )
   {//IS_DIRECTORY, IS_VIDEO or IS_SINGLE_FILE
     this->sourceName_=nameOfFile;
     this->type_of_input_=inputType;
@@ -116,16 +117,18 @@ namespace OpencvSfM{
     return true;
   };
 
-  bool MotionProcessor::setInputSource( string prefix,string suffix,int startNumber/*=0*/ )
+  bool MotionProcessor::setInputSource( std::string prefix, std::string suffix,
+    int startNumber/*=0*/ )
   {
     this->sourceName_ = prefix;
     this->suffix_ = suffix;
     pos_in_loading_process_ = startNumber;
     this->type_of_input_ = IS_LIST_FILES;
-    return true;//always true because the error will occur when user will try to get the frame, not now...
+    return true;
+    //always true because the error will occur when user will try to get the frame, not now...
   };
 
-  Mat MotionProcessor::getFrame( )
+  cv::Mat MotionProcessor::getFrame( )
   {
     Mat imgTmp;
 

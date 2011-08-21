@@ -30,7 +30,7 @@ namespace OpencvSfM{
   * s  \begin{bmatrix} u \\ v \\ 1 \end{bmatrix} =  \begin{bmatrix}f_x & 0 & c_x \\ 0 & f_y & c_y \\ 0 & 0 & 1 \end{bmatrix}
   * \begin{bmatrix} r_{11} & r_{12} & r_{13} & t_1  \\ r_{21} & r_{22} & r_{23} & t_2  \\ r_{31} & r_{32} & r_{33} & t_3 \end{bmatrix}
   * \begin{bmatrix} X \\ Y \\ Z \\ 1  \end{bmatrix}
-  * \f ]
+  * \f]
   *
   * This leads to the following relation between local coordinates and global ones:
   * \f[
@@ -38,7 +38,7 @@ namespace OpencvSfM{
   * \begin{bmatrix} x \\ y \\ z \end{bmatrix} = R  \begin{bmatrix} X \\ Y \\ Z \end{bmatrix} + t \\
   * x' = x/z \\ y' = y/z \vspace{10pt} 
   * \end{array}
-  * \f ]
+  * \f]
   * 
   */
   class SFM_EXPORTS PointOfView
@@ -62,11 +62,10 @@ namespace OpencvSfM{
     */
     PointOfView( cv::Ptr<Camera> device,cv::Mat rotation=cv::Mat::eye( 3, 3, CV_64F ),cv::Vec3d translation=cv::Vec3d( 0.0,0.0,0.0 ));
     /**
-    * To create a point of view using a projection matrix.
+    * To create a point of view using a projection matrix. (will create a 
+    * Pinhole Camera without distortion parameters)
     * We will extract intra, rotation and translation from this projection matrix.
-    * @param device address of existing Camera. This camera can be calibrated or not...
-    * @param rotation Matrix of the known rotation ( optional )...
-    * @param translation Vector of the known translation ( optional )...
+    * @param projection_matrix Projection matrix of the camera
     */
     PointOfView( cv::Mat projection_matrix );
     /**
@@ -110,48 +109,85 @@ namespace OpencvSfM{
     */
     virtual cv::Mat getProjectionMatrix( ) const;
 
+    /**
+    * Use this method to get the rotation matrix of this camera
+    * @return rotation matrix of this camera
+    */
     inline cv::Mat getRotationMatrix( ) const
     {
       return rotation_;
     };
+    /**
+    * Use this method to change the rotation matrix of this camera
+    * @param newRot new rotation matrix
+    */
     virtual void setRotationMatrix( cv::Mat newRot )
     {
       for( int i=0; i<3; ++i )
         for( int j=0; j<3; ++j )
           rotation_.at<double>( i,j ) = newRot.at<double>( i,j );
     };
-
+    
+    /**
+    * Use this method to get the translation vector of this camera
+    * @return translation vector of this camera
+    */
     inline cv::Mat getTranslationVector( ) const
     {
       return translation_;
     };
+    /**
+    * Use this method to change the translation vector of this camera
+    * @param newVect new translation vector
+    */
     virtual void setTranslationVector( cv::Mat newVect )
     {
       for( int i=0; i<3; ++i )
         translation_.at<double>( i,0 ) = newVect.at<double>( i,0 );
     };
 
+    /**
+    * Rotate this camera around X axis
+    * @param angle of rotation
+    */
     inline void rotationAroundX( double angle ) {
         double c = cos( angle ), s = sin( angle );
         double data[ ] = {1,  0,  0, 0,  c, -s, 0,  s,  c};
         cv::Mat R( 3,3,CV_64F,data );
         rotation_ *= R;
     }
+    /**
+    * Rotate this camera around Y axis
+    * @param angle of rotation
+    */
     inline void rotationAroundY( double angle ) {
       double c = cos( angle ), s = sin( angle );
       double data[ ] = {c, 0, s, 0, 1, 0, -s, 0, c};
       cv::Mat R( 3,3,CV_64F,data );
       rotation_ *= R;
     }
+    /**
+    * Rotate this camera around Z axis
+    * @param angle of rotation
+    */
     inline void rotationAroundZ( double angle ) {
       double c = cos( angle ), s = sin( angle );
       double data[ ] = {c, -s,  0, s,  c,  0, 0,  0,  1};
       cv::Mat R( 3,3,CV_64F,data );
       rotation_ *= R;
     }
-
+    
+    /**
+    * Create a new camera's point of view from a YAML file.
+    * @param node Previously opened YAML file node
+    */
     static cv::Ptr<PointOfView> read( const cv::FileNode& node );
-
+    
+    /**
+    * Save the camera's point of view into a YAML file.
+    * @param fs Previously opened YAML file node
+    * @param points sequence to save...
+    */
     static void write( cv::FileStorage& fs, const PointOfView& points );
 
   };

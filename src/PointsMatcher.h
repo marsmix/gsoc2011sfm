@@ -28,12 +28,21 @@ namespace OpencvSfM{
     */
     PointsMatcher( const cv::Ptr<cv::DescriptorMatcher>& matcher );
 
+    /**
+    * Copy constructor.
+    */
     PointsMatcher( const PointsMatcher& copy );
     /**
     * Destructor...
     */
     virtual ~PointsMatcher( );
 
+    /**
+    * Use this function to create a point matcher using the name of a matching
+    * algorithm (see http://opencv.willowgarage.com/documentation/cpp/features2d_common_interfaces_of_descriptor_matchers.html)
+    * @param match_algo name of the wanted algorithm
+    * @return 
+    */
     static cv::Ptr<PointsMatcher> create( std::string match_algo )
     {
       return cv::Ptr<PointsMatcher>( new PointsMatcher(
@@ -124,7 +133,7 @@ namespace OpencvSfM{
     * @param img1 First source image.
     * @param keypoints1 Keypoints from first source image.
     * @param keypoints2 Keypoints from second source image.
-    * @param matches Matches from first image to second one,
+    * @param matches1to2 Matches from first image to second one,
     * i.e. keypoints1[ i ] has corresponding point keypoints2[ matches[ i ]] .
     * @param outImg Output image. Its content depends on flags value
     * what is drawn in output image. See below possible flags bit values.
@@ -147,11 +156,26 @@ namespace OpencvSfM{
       const std::vector<char>& matchesMask=std::vector<char>( ),
       int flags=cv::DrawMatchesFlags::DEFAULT
       );
-
+    
+    /**
+    * Load the matches from a YAML file.
+    * @param node Previously opened YAML file node
+    * @param points output
+    */
     static void read( const cv::FileNode& node, PointsMatcher& points );
-
+    
+    /**
+    * Save the matches into a YAML file.
+    * @param fs Previously opened YAML file node
+    * @param points sequence to save...
+    */
     static void write( cv::FileStorage& fs, const PointsMatcher& points );
 
+    /**
+    * Get a keypoint
+    * @param numKey index of the wanted point
+    * @return keypoint using the cv::Keypoint format
+    */
     const cv::KeyPoint &getKeypoint( int numKey ) const;
 
   protected:

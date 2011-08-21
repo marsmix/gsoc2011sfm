@@ -40,7 +40,7 @@ NEW_TUTO( Triangulation_tuto, "Learn how you can triangulate 2D points",
   FileStorage fsStore( "cameras.yml", FileStorage::WRITE );
 
   fsStore<<"vector_PointOfView"<<"[";
-  for(int i=0;i<myCameras.size(); i++)
+  for(size_t i=0;i<myCameras.size(); i++)
     PointOfView::write(fsStore, myCameras[i]);
   fsStore<<"]";
 

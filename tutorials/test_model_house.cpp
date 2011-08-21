@@ -142,13 +142,12 @@ NEW_TUTO( Model_House_test, "Using Model house data, run a SFM algorithm",
       pe.point_computed_ = tracks;
 
       cout<<"Bundle adjustement..."<<endl;
-      pe.bundleAdjustement();//test bundle adjustement....
+      pe.bundleAdjustement();//test bundle adjustement...
       pe.viewEstimation();
     }
     else
     {
       //SequenceAnalyzer::keepOnlyCorrectMatches(motion_estim,3,0);
-
       pe.computeReconstruction();
     }
   }

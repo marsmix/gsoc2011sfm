@@ -24,18 +24,27 @@ namespace OpencvSfM{
   {
   protected:
     int index_origin;///<index of camera set as origin...
-    libmv::vector<libmv::Mat3> intra_params_;
-    libmv::vector<libmv::Mat3> rotations_;
-    libmv::vector<libmv::Vec3> translations_;
-    std::vector<PointOfView>& cameras_;
-    SequenceAnalyzer &sequence_;
+    libmv::vector<libmv::Mat3> intra_params_;///<Intra parameters of cameras (don't use them, they are strongly related to cameras_ attribut!
+    libmv::vector<libmv::Mat3> rotations_;///<rotations matrix of cameras (don't use them, they are strongly related to cameras_ attribut!
+    libmv::vector<libmv::Vec3> translations_;///<translation vectors of cameras (don't use them, they are strongly related to cameras_ attribut!
+    std::vector<PointOfView>& cameras_;///<List of cameras (intra and extern parameters...)
+    SequenceAnalyzer &sequence_;///<Object containing all 2D information of this sequence
   public:
+    /**
+    * Construct an euclidean estimator using a sequence of 2D points matches and
+    * a list of camera guess (intra parameters should be known!)
+    * @param sequence Object containing all 2D information of this sequence
+    * @param cameras List of cameras (intra (and extern if available) parameters...)
+    */
     EuclideanEstimator( SequenceAnalyzer &sequence,
       std::vector<PointOfView>& cameras );
+    /**
+    * Destructor of EuclideanEstimator
+    */
     virtual ~EuclideanEstimator( void );
 
-    std::vector< TrackOfPoints > point_computed_;
-    std::vector<bool> camera_computed_;
+    std::vector< TrackOfPoints > point_computed_;///<list of 3D points computed
+    std::vector<bool> camera_computed_;///<List of camera computed
 
     /**
     * Add a new camera to the estimator
@@ -48,13 +57,27 @@ namespace OpencvSfM{
     */
     void computeReconstruction( );
 
+    /**
+    * Run a bundle adjustment using every computed cameras and every computed 3D points
+    */
     void bundleAdjustement( );
 
+    /**
+    * Show this estimation
+    */
     void viewEstimation();
-
-    void initialReconstruction( std::vector<TrackOfPoints>& tracks,
-      int image1, int image2 );
-
+    
+    /**
+    * Create a new Euclidean reconstruction using matches between two images
+    * @param image1 index of the first image
+    * @param image2 index of the second image
+    */
+    void initialReconstruction( int image1, int image2 );
+    
+    /**
+    * Find the position of a new camera
+    * @param image index of the wanted camera
+    */
     bool cameraResection( unsigned int image );
   };
 
