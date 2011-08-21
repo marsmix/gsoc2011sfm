@@ -1,5 +1,6 @@
 #include "Boost_Matching.h"
 
+#include "CameraPinholeDistor.h"
 #include <iostream>
 
 namespace OpencvSfM{

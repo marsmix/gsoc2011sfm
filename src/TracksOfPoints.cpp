@@ -62,7 +62,6 @@ namespace OpencvSfM{
       good_values.push_back(false);
       return false;
     }
-    good_values.push_back(true);
 
     //If a track contains more than one keypoint in the same image but
     //a different keypoint, it is deemed inconsistent.
@@ -89,6 +88,7 @@ namespace OpencvSfM{
 
     images_indexes_.push_back( image_src );
     point_indexes_.push_back( point_idx1 );
+    good_values.push_back(true);
     return track_consistance>=0;
   }
 

@@ -40,8 +40,9 @@ namespace OpencvSfM{
     * @param descriptor_detector Algorithm to use for descriptors detection ( see http://opencv.willowgarage.com/documentation/cpp/common_interfaces_for_feature_detection_and_descriptor_extraction.html#descriptorextractor )
     */
     PointsToTrackWithImage( int corresponding_image,cv::Mat imageToAnalyse,
-      cv::Mat maskOfAnalyse, cv::Ptr<cv::FeatureDetector> feature_detector=0,
-      cv::Ptr<cv::DescriptorExtractor> descriptor_detector=0 );
+      cv::Ptr<cv::FeatureDetector> feature_detector=0,
+      cv::Ptr<cv::DescriptorExtractor> descriptor_detector=0,
+      cv::Mat maskOfAnalyse = cv::Mat() );
     /**
     * Second constructor used to create a list of points to track using a feature and a descriptor algorithm.
     * @param corresponding_image Global index of image
@@ -51,8 +52,8 @@ namespace OpencvSfM{
     * @param descriptor_detector name of the algorithm to use for descriptors detection ( see http://opencv.willowgarage.com/documentation/cpp/common_interfaces_for_feature_detection_and_descriptor_extraction.html#descriptorextractor )
     */
     PointsToTrackWithImage( int corresponding_image, cv::Mat imageToAnalyse,
-      cv::Mat maskOfAnalyse, std::string feature_detector,
-      std::string descriptor_detector="SIFT" );
+      std::string feature_detector, std::string descriptor_detector="SIFT",
+      cv::Mat maskOfAnalyse = cv::Mat() );
     ~PointsToTrackWithImage( void );
     
     /**

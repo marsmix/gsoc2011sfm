@@ -118,7 +118,12 @@ namespace OpencvSfM{
     * this method return the points coordinates and sometimes orientation and size
     * @return points coordinates and when available orientation and size
     */
-    inline const std::vector<cv::KeyPoint>& getKeypoints( ) const {return keypoints_;};
+    inline const std::vector<cv::KeyPoint>& getKeypointsConst( ) const {return keypoints_;};
+    /**
+    * this method return the points coordinates and sometimes orientation and size
+    * @return points coordinates and when available orientation and size
+    */
+    inline std::vector<cv::KeyPoint>& getKeypoints( ) {return keypoints_;};
     /**
     * This method update the points coordinates (last parameter) corresponding
     * to tracks containing image index "otherImage"

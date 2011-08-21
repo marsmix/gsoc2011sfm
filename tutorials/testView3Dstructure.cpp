@@ -99,9 +99,8 @@ NEW_TUTO( Triangulation_tests, "Compute of 3D points from 2D position and camera
       new PointsToTrack( j, tracks_keypoints[ j ] ) ) );
   }
 
-  Ptr<PointsMatcher> matches_algo ( new PointsMatcher(
-    Ptr<DescriptorMatcher>( new FlannBasedMatcher( ) ) ) );
-  SequenceAnalyzer motion_estim( points2D,matches_algo );
+  SequenceAnalyzer motion_estim( points2D,NULL,new PointsMatcher(
+    Ptr<DescriptorMatcher>( new FlannBasedMatcher( ) ) )  );
 
   //create tracks:
   vector<TrackOfPoints> tracks;
