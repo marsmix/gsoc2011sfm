@@ -141,7 +141,7 @@ NEW_TUTO( Track_creation, "Learn how you can compute tracks from a list of pictu
 
   cout<<"We will now remove bad points matches..."<<endl;
   int min_point_sequence = MAX( images.size()/30, 3 );
-  motion_estim.keepOnlyCorrectMatches( min_point_sequence, 0 );
+  SequenceAnalyzer::keepOnlyCorrectMatches(motion_estim, min_point_sequence, 0 );
 
   tracks=motion_estim.getTracks( );
   cout<<"numbers of correct tracks:"<<tracks.size( )<<endl;

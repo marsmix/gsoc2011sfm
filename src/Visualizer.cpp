@@ -157,9 +157,8 @@ namespace OpencvSfM{
     sensor_msgs::PointCloud2 msg;
     pcl::toROSMsg( *my_cloud, msg );
     triangles.cloud = msg;
-    /*
-    pcl::io::saveVTKFile ( ((std::string)"test")+name+((std::string)".vtk"),
-      triangles );*/
+    
+    //pcl::io::saveVTKFile ( ((std::string)"test")+name+((std::string)".vtk"), triangles );
 
   }
 

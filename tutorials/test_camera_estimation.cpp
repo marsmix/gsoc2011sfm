@@ -32,7 +32,7 @@ NEW_TUTO( Proj_Rec, "Euclidean reconstruction",
 
   vector<PointOfView> myCameras =
     loadCamerasFromFile( FROM_SRC_ROOT( "Medias/temple/temple_par.txt" ),
-    LOAD_FULL );//LOAD_INTRA );
+    LOAD_INTRA );//LOAD_INTRA );
   vector<PointOfView> myCamerasReal =
     loadCamerasFromFile( FROM_SRC_ROOT( "Medias/temple/temple_par.txt" ),
     LOAD_FULL );
@@ -65,7 +65,7 @@ NEW_TUTO( Proj_Rec, "Euclidean reconstruction",
 
     FileStorage fsRead( pathFileTracks, FileStorage::READ );
     FileNode myPtt = fsRead.getFirstTopLevelNode( );
-    SequenceAnalyzer motion_estim_loaded( images, myPtt );
+    SequenceAnalyzer motion_estim_loaded( myPtt, images );
     fsRead.release( );
 
     cout<<"A little help ;) Keep only good matches using triangulation."<<endl;
@@ -93,10 +93,10 @@ NEW_TUTO( Proj_Rec, "Euclidean reconstruction",
 
   FileStorage fsRead( pathFileTracks, FileStorage::READ );
   FileNode myPtt = fsRead.getFirstTopLevelNode( );
-  SequenceAnalyzer motion_estim_loaded( images, myPtt );
+  SequenceAnalyzer motion_estim_loaded( myPtt, images );
   fsRead.release( );
 
-  motion_estim_loaded.keepOnlyCorrectMatches(2,0);
+  SequenceAnalyzer::keepOnlyCorrectMatches(motion_estim_loaded,2,0);
   vector<TrackOfPoints> &tracks=motion_estim_loaded.getTracks( );
   cout<<"numbers of correct tracks loaded:"<<tracks.size( )<<endl;
 

@@ -108,8 +108,8 @@ namespace OpencvSfM{
     {
       ///////////////////////////////////////////////////////////////////
       //Same as pixelToNormImageCoordinates, faster than using matrix multiplication:
-      newCoordinates.push_back( Vec2d( ptrIntraParam[ 0 ] * ( *point )[ 0 ] + ptrIntraParam[ 1 ] * ( *point )[ 1 ] + ptrIntraParam[ 2 ],
-        ptrIntraParam[ 4 ] * ( *point )[ 1 ] + ptrIntraParam[ 5 ] ));
+      newCoordinates.push_back( Vec2d( (ptrIntraParam[ 0 ] * ( *point )[ 0 ] + ptrIntraParam[ 1 ] * ( *point )[ 1 ] + ptrIntraParam[ 2 ]) / ptrIntraParam[ 8 ],
+        (ptrIntraParam[ 4 ] * ( *point )[ 1 ] + ptrIntraParam[ 5 ] ) / ptrIntraParam[ 8 ]));
 
       point++;
     }

@@ -92,10 +92,13 @@ namespace OpencvSfM{
     return points3D;
   }
 
-  void StructureEstimator::removeOutliersTracks( double max_error )
+  void StructureEstimator::removeOutliersTracks( double max_error,
+    std::vector< TrackOfPoints >* list_of_tracks )
   {
     vector<char> output_mask;
-    vector<TrackOfPoints>& tracks = sequence_->getTracks( );
+    if(list_of_tracks==NULL)
+      list_of_tracks = &sequence_->getTracks( );
+    vector<TrackOfPoints>& tracks = *list_of_tracks;
     vector< Ptr< PointsToTrack > > &points_to_track = sequence_->getPoints( );
 
     //for each points:

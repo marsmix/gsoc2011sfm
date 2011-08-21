@@ -92,8 +92,6 @@ namespace OpencvSfM{
     //as we are a new point of view related to a device, we should add our address into device_:
     device_->pointsOfView_.push_back( this );
 
-    cv::Mat projection_matrix_comp = K_cv * projection_matrix_;
-    projection_matrix_comp=K_cv;
   };
 
   PointOfView::~PointOfView( void )
