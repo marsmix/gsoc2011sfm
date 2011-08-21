@@ -64,7 +64,7 @@ namespace OpencvSfM{
   using cv::DescriptorMatcher;
   using cv::FlannBasedMatcher;
   //by default, use flann based matcher
-  SequenceAnalyzer::SequenceAnalyzer( std::vector<cv::Mat> &images, cv::FileNode file )
+  SequenceAnalyzer::SequenceAnalyzer( cv::FileNode file, std::vector<cv::Mat> &images )
     :images_( images ),
     match_algorithm_( new PointsMatcher( Ptr<DescriptorMatcher>( new FlannBasedMatcher( ) )) )
   {
@@ -168,7 +168,7 @@ namespace OpencvSfM{
         point_matcher1->clear();
         points_to_track_j->free_descriptors();
 
-        Mat fundam = cv::findFundamentalMat( srcP, destP, status, cv::FM_RANSAC );
+        Mat fundam = cv::findFundamentalMat( srcP, destP, status, cv::FM_RANSAC, 1 );
 
         unsigned int nbErrors = 0, nb_iter=0;
         //refine the mathing :
@@ -190,7 +190,7 @@ namespace OpencvSfM{
           }
         }
 
-        while( nbErrors > 50 && nb_iter < 4 &&
+        while( nbErrors > size_match/10 && nb_iter < 4 &&
           matches_i_j.size( ) > mininum_points_matches )
         {
           fundam = cv::findFundamentalMat( srcP, destP, status, cv::FM_RANSAC, 1.5 );
@@ -332,21 +332,22 @@ namespace OpencvSfM{
   }
 
   void SequenceAnalyzer::keepOnlyCorrectMatches(
+    std::vector<TrackOfPoints>& tracks,
     unsigned int min_matches, unsigned int min_consistance )
   {
-    unsigned int tracks_size = tracks_.size( );
+    unsigned int tracks_size = tracks.size( );
     unsigned int index=0;
 
     while ( index < tracks_size )
     {
-      if( ( tracks_[ index ].getNbTrack( ) < min_matches ) ||
-        ( tracks_[ index ].track_consistance < (int)min_consistance ) )
+      if( ( tracks[ index ].getNbTrack( ) < min_matches ) ||
+        ( tracks[ index ].track_consistance < (int)min_consistance ) )
       {
         //problem with this track, too small to be consistent
         // or inconsistant...
         tracks_size--;
-        tracks_[ index ]=tracks_[ tracks_size ];
-        tracks_.pop_back( );
+        tracks[ index ]=tracks[ tracks_size ];
+        tracks.pop_back( );
         index--;
       }
       index++;
@@ -747,5 +748,24 @@ namespace OpencvSfM{
       itTrack++;
     }
     return out_vector;
+  }
+
+
+  void SequenceAnalyzer::showPointsOnImage(unsigned int i,
+    const std::vector<cv::Vec2d>& pixelProjection)
+  {
+    CV_Assert( i < images_.size() );
+    //convert Vec2D into Keypoints:
+    std::vector<KeyPoint> keypoints;
+    for(size_t cpt = 0; cpt<pixelProjection.size(); ++cpt)
+    {
+      keypoints.push_back( cv::KeyPoint( pixelProjection[ cpt ][0],
+        pixelProjection[ cpt ][1], 1 ) );
+    }
+    cv::Mat outImg;
+    cv::drawKeypoints( images_[i], keypoints, outImg );
+    cv::imshow( "Keypoints", outImg );
+    cv::waitKey( 0 );
+    cv::destroyWindow( "Keypoints" );
   }
 }

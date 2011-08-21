@@ -91,7 +91,8 @@ namespace OpencvSfM{
     * @param images input images. Points should be in the same order!
     * @param file YAML file to get points and matches
     */
-    SequenceAnalyzer( std::vector<cv::Mat> &images, cv::FileNode file );
+    SequenceAnalyzer( cv::FileNode file,
+      std::vector<cv::Mat> &images = std::vector<cv::Mat>() );
 
     ~SequenceAnalyzer( void );
     /**
@@ -112,9 +113,20 @@ namespace OpencvSfM{
     /**
     * This method keep only tracks with more than mininum_image_matches
     */
-    void keepOnlyCorrectMatches(
+    static void keepOnlyCorrectMatches(
+      std::vector<TrackOfPoints>& tracks,
       unsigned int min_matches = 10,
       unsigned int min_consistance = 3);
+    /**
+    * This method keep only tracks with more than mininum_image_matches
+    */
+    static inline void keepOnlyCorrectMatches(
+      SequenceAnalyzer& tracks,
+      unsigned int min_matches = 10,
+      unsigned int min_consistance = 3)
+      {
+        keepOnlyCorrectMatches(tracks.getTracks(),min_matches,min_consistance);
+      }
     /**
     * This method can be used to get the tracks
     */
@@ -195,6 +207,16 @@ namespace OpencvSfM{
     * object viewed in the sequence
     */
     std::vector< cv::Vec3d > get3DStructure( );
+    /**
+    * Use this function to show 2D points into ith image
+    * @param i index of wanted image
+    * @param pixelProjection list of 2D points
+    */
+    void showPointsOnImage(unsigned int i,
+      const std::vector<cv::Vec2d>& pixelProjection);
+
+    inline std::vector< cv::Ptr< PointsToTrack > > getPointsToTrack()
+    { return points_to_track_; };
   };
 
 }

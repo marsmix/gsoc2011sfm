@@ -64,10 +64,10 @@ NEW_TUTO( PCL_Tutorial, "Learn how you use PCL to show 3D points",
   cout<<"create a SequenceAnalyzer using "<<pathFileTracks<<endl;
   cv::FileStorage fsRead( pathFileTracks, cv::FileStorage::READ );
   cv::FileNode myPtt = fsRead.getFirstTopLevelNode( );
-  vector< cv::Mat > images;//empty list of image as we don't need them here...
-  motion_estim_loaded = new SequenceAnalyzer( images, myPtt );
+
+  motion_estim_loaded = new SequenceAnalyzer( myPtt );
   fsRead.release( );
-  motion_estim_loaded->keepOnlyCorrectMatches();
+  SequenceAnalyzer::keepOnlyCorrectMatches( *motion_estim_loaded );
   cout<<"numbers of correct tracks loaded:"<<
     motion_estim_loaded->getTracks( ).size( )<<endl;
 

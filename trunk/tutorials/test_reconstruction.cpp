@@ -84,7 +84,7 @@ NEW_TUTO( Triangulation_tuto, "Learn how you can triangulate 2D points",
   cout<<"Finally create a new SequenceAnalyzer"<<endl;
   FileStorage fsRead( pathFileTracks, FileStorage::READ );
   FileNode myPtt = fsRead.getFirstTopLevelNode( );
-  motion_estim_loaded = new SequenceAnalyzer( images, myPtt );
+  motion_estim_loaded = new SequenceAnalyzer( myPtt, images );
   fsRead.release( );
 
   cout<<"numbers of correct tracks loaded:"<<

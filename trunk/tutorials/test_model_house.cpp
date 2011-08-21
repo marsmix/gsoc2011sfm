@@ -73,12 +73,13 @@ NEW_TUTO( Model_House_test, "Using Model house data, run a SFM algorithm",
   }
   cout<<cameras.size()<<" cameras loaded!"<<endl;
 
-  cout<<"Do you want to comput 3D points from matches (0) or use loaded points (1)?"<<endl;
+  cout<<"Do you want to compute 3D points using cameras (0),\n"
+    "using points & cameras (noting computed)(1)\n"
+    " or compute everything(2)?"<<endl;
   string rep;
   cin>>rep;
   if(rep!="1")
   {
-
     string pathFileTracks = FROM_SRC_ROOT( "Medias/modelHouse/motion.yml" );
 
     std::ifstream inPoints( pathFileTracks.c_str( ) );
@@ -100,8 +101,6 @@ NEW_TUTO( Model_House_test, "Using Model house data, run a SFM algorithm",
         cout<<"Can't create "<<pathFileTracks<<"!\nPlease verify you have access to the directory!"<<endl;
         return;
       }
-      //Can't find a way to enable the following notation:
-      //fs << *ptt1;
       SequenceAnalyzer::write( fsOutMotion1,motion_estim );
       fsOutMotion1.release( );
     }
@@ -109,40 +108,49 @@ NEW_TUTO( Model_House_test, "Using Model house data, run a SFM algorithm",
 
     FileStorage fsRead( pathFileTracks, FileStorage::READ );
     FileNode myPtt = fsRead.getFirstTopLevelNode( );
-    vector<Mat> images;
-    SequenceAnalyzer motion_estim( images, myPtt );
+    SequenceAnalyzer motion_estim( myPtt );
     fsRead.release( );
 
 
-    //motion_estim.keepOnlyCorrectMatches( 3, 0 );
-
+    SequenceAnalyzer::keepOnlyCorrectMatches( motion_estim, 3, 0 );
     vector<TrackOfPoints> &tracks=motion_estim.getTracks( );
-    cout<<"numbers of correct tracks loaded:"<<tracks.size( )<<endl;
+    if(rep=="0")
+    {
+      cout<<"numbers of correct tracks loaded:"<<tracks.size( )<<endl;
 
-    cout<<"triangulation of points."<<endl;
-    StructureEstimator structure ( &motion_estim, &cameras );
-    vector<char> mask =  structure.computeStructure( );
-    //remove bad points:
-    for(unsigned int d = 0, d_idx=0;d<mask.size(); d++,d_idx++)
-      if(mask[d]==0)
-      {
-        //remove this bad match:
-        tracks[d_idx] = tracks[tracks.size()-1];
-        d_idx--;
-        tracks.pop_back();
-      }
-    structure.removeOutliersTracks(2);
+      cout<<"triangulation of points."<<endl;
+      StructureEstimator structure ( &motion_estim, &cameras );
+      vector<char> mask =  structure.computeStructure( );
+      //remove bad points:
+      for(unsigned int d = 0, d_idx=0;d<mask.size(); d++,d_idx++)
+        if(mask[d]==0)
+        {
+          //remove this bad match:
+          tracks[d_idx] = tracks[tracks.size()-1];
+          d_idx--;
+          tracks.pop_back();
+        }
+        structure.removeOutliersTracks(2);
+    }
 
-    cout<<"Bundle adjustement..."<<endl;
     EuclideanEstimator pe( motion_estim, cameras );
 
-    for(unsigned int d = 0;d<cameras.size(); d++)
-      pe.camera_computed_[d] = true;/*
-    TrackOfPoints::keepTrackWithImage(0, tracks);
-    TrackOfPoints::keepTrackWithImage(1, tracks);*/
-    pe.point_computed_ = tracks;
-    pe.bundleAdjustement();//test bundle adjustement....
-    pe.viewEstimation();
+    if(rep=="0")
+    {
+      for(unsigned int d = 0;d<cameras.size(); d++)
+        pe.camera_computed_[d] = true;
+      pe.point_computed_ = tracks;
+
+      cout<<"Bundle adjustement..."<<endl;
+      pe.bundleAdjustement();//test bundle adjustement....
+      pe.viewEstimation();
+    }
+    else
+    {
+      //SequenceAnalyzer::keepOnlyCorrectMatches(motion_estim,3,0);
+
+      pe.computeReconstruction();
+    }
   }
   else
   {

@@ -52,7 +52,6 @@ namespace OpencvSfM{
 
     void viewEstimation();
 
-  protected:
     void initialReconstruction( std::vector<TrackOfPoints>& tracks,
       int image1, int image2 );
 
