@@ -15,9 +15,9 @@
 #include "test_data_sets.h"
 //FeatureDetector::create( "FAST" )
 #define POINT_METHOD "SIFT"
-#define POINT_DETECTOR new DynamicAdaptedFeatureDetector (new FastAdjuster(), 1250, 2000 )
+#define POINT_DETECTOR FeatureDetector::create( "FAST" )
 #define DESCRIPTOR_METHOD "ORB"
-#define MATCHER_METHOD "BruteForce-HammingLUT"
+#define MATCHER_METHOD "BruteForce-Hamming"
 
 using namespace cv;
 using namespace OpencvSfM;
