@@ -93,7 +93,7 @@ NEW_TUTO( Track_creation, "Learn how you can compute tracks from a list of pictu
     int nbFrame=0;
     cout<<"Compute points and description for each frame..."<<endl;
     cout<<"This can take time so be patient ;)"<<endl;
-    while ( !currentImage.empty( ) && nbFrame<10)
+    while ( !currentImage.empty( ) )
     {
       //if the image is loaded, find the points:
       cout<<"Create a new PointsToTrack..."<<endl;
@@ -151,8 +151,8 @@ NEW_TUTO( Track_creation, "Learn how you can compute tracks from a list of pictu
   fsOutMotion1.release( );
 
   cout<<"We will now remove bad points matches..."<<endl;
-  int min_point_sequence = MAX( images.size()/30, 2 );
-  SequenceAnalyzer::keepOnlyCorrectMatches(motion_estim, min_point_sequence, 0 );
+  //int min_point_sequence = MAX( images.size()/30, 2 );
+  SequenceAnalyzer::keepOnlyCorrectMatches(motion_estim, 2, 0 );
 
   tracks=motion_estim.getTracks( );
   cout<<"numbers of correct tracks:"<<tracks.size( )<<endl;
