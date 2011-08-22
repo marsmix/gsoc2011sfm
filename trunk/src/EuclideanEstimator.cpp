@@ -279,7 +279,7 @@ namespace OpencvSfM{
     data.points3D = points3D_values;
 
     //////////////////////////////////////////////////////////////////////////
-#define PRINT_DEBUG
+//#define PRINT_DEBUG
 #ifdef PRINT_DEBUG
     //Debug compare projected point vs estimated point:
     idx_visible = 0;
@@ -334,7 +334,7 @@ namespace OpencvSfM{
     int iter = sba_motstr_levmar_x(n, ncon, m, mcon, vmask, p, cnp, pnp, x, NULL, mnp,
         img_projsRTS_x, img_projsRTS_jac_x, (void*)&data, itmax, 0, opts, info);
 
-    std::cout<<"SBA returned in "<<iter<<" iter, reason "<<info[6]
+    std::cout<<"SBA ("<<nz_count<<") returned in "<<iter<<" iter, reason "<<info[6]
     <<", error "<<info[1]<<" [initial "<< info[0]<<"]\n";
     if(iter>1)
     {
@@ -440,7 +440,7 @@ namespace OpencvSfM{
     delete [] x;// measurement vector
   }
 
-  bool EuclideanEstimator::cameraResection( unsigned int image )
+  bool EuclideanEstimator::cameraResection( unsigned int image, int max_reprojection )
   {
     //wrap the lourakis SBA:
     cout<<"resection"<<endl;
@@ -579,14 +579,14 @@ namespace OpencvSfM{
       img_projsRT_x, NULL, (void*)&data, itmax, 0, opts, info);
 
     bool resection_ok = true;
-    if( ( iter<=0 ) || (info[1]/nz_count)>100 )
+    if( ( iter<=0 ) || (info[1]/nz_count)>max_reprojection )
     {
       resection_ok = false;
       std::cout<<"resection rejected ("<<nz_count<<") : "<<info[1]/nz_count<<std::endl;
     }
     else
     {
-      std::cout<<"SBA returned in "<<iter<<" iter, reason "<<info[6]
+      std::cout<<"SBA ("<<nz_count<<") returned in "<<iter<<" iter, reason "<<info[6]
       <<", error "<<info[1]/nz_count<<" [initial "<< info[0]/nz_count<<"]\n";
 
 
@@ -822,7 +822,7 @@ namespace OpencvSfM{
     int img1,img2;
     int nbMatches = images_graph.getHighestLink( img1,img2 );
     vector<ImageLink> bestMatches;
-    images_graph.getOrderedLinks( bestMatches, MIN(nbMatches/2,100), nbMatches );
+    images_graph.getOrderedLinks( bestMatches, MIN(nbMatches/2,100) );
     double min_inliners=1e7;
     int index_of_min=0;
     cv::Mat minFundamental;
@@ -872,7 +872,7 @@ namespace OpencvSfM{
     //try to find more matches:
     cout<<"before"<<point_computed_.size()<<endl;
     addMoreMatches( img1, img2 );
-    cout<<"before"<<point_computed_.size()<<endl;
+    cout<<"after"<<point_computed_.size()<<endl;
 
     bundleAdjustement();
 
@@ -881,18 +881,31 @@ namespace OpencvSfM{
     //Find for other cameras position:
     vector<ImageLink> images_close;
     int nbIter = 0;
-    /*while( nbMatches>10 && images_computed.size()<cameras_.size()/2 && nbIter<4 )
+    while( nbMatches>10 && images_computed.size()<cameras_.size()-2 && nbIter<10 )
     {
       nbIter++;
       images_close.clear( );
-      while ( images_close.size( ) < 2 )
+      while ( images_close.size( ) < 2 && nbMatches>0 )
       {
         for(size_t cpt = 0; cpt<images_computed.size(); ++cpt )
         {
           images_graph.getImagesRelatedTo( images_computed[ cpt ],
             images_close, nbMatches * 0.8 - 10 );
+          //remove from images_close those into camera_computed_:
+          for(size_t cpt1 = 0; cpt1<images_close.size(); ++cpt1 )
+          {
+            if( camera_computed_[ images_close[cpt1].imgDest ] &&
+              camera_computed_[ images_close[cpt1].imgSrc ] )
+            {
+              images_close[ cpt1 ] = images_close[ images_close.size() - 1 ];
+              images_close.pop_back();
+              cpt1--;
+            }
+          }
         }
-        nbMatches = nbMatches * 0.8 - 10;
+        nbMatches = nbMatches * 0.9;
+        if(nbMatches<0)
+          nbMatches=0;
       }
 
       //for each images, comptute the camera position:
@@ -914,17 +927,19 @@ namespace OpencvSfM{
 
         if( new_id_image >= 0 )
         {
-          if( cameraResection( new_id_image ) )
+          if( cameraResection( new_id_image, 50*(nbIter/4.0+1.0) ) )
           {
             images_computed.push_back( new_id_image );
+            cout<<"before"<<point_computed_.size()<<endl;
             addMoreMatches( old_id_image, new_id_image );
+            cout<<"after"<<point_computed_.size()<<endl;
           }
         }
       }
       // Performs a bundle adjustment
-      //bundleAdjustement();
+      bundleAdjustement();
     }//*/
-    //bundleAdjustement();
+
     viewEstimation();
   }
 
@@ -952,6 +967,7 @@ namespace OpencvSfM{
         cam_name<<"Cam"<< ( i+1 );
         debugView.addCamera( cameras_[ i ],
           cam_name.str() );
+        cout<<cameras_[ i ].getTranslationVector()<<endl;
       }//*/
       
 

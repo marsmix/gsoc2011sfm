@@ -78,7 +78,7 @@ namespace OpencvSfM{
     * Find the position of a new camera
     * @param image index of the wanted camera
     */
-    bool cameraResection( unsigned int image );
+    bool cameraResection( unsigned int image, int max_reprojection = 50 );
 
     /**
     * Find matches between img1 and img2 and add the to the reconstruction...

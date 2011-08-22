@@ -475,9 +475,9 @@ namespace OpencvSfM{
     for( ; it != it_end; ++it )
     {
       int currentValue=it.value<int>( );
+      const cv::SparseMat::Node* n = it.node( );
       if( currentValue <= max_number && currentValue >= min_number )
       {
-        const cv::SparseMat::Node* n = it.node( );
         ImageLink link;
         link.imgSrc = n->idx[ 0 ];
         link.imgDest = n->idx[ 1 ];
@@ -511,7 +511,7 @@ namespace OpencvSfM{
         }
       }
     }
-    ++it;//skeep the diagonal
+    ++it;//skip the diagonal
     for( ; it < it_end; ++it )
     {
       uchar* currentValue=images_graph_.ptr( first_image, it, false );

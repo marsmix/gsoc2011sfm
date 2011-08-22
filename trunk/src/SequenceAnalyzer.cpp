@@ -44,7 +44,7 @@ namespace OpencvSfM{
     {
 
       Ptr<PointsToTrack> ptrPoints_tmp( new PointsToTrackWithImage (
-        nbFrame, currentImage, Mat( ), feature_detector, descriptor_extractor ));
+        nbFrame, currentImage, feature_detector, descriptor_extractor ));
 
       points_to_track_.push_back( ptrPoints_tmp );
       images_.push_back( currentImage );
@@ -55,23 +55,31 @@ namespace OpencvSfM{
 
   SequenceAnalyzer::SequenceAnalyzer(
     std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
-    cv::Ptr<PointsMatcher> match_algorithm,
-    const std::vector< cv::Mat > &images )
-    :images_( images ),points_to_track_( points_to_track ),
-    match_algorithm_( match_algorithm )
-  {
-  }
-
-  using cv::DescriptorMatcher;
-  using cv::FlannBasedMatcher;
-  //by default, use flann based matcher
-  SequenceAnalyzer::SequenceAnalyzer( cv::FileNode file,cv::Ptr<PointsMatcher> match_algorithm, std::vector<cv::Mat> &images )
-    :images_( images )
+    std::vector< cv::Mat > *images,
+    cv::Ptr<PointsMatcher> match_algorithm )
+    :points_to_track_( points_to_track )
   {
     if( match_algorithm.empty() )
-      match_algorithm_ = new PointsMatcher( Ptr<DescriptorMatcher>( new FlannBasedMatcher( ) ) );
+      match_algorithm_ = new PointsMatcher( 
+      Ptr<cv::DescriptorMatcher>( new cv::FlannBasedMatcher( ) ) );
     else
       match_algorithm_ = match_algorithm;
+    if( images != NULL)
+      images_ = (*images);
+  }
+
+  //by default, use flann based matcher
+  SequenceAnalyzer::SequenceAnalyzer( cv::FileNode file,
+    std::vector<cv::Mat> *images,
+    cv::Ptr<PointsMatcher> match_algorithm )
+  {
+    if( match_algorithm.empty() )
+      match_algorithm_ = new PointsMatcher(
+      Ptr<cv::DescriptorMatcher>( new cv::FlannBasedMatcher( ) ) );
+    else
+      match_algorithm_ = match_algorithm;
+    if( images != NULL)
+      images_ = (*images);
     read( file,*this );
   }
 
@@ -87,7 +95,7 @@ namespace OpencvSfM{
         !descriptor_extractor_.empty( ) );
       int nbFrame = points_to_track_.size( );
       Ptr<PointsToTrack> ptrPoints_tmp( new PointsToTrackWithImage (
-        nbFrame, image, Mat( ), feature_detector_, descriptor_extractor_ ));
+        nbFrame, image, feature_detector_, descriptor_extractor_ ));
       ptrPoints_tmp->computeKeypointsAndDesc( );
 
       points_to_track_.push_back( ptrPoints_tmp );
@@ -97,7 +105,7 @@ namespace OpencvSfM{
 
     images_.push_back( image );
   }
-  
+
   void SequenceAnalyzer::computeMatches( )
   {
     //First compute missing features descriptors:
@@ -400,7 +408,7 @@ namespace OpencvSfM{
     //initialisation of all empty vectors
     for( int i=0; i<nb_pictures; i++ )
     {
-      Ptr<PointsToTrack> ptt = Ptr<PointsToTrack>( new PointsToTrack( i ));
+      Ptr<PointsToTrack> ptt = Ptr<PointsToTrack>( new PointsToTrackWithImage( i, me.images_[i] ));
       me.points_to_track_.push_back( ptt );
 
       Ptr<PointsMatcher> p_m = Ptr<PointsMatcher>( new PointsMatcher(
@@ -506,7 +514,7 @@ namespace OpencvSfM{
               fs  << "[:";
 
               const cv::KeyPoint kpt = me.points_to_track_[ idImage ]->
-                getKeypoints( )[ idPoint ];
+                getKeypointsConst( )[ idPoint ];
               cv::write( fs, kpt.pt.x );
               cv::write( fs, kpt.pt.y );
               cv::write( fs, kpt.size );
@@ -540,7 +548,7 @@ namespace OpencvSfM{
       for( unsigned int cpt=0;cpt<nviews;cpt++ )
       {
         unsigned int imgSrc = track.images_indexes_[ cpt ];
-        for( unsigned int cpt1=imgSrc+1;cpt1<nviews;cpt1++ )
+        for( unsigned int cpt1=cpt+1;cpt1<nviews;cpt1++ )
         {
           images_graph_.addLink( imgSrc, track.images_indexes_[ cpt1 ] );
         }
@@ -591,4 +599,79 @@ namespace OpencvSfM{
     cv::waitKey( 0 );
     cv::destroyWindow( "Keypoints" );
   }
+
+  std::vector< cv::DMatch > SequenceAnalyzer::simple_matching(
+    cv::Ptr<PointsMatcher> point_matcher,
+    cv::Ptr<PointsMatcher> point_matcher1,
+    int mininum_points_matches)
+  {
+    vector< cv::DMatch > matches_i_j;
+    point_matcher->crossMatch( point_matcher1, matches_i_j );
+
+    //First compute points matches:
+    unsigned int size_match=matches_i_j.size( );
+    vector<cv::Point2f> srcP;
+    vector<cv::Point2f> destP;
+    vector<uchar> status;
+
+    //vector<KeyPoint> points1 = point_matcher->;
+    for( size_t cpt = 0; cpt < size_match; ++cpt ){
+      const cv::KeyPoint &key1 = point_matcher1->getKeypoint(
+        matches_i_j[ cpt ].queryIdx );
+      const cv::KeyPoint &key2 = point_matcher->getKeypoint(
+        matches_i_j[ cpt ].trainIdx );
+      srcP.push_back( cv::Point2f( key1.pt.x,key1.pt.y ) );
+      destP.push_back( cv::Point2f( key2.pt.x,key2.pt.y ) );
+      status.push_back( 1 );
+    }
+
+    //free some memory:
+    point_matcher->clear();
+    point_matcher1->clear();
+
+    cv::Mat fundam = cv::findFundamentalMat( srcP, destP, status, cv::FM_RANSAC, 1 );
+
+    unsigned int nbErrors = 0, nb_iter=0;
+    //refine the mathing :
+    size_match = status.size( );
+    for( size_t cpt = 0; cpt < size_match; ++cpt ){
+      if( status[ cpt ] == 0 )
+      {
+        size_match--;
+        status[ cpt ] = status[ size_match ];
+        status.pop_back( );
+        srcP[ cpt ] = srcP[ size_match ];
+        srcP.pop_back( );
+        destP[ cpt ] = destP[ size_match ];
+        destP.pop_back( );
+        matches_i_j[ cpt ] = matches_i_j[ size_match ];
+        matches_i_j.pop_back( );
+        cpt--;
+        ++nbErrors;
+      }
+    }
+
+    //refine the mathing:
+    fundam = cv::findFundamentalMat( srcP, destP, status, cv::FM_LMEDS );
+
+    size_match = status.size( );
+    for( size_t cpt = 0; cpt < size_match; ++cpt ){
+      if( status[ cpt ] == 0 )
+      {
+        size_match--;
+        status[ cpt ] = status[ size_match ];
+        status.pop_back( );
+        srcP[ cpt ] = srcP[ size_match ];
+        srcP.pop_back( );
+        destP[ cpt ] = destP[ size_match ];
+        destP.pop_back( );
+        matches_i_j[ cpt ] = matches_i_j[ size_match ];
+        matches_i_j.pop_back( );
+        cpt--;
+        ++nbErrors;
+      }
+    }
+    return matches_i_j;
+  };
+
 }

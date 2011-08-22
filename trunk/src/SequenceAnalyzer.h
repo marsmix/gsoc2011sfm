@@ -84,16 +84,16 @@ namespace OpencvSfM{
     */
     SequenceAnalyzer(
       std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
-      cv::Ptr<PointsMatcher> match_algorithm,
-      const std::vector<cv::Mat> &images );
+      std::vector<cv::Mat> *images = NULL,
+      cv::Ptr<PointsMatcher> match_algorithm = NULL );
     /**
     * Constructor taking a list of images and a FileNode
     * @param images input images. Points should be in the same order!
     * @param file YAML file to get points and matches
     */
     SequenceAnalyzer( cv::FileNode file,
-      cv::Ptr<PointsMatcher> match_algorithm = cv::Ptr<PointsMatcher>(NULL),
-      std::vector<cv::Mat> &images = std::vector<cv::Mat>() );
+      std::vector<cv::Mat> *images = NULL,
+      cv::Ptr<PointsMatcher> match_algorithm = NULL );
 
     /**
     * Destructor of SequenceAnalyzer (nothing is released!)
@@ -255,7 +255,18 @@ namespace OpencvSfM{
     * @return points Matcher algorithm from this sequence.
     */
     inline cv::Ptr<PointsMatcher> getMatchAlgo()
-      { return match_algorithm_->clone( true ); };
+    { return match_algorithm_->clone( true ); };
+    
+    /**
+    * This will find matches between two points matchers
+    * @param point_matcher first image
+    * @param point_matcher second image
+    * @param mininum_points_matches minimum matches allowed
+    */
+    static std::vector< cv::DMatch > simple_matching(
+      cv::Ptr<PointsMatcher> point_matcher,
+      cv::Ptr<PointsMatcher> point_matcher1,
+      int mininum_points_matches = 10);
   };
 
 }
