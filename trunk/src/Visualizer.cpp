@@ -158,7 +158,7 @@ namespace OpencvSfM{
     pcl::toROSMsg( *my_cloud, msg );
     triangles.cloud = msg;
     
-    //pcl::io::saveVTKFile ( ((std::string)"test")+name+((std::string)".vtk"), triangles );
+    pcl::io::saveVTKFile ( ((std::string)"test")+name+((std::string)".vtk"), triangles );
 
   }
 

@@ -72,7 +72,7 @@ namespace OpencvSfM{
     * Destructor of PointOfView, release all vectors... TODO: define how we should release the vectors...
     */
     virtual ~PointOfView( void );
-
+    
     /**
     * use this function to get acces to the camera parameters
     * @return camera matrix
@@ -190,8 +190,13 @@ namespace OpencvSfM{
     */
     static void write( cv::FileStorage& fs, const PointOfView& points );
 
+    /**
+    * This operator overload allow us to print easily a point of view:
+    */
+    void print( std::ostream &flux ) const;
   };
 
 }
+SFM_EXPORTS std::ostream& operator<<( std::ostream &flux, OpencvSfM::PointOfView const & pov );
 
 #endif

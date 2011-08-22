@@ -19,13 +19,6 @@ int main( )
   //_CrtSetBreakAlloc(1134);
 #endif
 
-  string tt = "test_aaa";
-  string tt1 = "testaaaa";
-  if(tt<tt1)
-    cout<<"petit"<<endl;
-  else
-    cout<<"grand"<<endl;
-
   //usefull to hide libmv debug output...
   std::ofstream out("libmv_log.txt"); 
   std::clog.rdbuf(out.rdbuf()); 

@@ -56,6 +56,8 @@ NEW_TUTO( Model_House_test, "Using Model house data, run a SFM algorithm",
   nameFile<<FROM_SRC_ROOT( "Medias/modelHouse/house.00" )<<idFile<<".P\0";
   inCams.open( nameFile.str().c_str( ) );
   double P[ 12 ];
+
+  
   while( inCams.is_open() )
   {
     inCams >> P[ 0 ] >> P[ 1 ] >> P[ 2 ] >> P[ 3 ];
@@ -71,6 +73,7 @@ NEW_TUTO( Model_House_test, "Using Model house data, run a SFM algorithm",
     inCams.close();
     inCams.open( tmpName.c_str( ) );
   }
+
   cout<<cameras.size()<<" cameras loaded!"<<endl;
 
   cout<<"Do you want to (0) compute 3D points using cameras ,\n"
@@ -90,8 +93,8 @@ NEW_TUTO( Model_House_test, "Using Model house data, run a SFM algorithm",
         IS_DIRECTORY);
       SequenceAnalyzer motion_estim( mp,
         FeatureDetector::create("FAST"),
-        DescriptorExtractor::create("SIFT"),
-        PointsMatcher::create("FlannBased") );
+        DescriptorExtractor::create("ORB"),
+        PointsMatcher::create("BruteForce-HammingLUT") );
 
       cout<<"Compute matches..."<<endl;
       motion_estim.computeMatches();
@@ -122,7 +125,6 @@ NEW_TUTO( Model_House_test, "Using Model house data, run a SFM algorithm",
     SequenceAnalyzer motion_estim( myPtt, &images,
       new PointsMatcher( DescriptorMatcher::create( "BruteForce-Hamming" ) ) );
     fsRead.release( );
-
 
     SequenceAnalyzer::keepOnlyCorrectMatches( motion_estim, 3, 0 );
     vector<TrackOfPoints> &tracks=motion_estim.getTracks( );
@@ -165,12 +167,13 @@ NEW_TUTO( Model_House_test, "Using Model house data, run a SFM algorithm",
 
       cout<<"Bundle adjustement..."<<endl;
       pe.bundleAdjustement();//test bundle adjustement...
-      pe.viewEstimation();
+      pe.viewEstimation( false );
     }
     else
     {
       //SequenceAnalyzer::keepOnlyCorrectMatches(motion_estim,3,0);
       pe.computeReconstruction();
+      pe.viewEstimation( false );
     }
   }
   else
