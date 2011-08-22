@@ -140,7 +140,7 @@ namespace OpencvSfM{
     * Use this method to change the translation vector of this camera
     * @param newVect new translation vector
     */
-    virtual void setTranslationVector( cv::Mat newVect )
+    inline void setTranslationVector( cv::Mat newVect )
     {
       for( int i=0; i<3; ++i )
         translation_.at<double>( i,0 ) = newVect.at<double>( i,0 );

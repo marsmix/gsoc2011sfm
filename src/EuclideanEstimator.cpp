@@ -321,7 +321,7 @@ namespace OpencvSfM{
     int itmax = 10000;        //max iterations
     int verbose = 1;
     double opts[SBA_OPTSSZ] = {
-      0.001,		//Tau
+      0.00001,		//Tau
       1e-20,		//E1
       1e-20,		//E2
       0,		//E3 average reprojection error
@@ -732,14 +732,15 @@ namespace OpencvSfM{
     //bundleAdjustement();
   }
 
-  void EuclideanEstimator::addMoreMatches(int img1, int img2)
+  void EuclideanEstimator::addMoreMatches(int img1, int img2,
+    std::string detect, std::string extractor )
   {
     Ptr<PointsMatcher> point_matcher = sequence_.getMatchAlgo();
 
     Ptr<PointsToTrack> pointCollection = Ptr<PointsToTrack>(
-      new PointsToTrackWithImage( img1, sequence_.getImage(img1), "FAST", "ORB" ));
+      new PointsToTrackWithImage( img1, sequence_.getImage(img1), detect, extractor ));
     Ptr<PointsToTrack> pointCollection1 = Ptr<PointsToTrack>(
-      new PointsToTrackWithImage( img2, sequence_.getImage(img2), "FAST", "ORB" ));
+      new PointsToTrackWithImage( img2, sequence_.getImage(img2), detect, extractor ));
     pointCollection->computeKeypointsAndDesc( true );
     point_matcher->add( pointCollection );
     point_matcher->train();
@@ -868,13 +869,16 @@ namespace OpencvSfM{
     images_computed.push_back( img2 );
     camera_computed_[ img1 ] = true;
     initialReconstruction( img1, img2 );
-
+    
     //try to find more matches:
+    std::vector< TrackOfPoints > point_before = point_computed_;
     cout<<"before"<<point_computed_.size()<<endl;
     addMoreMatches( img1, img2 );
     cout<<"after"<<point_computed_.size()<<endl;
+    if( point_computed_.size() < point_before.size()-20 )
+      point_computed_ = point_before;
 
-    bundleAdjustement();
+    //bundleAdjustement();
 
     //now we have updated the position of the camera which take img2
     //and 3D estimation from these 2 first cameras...
@@ -930,15 +934,25 @@ namespace OpencvSfM{
           if( cameraResection( new_id_image, 50*(nbIter/4.0+1.0) ) )
           {
             images_computed.push_back( new_id_image );
+            std::vector< TrackOfPoints > point_before = point_computed_;
             cout<<"before"<<point_computed_.size()<<endl;
             addMoreMatches( old_id_image, new_id_image );
             cout<<"after"<<point_computed_.size()<<endl;
+            if( point_computed_.size() < point_before.size() )
+              point_computed_ = point_before;
           }
         }
       }
       // Performs a bundle adjustment
       bundleAdjustement();
     }//*/
+    /*
+    for( unsigned int i = 0; i<cameras_.size( ) ; ++i )
+      camera_computed_[i] = true;
+
+    point_computed_ = sequence_.getTracks();
+
+    bundleAdjustement();*/
 
     viewEstimation();
   }
@@ -968,7 +982,7 @@ namespace OpencvSfM{
         debugView.addCamera( cameras_[ i ],
           cam_name.str() );
         cout<<cameras_[ i ].getTranslationVector()<<endl;
-      }//*/
+      }
       
 
 

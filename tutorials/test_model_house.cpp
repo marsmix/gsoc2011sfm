@@ -73,9 +73,9 @@ NEW_TUTO( Model_House_test, "Using Model house data, run a SFM algorithm",
   }
   cout<<cameras.size()<<" cameras loaded!"<<endl;
 
-  cout<<"Do you want to compute 3D points using cameras (0),\n"
-    "using points & cameras (noting computed)(1)\n"
-    " or compute everything(2)?"<<endl;
+  cout<<"Do you want to (0) compute 3D points using cameras ,\n"
+    "(1) using points & cameras (noting computed)\n"
+    " or (2) compute everything (except intra parameters)?"<<endl;
   string rep;
   cin>>rep;
   if(rep!="1")
@@ -89,7 +89,7 @@ NEW_TUTO( Model_House_test, "Using Model house data, run a SFM algorithm",
       mp.setInputSource( FROM_SRC_ROOT( "Medias/modelHouse/" ),
         IS_DIRECTORY);
       SequenceAnalyzer motion_estim( mp,
-        FeatureDetector::create("SIFT"),
+        FeatureDetector::create("FAST"),
         DescriptorExtractor::create("SIFT"),
         PointsMatcher::create("FlannBased") );
 
@@ -106,9 +106,21 @@ NEW_TUTO( Model_House_test, "Using Model house data, run a SFM algorithm",
     }
     inPoints.close( );
 
+    MotionProcessor mp;
+    mp.setInputSource( FROM_SRC_ROOT( "Medias/modelHouse/" ),
+      IS_DIRECTORY);
+    vector<Mat> images;
+    Mat imgTmp=mp.getFrame( );//get the current image
+    while ( !imgTmp.empty() )
+    {
+      images.push_back( imgTmp );
+      imgTmp=mp.getFrame();
+    }
+
     FileStorage fsRead( pathFileTracks, FileStorage::READ );
     FileNode myPtt = fsRead.getFirstTopLevelNode( );
-    SequenceAnalyzer motion_estim( myPtt );
+    SequenceAnalyzer motion_estim( myPtt, &images,
+      new PointsMatcher( DescriptorMatcher::create( "BruteForce-Hamming" ) ) );
     fsRead.release( );
 
 
@@ -131,6 +143,16 @@ NEW_TUTO( Model_House_test, "Using Model house data, run a SFM algorithm",
           tracks.pop_back();
         }
         structure.removeOutliersTracks(2);
+    }
+
+    if(rep!="0")
+    {
+      //to be sure, remove rotation and translation:
+      for(unsigned int d = 0;d<cameras.size(); d++)
+      {
+        cameras[d].setRotationMatrix( Mat::eye(3, 3, CV_64F) );
+        cameras[d].setTranslationVector( Mat::zeros(3,1,CV_64F) );
+      }
     }
 
     EuclideanEstimator pe( motion_estim, cameras );

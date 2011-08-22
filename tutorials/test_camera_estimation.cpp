@@ -78,10 +78,10 @@ NEW_TUTO( Proj_Rec, "Euclidean reconstruction",
     FileStorage fsRead( pathFileTracks, FileStorage::READ );
     FileNode myPtt = fsRead.getFirstTopLevelNode( );
     SequenceAnalyzer motion_estim_loaded( myPtt, &images,
-      new PointsMatcher( DescriptorMatcher::create( "BruteForce-HammingLUT" ) ) );
+      new PointsMatcher( DescriptorMatcher::create( "BruteForce-Hamming" ) ) );
 
     fsRead.release( );
-
+    /*
     cout<<"A little help ;) Keep only good matches using triangulation."<<endl;
     StructureEstimator structure ( &motion_estim_loaded, &myCamerasReal );
     vector<char> mask =  structure.computeStructure( );
@@ -96,6 +96,7 @@ NEW_TUTO( Proj_Rec, "Euclidean reconstruction",
         tracks.pop_back();
       }
       structure.removeOutliersTracks( 2 );
+      */
       //save these correct points:
       pathFileTracks = FROM_SRC_ROOT( "Medias/motion_track_no_error.yml" );
       FileStorage fsOutMotion1( pathFileTracks, FileStorage::WRITE );
