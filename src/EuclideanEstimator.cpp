@@ -735,7 +735,12 @@ namespace OpencvSfM{
   void EuclideanEstimator::addMoreMatches(int img1, int img2,
     std::string detect, std::string extractor )
   {
-    Ptr<PointsMatcher> point_matcher = sequence_.getMatchAlgo();
+    std::string methodMatch = "FlannBased";
+    if( extractor.find("ORB")!=std::string::npos ||
+      extractor.find("BRIEF")!=std::string::npos)
+      methodMatch = "BruteForce-Hamming";
+    Ptr<PointsMatcher> point_matcher = 
+      new PointsMatcher( cv::DescriptorMatcher::create( methodMatch ) );
 
     Ptr<PointsToTrack> pointCollection = Ptr<PointsToTrack>(
       new PointsToTrackWithImage( img1, sequence_.getImage(img1), detect, extractor ));
@@ -746,15 +751,18 @@ namespace OpencvSfM{
     point_matcher->train();
 
     pointCollection1->computeKeypointsAndDesc( true );
-    Ptr<PointsMatcher> point_matcher1 = sequence_.getMatchAlgo();
+    Ptr<PointsMatcher> point_matcher1 =
+      new PointsMatcher( cv::DescriptorMatcher::create( methodMatch ) );
     point_matcher1->add( pointCollection1 );
     point_matcher1->train( );
 
     vector< cv::DMatch > matches_i_j = 
       SequenceAnalyzer::simple_matching(point_matcher, point_matcher1 );
     //matches don't use the same indices... set correct one:
-    vector<cv::KeyPoint>& kpImg1 = sequence_.getPointsToTrack()[img1]->getKeypoints();
-    vector<cv::KeyPoint>& kpImg2 = sequence_.getPointsToTrack()[img2]->getKeypoints();
+    vector<cv::KeyPoint>& kpImg1 =
+      sequence_.getPointsToTrack()[img1]->getModifiableKeypoints();
+    vector<cv::KeyPoint>& kpImg2 =
+      sequence_.getPointsToTrack()[img2]->getModifiableKeypoints();
     int point_added = 0;
     size_t nbK1 = kpImg1.size(), nbK2 = kpImg2.size(), cpt1;
     for(size_t cpt=0; cpt<matches_i_j.size(); ++cpt)
@@ -885,7 +893,7 @@ namespace OpencvSfM{
     //Find for other cameras position:
     vector<ImageLink> images_close;
     int nbIter = 0;
-    while( nbMatches>10 && images_computed.size()<cameras_.size()-2 && nbIter<10 )
+    while( nbMatches>10 && images_computed.size()<cameras_.size() && nbIter<20 )
     {
       nbIter++;
       images_close.clear( );
@@ -954,10 +962,9 @@ namespace OpencvSfM{
 
     bundleAdjustement();*/
 
-    viewEstimation();
   }
 
-  void EuclideanEstimator::viewEstimation()
+  void EuclideanEstimator::viewEstimation( bool coloredPoints )
   {
     vector<cv::Vec3d> tracks3D;
     vector< unsigned int > colors;
@@ -972,7 +979,10 @@ namespace OpencvSfM{
     //////////////////////////////////////////////////////////////////////////
     // Open 3D viewer and add point cloud
     Visualizer debugView ( "Debug viewer" );
-    debugView.add3DPointsColored( tracks3D,colors, "Euclidean estimated" );
+    if( coloredPoints )
+      debugView.add3DPointsColored( tracks3D,colors, "Euclidean estimated" );
+    else
+      debugView.add3DPoints( tracks3D, "Euclidean estimated" );
     
     for( unsigned int i = 0; i<cameras_.size( ) ; ++i )
       if( camera_computed_[i] )

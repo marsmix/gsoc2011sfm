@@ -106,31 +106,39 @@ namespace OpencvSfM{
     images_.push_back( image );
   }
 
-  void SequenceAnalyzer::computeMatches( )
+  void SequenceAnalyzer::computeMatches( bool printProgress )
   {
     //First compute missing features descriptors:
     vector< Ptr< PointsToTrack > >::iterator it =
-      points_to_track_.begin( );
-    MatchingThread::end_matches_it = points_to_track_.end( );
+      points_to_track_.begin( ),
+      end_matches_it = points_to_track_.end( );
+    MatchingThread::size_list = points_to_track_.size();
     MatchingThread::match_algorithm = match_algorithm_;
+
+    MatchingThread::matches_ = &points_to_track_;
+
+    double nbMatches = points_to_track_.size();
+    MatchingThread::total_matches = nbMatches * nbMatches / 2.0;
+    MatchingThread::current_match_ = 0;
+    MatchingThread::print_progress_ = printProgress;
 
     //Try to match each picture with other:
     vector<Mat> masks;
     vector< Ptr< PointsToTrack > >::iterator matches_it = points_to_track_.begin( );
 
     MatchingThread::mininum_points_matches = mininum_points_matches;
-    unsigned int nb_proc = boost::thread::hardware_concurrency();
+    unsigned int nb_proc = boost::thread::hardware_concurrency()-1;
     INIT_SEMAPHORE( MatchingThread::thread_concurr,nb_proc );
     INIT_MUTEX( MatchingThread::thread_unicity );
 
     unsigned int i=0;
 
-    while ( matches_it != MatchingThread::end_matches_it )
+    while ( matches_it != end_matches_it )
     {
       //can we start a new thread?
       P_MUTEX( MatchingThread::thread_concurr );
       //create local values for the thead:
-      MatchingThread match_thread(this, i, matches_it);
+      MatchingThread match_thread(this, i );
       //start the thread:
       boost::thread myThread(match_thread);
 
@@ -514,7 +522,7 @@ namespace OpencvSfM{
               fs  << "[:";
 
               const cv::KeyPoint kpt = me.points_to_track_[ idImage ]->
-                getKeypointsConst( )[ idPoint ];
+                getKeypoints( )[ idPoint ];
               cv::write( fs, kpt.pt.x );
               cv::write( fs, kpt.pt.y );
               cv::write( fs, kpt.size );

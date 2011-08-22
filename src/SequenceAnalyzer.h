@@ -113,8 +113,9 @@ namespace OpencvSfM{
     * It first compute missing features descriptor, then train each matcher.
     * Finally compute tracks of keypoints ( a track is a connected set of
     * matching keypoints across multiple images )
+    * @param  printProgress set to true is you want to view progress.
     */
-    void computeMatches( );
+    void computeMatches( bool printProgress = true );
     /**
     * This method keep only tracks with more than mininum_image_matches
     */

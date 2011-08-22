@@ -152,3 +152,4 @@ configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config_SFM.h.in ${CMAKE_BINARY_DIR}/
 add_subdirectory( src )
 add_subdirectory( tutorials )
 add_subdirectory( YAML_loader )
+add_subdirectory( EuclideanReconstruction )

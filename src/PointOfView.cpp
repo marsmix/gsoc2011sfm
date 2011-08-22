@@ -264,5 +264,18 @@ namespace OpencvSfM{
     pov.device_->write( fs );
     fs << "}" << "}";
   }
+  
+  void PointOfView::print( std::ostream &flux ) const
+  {
+    flux << "Intra parameters: " << endl << device_->getIntraMatrix()<<endl;
+    flux << "Rotation matrix: " << endl << rotation_<<endl;
+    flux << "Translation vector: " << endl << translation_<<endl;
+  }
 
+}
+
+std::ostream& operator<<( std::ostream &flux, OpencvSfM::PointOfView const & pov )
+{
+  pov.print(flux);
+  return flux;
 }

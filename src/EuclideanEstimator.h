@@ -64,8 +64,9 @@ namespace OpencvSfM{
 
     /**
     * Show this estimation
+    * @param coloredPoints set to true if you have points with color...
     */
-    void viewEstimation();
+    void viewEstimation( bool coloredPoints = true );
     
     /**
     * Create a new Euclidean reconstruction using matches between two images

@@ -130,7 +130,7 @@ NEW_TUTO( Track_creation, "Learn how you can compute tracks from a list of pictu
 
   pathFileTracks = FROM_SRC_ROOT( "Medias/tracks_points_"POINT_METHOD"/motion_tracks1.yml" );
   cout<<"Compute matches between each frames..."<<endl<<endl;
-  cout<<"The complexity is O( scary ) (approx fact(n)), so be patient...\nOnce done "
+  cout<<"The complexity is O( scary ) (approx n^2), so be patient...\nOnce done "
     "you will not have to do it again, everything will be saved in:\n"<<
     pathFileTracks<<"..."<<endl;
   motion_estim.computeMatches( );

@@ -130,6 +130,6 @@ NEW_TUTO( Proj_Rec, "Euclidean reconstruction",
   TrackOfPoints::keepTrackWithImages(idx_keep,tracks);
   pe.point_computed_ = tracks;
   pe.bundleAdjustement();
-  pe.viewEstimation();
   //*/
+  pe.viewEstimation();
 }

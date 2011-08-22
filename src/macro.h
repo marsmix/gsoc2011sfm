@@ -1,5 +1,5 @@
-#ifndef _SFM_MACRO_H_
-#define _SFM_MACRO_H_
+#ifndef _SFM_GSOC2011_MACRO_H_
+#define _SFM_GSOC2011_MACRO_H_
 
 //Taken from opencv's precom.hpp
 #if _MSC_VER >= 1200
