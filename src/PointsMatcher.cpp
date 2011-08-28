@@ -2,6 +2,8 @@
 #include "macro.h" //SFM_EXPORTS
 
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/video/tracking.hpp>
+#include <algorithm>
 
 #include "PointsMatcher.h"
 #include "PointsToTrack.h"
@@ -19,6 +21,12 @@ namespace OpencvSfM{
   {
     CV_DbgAssert( !matcher.empty( ) );
     matcher_ = matcher;
+    INIT_MUTEX( thread_concurr );
+  }
+
+  PointsMatcher::PointsMatcher( )
+  {
+    matcher_ = NULL;
     INIT_MUTEX( thread_concurr );
   }
 
@@ -95,6 +103,7 @@ namespace OpencvSfM{
   {
     train( );
 
+    P_MUTEX( thread_concurr );
     queryPoints->computeKeypointsAndDesc( false );
 
     vector<KeyPoint> keyPoints=queryPoints->getKeypoints( );
@@ -103,7 +112,6 @@ namespace OpencvSfM{
     CV_DbgAssert( !keyPoints.empty( ) );
     CV_DbgAssert( !descMat.empty( ) );
 
-    P_MUTEX( thread_concurr );
     matcher_->match( descMat, matches, masks );
     V_MUTEX( thread_concurr );
 
@@ -116,6 +124,7 @@ namespace OpencvSfM{
   {
     train( );
 
+    P_MUTEX( thread_concurr );
     queryPoints->computeKeypointsAndDesc( false );
 
     vector<KeyPoint> keyPoints=queryPoints->getKeypoints( );
@@ -124,7 +133,6 @@ namespace OpencvSfM{
     CV_DbgAssert( !keyPoints.empty( ) );
     CV_DbgAssert( !descMat.empty( ) );
 
-    P_MUTEX( thread_concurr );
     matcher_->knnMatch( descMat, matches, knn, masks, compactResult );
     V_MUTEX( thread_concurr );
 
@@ -137,6 +145,7 @@ namespace OpencvSfM{
   {
     train( );
 
+    P_MUTEX( thread_concurr );
     queryPoints->computeKeypointsAndDesc( false );
 
     vector<KeyPoint> keyPoints=queryPoints->getKeypoints( );
@@ -145,7 +154,6 @@ namespace OpencvSfM{
     CV_DbgAssert( !keyPoints.empty( ) );
     CV_DbgAssert( !descMat.empty( ) );
 
-    P_MUTEX( thread_concurr );
     matcher_->radiusMatch( descMat, matches, maxDistance, masks, compactResult );
     V_MUTEX( thread_concurr );
 
@@ -191,12 +199,18 @@ namespace OpencvSfM{
     otherMatcher->match( pointCollection_[ 0 ], matchesOtherWay, masks );
     V_MUTEX( thread_concurr );
     //now check for reciprocity:
-    unsigned int nbPoints=matches.size( );
-    for( unsigned int i=0; i<nbPoints; i++ )
+    size_t nbPoints = matches.size( ),
+      nbPoints1 = matchesOtherWay.size( );
+    for( size_t i=0; i<nbPoints; i++ )
     {
       DMatch d1=matches[ i ];
-      DMatch d2=matchesOtherWay[ d1.trainIdx ];
-      if( d2.trainIdx!=d1.queryIdx )
+      bool found = false;
+      for( size_t j=0; j<nbPoints1 && !found ; ++j )
+      {
+        DMatch d2=matchesOtherWay[ j ];
+        found = (d1.trainIdx == d2.queryIdx) && (d1.queryIdx == d2.trainIdx);
+      }
+      if( !found )
       {
         //remove the current match!
         nbPoints--;//because we have a match less!
@@ -303,4 +317,224 @@ namespace OpencvSfM{
     }
     fs << "]";
   }
+
+  
+  PointsMatcherOpticalFlow::PointsMatcherOpticalFlow( std::string name_of_algo,
+    double dist_allowed )
+  {
+    transform(name_of_algo.begin(), name_of_algo.end(),
+      name_of_algo.begin(),tolower);
+    id_algo = 0;
+    max_distance = dist_allowed;
+
+    if( name_of_algo == "opticalflowpyrlk" )
+      id_algo = 1;
+    if( name_of_algo == "opticalflowfarneback" )
+      id_algo = 2;
+    if( name_of_algo == "opticalflowbm" )
+      id_algo = 3;
+    if( name_of_algo == "opticalflowhs" )
+      id_algo = 4;
+    if( name_of_algo == "opticalflowlk" )
+      id_algo = 5;
+  }
+
+  void PointsMatcherOpticalFlow::clear( )
+  {
+    //nothing to do...
+  }
+
+  void PointsMatcherOpticalFlow::train( )
+  {
+    //nothing to do...
+  }
+
+  bool PointsMatcherOpticalFlow::isMaskSupported( )
+  {
+    return false;
+  }
+
+  void PointsMatcherOpticalFlow::match( cv::Ptr<PointsToTrack> queryPoints,
+    std::vector<cv::DMatch>& matches,
+    const std::vector<cv::Mat>& masks )
+  {
+    P_MUTEX( thread_concurr );
+
+    if(pointCollection_[0]->getKeypoints( ).empty())
+      pointCollection_[0]->computeKeypoints();
+    const vector<KeyPoint>& keyPoints=pointCollection_[0]->getKeypoints( );
+    vector<cv::Point2f> keyPointsIn;
+    vector<cv::Point2f> keyPointsOut;
+    vector<uchar> status;
+    vector<float> error;
+
+    cv::Mat img1 = pointCollection_[0]->getImage();
+    cv::Mat img2 = queryPoints->getImage();
+    CV_Assert( !img1.empty() && !img2.empty()  );
+
+    for( size_t cpt = 0; cpt<keyPoints.size(); cpt++)
+    {
+      const KeyPoint &kp = keyPoints[cpt];
+      keyPointsIn.push_back( cv::Point2f(kp.pt.x, kp.pt.y) );
+    }
+
+    switch( id_algo )
+    {
+    case 1://1:  OpticalFlowPyrLK
+      cv::calcOpticalFlowPyrLK(img1, img2, keyPointsIn, keyPointsOut,
+        status, error );
+      break;/*
+    case 2://2:  OpticalFlowFarneback
+      cv::OpticalFlowFarneback(img1, img2, keyPointsIn, keyPointsOut,
+        status, error );
+      break;
+    case 3://3:  OpticalFlowBM
+      cv::OpticalFlowBM(img1, img2, keyPointsIn, keyPointsOut,
+        status, error );
+      break;
+    case 4://4:  OpticalFlowHS
+      cv::OpticalFlowHS(img1, img2, keyPointsIn, keyPointsOut,
+        status, error );
+      break;
+    case 5://5:  OpticalFlowLK
+      cv::OpticalFlowLK(img1, img2, keyPointsIn, keyPointsOut,
+        status, error );
+      break;
+    default:;*/
+    }
+
+    //construct the DMatch vector (find the closest point in queryPoints)
+    if(queryPoints->getKeypoints( ).empty())
+      queryPoints->computeKeypoints();
+    const vector< KeyPoint >& points = queryPoints->getKeypoints();
+    for( size_t cpt = 0; cpt<keyPointsOut.size(); cpt++)
+    {
+      if( status[cpt]!=0 )
+      {
+        float dist_min = 1e10;
+        int idx_min = 0;
+        for(size_t i = 0; i<points.size() ; ++i)
+        {
+          const cv::KeyPoint& kp = points[i];
+          float dist = sqrt( (keyPointsOut[cpt].x - kp.pt.x)*(keyPointsOut[cpt].x - kp.pt.x)
+            + (keyPointsOut[cpt].y - kp.pt.y)*(keyPointsOut[cpt].y - kp.pt.y) );
+          if(dist<dist_min)
+          {
+            dist_min = dist;
+            idx_min = i;
+          }
+        }
+        if( dist_min<max_distance )
+        matches.push_back( cv::DMatch(idx_min, cpt, dist_min) );//not really the correct dist...
+      }
+    }
+    V_MUTEX( thread_concurr );
+  }
+
+  void PointsMatcherOpticalFlow::knnMatch(  Ptr<PointsToTrack> queryPoints,
+    vector<vector<DMatch> >& matches, int knn,
+    const vector<Mat>& masks, bool compactResult )
+  {
+    if( knn!=1 )
+      CV_Error( CV_StsError, "not yet implemented..." );
+
+    vector<DMatch> matchesTmp;
+    match( queryPoints, matchesTmp, masks );
+    matches.push_back(matchesTmp);
+  }
+
+  void PointsMatcherOpticalFlow::radiusMatch( cv::Ptr<PointsToTrack> queryPoints,
+    vector<vector<DMatch> >& matches, float maxDistance,
+    const vector<Mat>& masks, bool compactResult )
+  {
+    P_MUTEX( thread_concurr );
+
+    if(pointCollection_[0]->getKeypoints( ).empty())
+      pointCollection_[0]->computeKeypoints();
+    const vector<KeyPoint>& keyPoints=pointCollection_[0]->getKeypoints( );
+    vector<cv::Point2f> keyPointsIn;
+    vector<cv::Point2f> keyPointsOut;
+    vector<char> status;
+    vector<double> error;
+
+    cv::Mat img1 = pointCollection_[0]->getImage();
+    cv::Mat img2 = queryPoints->getImage();
+    CV_Assert( !img1.empty() && !img2.empty()  );
+
+    for( size_t cpt = 0; cpt<keyPoints.size(); cpt++)
+    {
+      const KeyPoint &kp = keyPoints[cpt];
+      keyPointsIn.push_back( cv::Point2f(kp.pt.x, kp.pt.y) );
+    }
+
+    switch( id_algo )
+    {
+    case 1://1:  OpticalFlowPyrLK
+      cv::calcOpticalFlowPyrLK(img1, img2, keyPointsIn, keyPointsOut,
+        status, error );
+      break;/*
+    case 2://2:  OpticalFlowFarneback
+      cv::OpticalFlowFarneback(img1, img2, keyPointsIn, keyPointsOut,
+        status, error );
+      break;
+    case 3://3:  OpticalFlowBM
+      cv::OpticalFlowBM(img1, img2, keyPointsIn, keyPointsOut,
+        status, error );
+      break;
+    case 4://4:  OpticalFlowHS
+      cv::OpticalFlowHS(img1, img2, keyPointsIn, keyPointsOut,
+        status, error );
+      break;
+    case 5://5:  OpticalFlowLK
+      cv::OpticalFlowLK(img1, img2, keyPointsIn, keyPointsOut,
+        status, error );
+      break;
+    default:;*/
+    }
+
+    //construct the DMatch vector (find the closest point in queryPoints)
+    if(queryPoints->getKeypoints( ).empty())
+      queryPoints->computeKeypoints();
+    const std::vector< cv::KeyPoint >& points = queryPoints->getKeypoints();
+    for( size_t cpt = 0; cpt<keyPointsOut.size(); cpt++)
+    {
+      if( status[cpt]!=0 )
+      {
+        vector<DMatch> matchesTmp;
+        for(size_t i = 0; i<points.size() ; ++i)
+        {
+          const cv::KeyPoint& kp = points[i];
+          float dist = sqrt( (keyPointsOut[cpt].x - kp.pt.x)*(keyPointsOut[cpt].x - kp.pt.x)
+            + (keyPointsOut[cpt].y - kp.pt.y)*(keyPointsOut[cpt].y - kp.pt.y) );
+          if( dist<maxDistance )
+          {
+            matchesTmp.push_back( cv::DMatch(i, cpt, dist) );//not really the correct dist...
+          }
+        }
+        matches.push_back( matchesTmp );//not really the correct dist...
+      }
+      else
+        matches.push_back( vector<DMatch>() );//empty match!
+    }
+    V_MUTEX( thread_concurr );
+  }
+
+  bool PointsMatcherOpticalFlow::empty( ) const
+  {
+    return pointCollection_.empty( );
+  }
+
+  Ptr<PointsMatcher> PointsMatcherOpticalFlow::clone( bool emptyTrainData )
+  {
+    P_MUTEX( thread_concurr );
+    PointsMatcherOpticalFlow* outPointMatcher =
+      new PointsMatcherOpticalFlow( "void" );
+    outPointMatcher->id_algo = this->id_algo;
+    if( !emptyTrainData )
+      outPointMatcher->pointCollection_ = pointCollection_;
+    V_MUTEX( thread_concurr );
+
+    return outPointMatcher;
+  }
+
 }

@@ -38,7 +38,9 @@ namespace OpencvSfM{
     * @param intra_params matrix of intra parameters ( 3*3 )
     * @param wantedEstimation values which need an estimation
     */
-    CameraPinhole( cv::Mat intra_params=cv::Mat::eye( 3, 3, CV_64F ),unsigned char wantedEstimation=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM );
+    CameraPinhole( cv::Mat intra_params=cv::Mat::eye( 3, 3, CV_64F ),
+      int img_w=640, int img_h=480, unsigned char wantedEstimation
+      = FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM );
     /**
     * Constructor where initial camera matrix is computed from the 3D-2D point correspondences.
     * Currently, the function only supports planar calibration patterns, i.e. patterns where each object point has z-coordinate =0.
@@ -48,7 +50,10 @@ namespace OpencvSfM{
     * @param aspectRatio If it is zero or negative, both \f$f_x\f$  and \f$f_y\f$  are estimated independently. Otherwise \f$f_x=f_y * aspectRatio\f$ 
     * @param wantedEstimation values which need an estimation
     */
-    CameraPinhole( const std::vector<std::vector<cv::Point3f> >& objectPoints, const std::vector<std::vector<cv::Point2f> >& imagePoints, cv::Size imageSize, double aspectRatio=1.,unsigned char wantedEstimation=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM );
+    CameraPinhole( const std::vector<std::vector<cv::Point3f> >& objectPoints,
+      const std::vector<std::vector<cv::Point2f> >& imagePoints,
+      cv::Size imageSize, double aspectRatio=1., int img_w=640, int img_h=480,
+      unsigned char wantedEstimation=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM );
     ~CameraPinhole( );
 
     /**

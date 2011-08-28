@@ -50,14 +50,24 @@ namespace OpencvSfM{
     friend class PointOfView;//PointOfView is a good friend of Camera as it's intimately related!
   protected:
 
+    int img_width;///<Width of the images taken by this camera
+    int img_height;///<Height of the images taken by this camera
+
     std::vector<PointOfView*> pointsOfView_;///<vector of the differents positions of the camera.
     /**
     * As this class is virtual, we can't create a new empty camera...
     */
-    Camera( );
+    Camera( int img_w=640, int img_h=480 );
   public:
     virtual ~Camera( void );
-
+    /**
+    * get the width of the images taken by this camera
+    */
+    int getImgWidth() const { return img_width;};
+    /**
+    * get the height of the images taken by this camera
+    */
+    int getImgHeight() const { return img_height;};
     /**
     * This method can transform points from image to 3D rays ( homogeneous coordinates )
     */

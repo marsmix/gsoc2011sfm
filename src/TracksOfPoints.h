@@ -151,7 +151,7 @@ namespace OpencvSfM{
       cv::Vec3d& points3D,
       double reproj_error = 4,
       const std::vector<bool> &masks = std::vector<bool>( ) );
-
+    
     /**
     * From the list of points of this track, remove each 2D points when
     * reprojection error > reproj_error
@@ -164,6 +164,12 @@ namespace OpencvSfM{
       const std::vector< cv::Ptr< PointsToTrack > > &points_to_track,
       double reproj_error = 4,
       std::vector<bool> *masks = NULL );
+
+    /**
+    * Remove tracks having points in commun (mix them and set them inconsistant if needed...)
+    * @param tracks list of tracks to analyze
+    */
+    static void fusionDuplicates( std::vector<TrackOfPoints>& tracks );
     
     /**
     * Use this function to change the 3D coordinates corresponding to this track

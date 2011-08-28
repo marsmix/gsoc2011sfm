@@ -54,7 +54,10 @@ vector<PointOfView> loadCamerasModelHouse( string nameFile )
     inCams >> P[ 4 ] >> P[ 5 ] >> P[ 6 ] >> P[ 7 ];
     inCams >> P[ 8 ] >> P[ 9 ] >> P[10 ] >> P[11 ];
     //create the PointOfView:
-    cameras.push_back( PointOfView( Mat( 3, 4, CV_64F, P ) ) );
+    PointOfView myPointOfView( Mat( 3, 4, CV_64F, P ) );
+    myPointOfView.setRotationMatrix( cv::Mat::eye(3,3,CV_64F) );
+    myPointOfView.setTranslationVector( cv::Mat::zeros(3,1,CV_64F) );
+    cameras.push_back( PointOfView ( Mat( 3, 4, CV_64F, P ) ) );
 
     idFile++;
     stringstream nameFile;
@@ -66,13 +69,57 @@ vector<PointOfView> loadCamerasModelHouse( string nameFile )
   return cameras;
 }
 
+//Medias/modelHouse/house.000.P
+vector<PointOfView> loadCamerasTemple( string nameFile )
+{
+  vector<PointOfView> outVect;
+  ifstream pointsDef( nameFile.c_str( ) );
+  bool isOK=pointsDef.is_open( );
+  if ( !isOK ){
+    cout<<"Can't find "<<nameFile<<"!\nPlease download the temple"
+      "dataset from http://vision.middlebury.edu/mview/data/"<<endl;
+  }
+  //first get the numbers of cameras:
+  int nbCameras;
+  if( pointsDef>>nbCameras )
+  {
+    string name_of_picture;
+    Mat intra_params,rotation;
+    Vec3d translation;
+    intra_params.create( 3, 3, CV_64F );
+    rotation.create( 3, 3, CV_64F );
+    double* data_intra_param=( double* )intra_params.data;
+    double* data_rotation=( double* )rotation.data;
+    for ( int i=0;i<nbCameras;i++ )
+    {
+      //first the name of image:
+      if( pointsDef>>name_of_picture )
+      {
+        //the 9 values of K:
+        for( int j=0;j<9;j++ )
+          pointsDef>>data_intra_param[ j ];
+        //the 9 values of rotation:
+        for( int j=0;j<9;j++ )
+          pointsDef>>data_rotation[ j ];
+        //the 3 values of translation:
+        for( int j=0;j<3;j++ )
+          pointsDef>>translation[ j ];
+        //now create a point of view:
+        outVect.push_back(
+          PointOfView( new CameraPinhole( intra_params ) ));
+      }
+    }
+  }
+  return outVect;
+}
+
 vector<PointOfView> loadCameras( string nameFile )
 {
   if( nameFile.find(".P")!=string::npos )
     return loadCamerasModelHouse( nameFile );
+  if( nameFile.find("_par.txt")!=string::npos )
+    return loadCamerasTemple( nameFile );
 }
-
-
 
 int main( )
 {
@@ -83,24 +130,28 @@ int main( )
   int type_of_input = 1, loadCamera = 1;
   Mat K = Mat::eye(3,3,CV_64F);
   double* data_intra_param=( double* )K.data;
-  string imageDirectory =  FROM_SRC_ROOT( "Medias/modelHouse/" ),
-    methodDetect = "GridFAST", methodExtract = "SIFT", methodMatch = "FlannBased";
+  string imageDirectory =  "Medias/modelHouse/",//"Medias/templeSparseRing/",
+    methodDetect = "PyramidORB", methodExtract = "ORB", methodMatch = "FlannBased";
   MotionProcessor mp;
   Ptr<Camera> my_device;
   vector<Mat> images;
   vector< Ptr<PointsToTrack> > vec_point_for_track;
   vector<PointOfView> myCameras;
-
+  
+  
   cout<<"Welcome to the Structure from motion Application!"<<endl;
   cout<<"This application will try to find camera position and geometry automatically!"<<endl;
   cout<<"We need the intra parameters..."<<endl;
   cout<<"If they don't change across the sequence, you can give them here, else I will try to load them!"<<endl;
   cout<<"So, (0) give the value of one camera, (1) load cameras intra values? ";
+  cout<<"Default : 1"<<endl;
   cin>>loadCamera;
   if( loadCamera == 1 )
   {
-    string nameCameraFile;
+    //templeSparseRing/templeSR_par.txt
+    string nameCameraFile = "Medias/modelHouse/house.000.P";
     cout<<"Where can I find camera matrix (if multiple files, give the first one, I will try to find other alone!) ?"<<endl;
+    cout<<"Default : "<<nameCameraFile<<endl;
     cin>>nameCameraFile;
     myCameras = loadCameras( convertReal(nameCameraFile) );
   }
@@ -112,7 +163,7 @@ int main( )
     cout<<"Now the focal_y_ (can be set equal to focal_x_): ";
     cin>>data_intra_param[4];
     cout<<"The principal_point_x_ (can be set to image width/2): ";
-    cin>>data_intra_param[3];
+    cin>>data_intra_param[2];
     cout<<"The principal_point_y_ (can be set to image height/2): ";
     cin>>data_intra_param[5];
     cout<<"And finally the skew (can be set to 0): ";
@@ -124,19 +175,23 @@ int main( )
   cout<<endl<<"Which point detector you want to use (SIFT, SURF, ORB, FAST, HARRIS, ...)?"<<endl;
   cout<<"For a list of available detector, see\n"
     "http://code.google.com/p/gsoc2011sfm/wiki/PointsToTrack_tut"<<endl;
+  cout<<"Default : "<<methodDetect<<endl;
   cin>>methodDetect;
 
   cout<<endl<<"Which point extractor you want to use (SIFT, SURF, ORB, BRIEF)?"<<endl;
   cout<<"For a list of available detector, see\n"
     "http://code.google.com/p/gsoc2011sfm/wiki/PointsToTrack_tut"<<endl;
+  cout<<"Default : "<<methodExtract<<endl;
   cin>>methodExtract;
 
   cout<<endl<<"Which point matcher you want to use (BruteForce, FlannBased, BruteForce-Hamming, ...)?"<<endl;
   cout<<"For details and compatibility between matcher and descritors, see\n"
     "http://code.google.com/p/gsoc2011sfm/wiki/Matching_tuto"<<endl;
+  cout<<"Default : "<<methodMatch<<endl;
   cin>>methodMatch;
 
   cout<<endl<<"The sequence you have is:\n(0) a video\n(1) a directory of images\n(2) a webcam?"<<endl;
+  cout<<"Default : 1"<<endl;
   cin>>type_of_input;
   switch(type_of_input)
   {
@@ -155,10 +210,11 @@ int main( )
            }
     default://by default, it's a directory...
       cout<<"So please give me the path of the folder containing the images:"<<endl;
+      cout<<"Default : "<<imageDirectory<<endl;
       cin>>imageDirectory;
       mp.setInputSource( convertReal(imageDirectory), IS_DIRECTORY );
   }
-  
+
   //////////////////////////////////////////////////////////////////////////
   //everything is now configured, we will be able to begin:
   //////////////////////////////////////////////////////////////////////////
@@ -213,13 +269,13 @@ int main( )
   cout<<"The complexity is O( n^2 ), so be patient..."<<endl;
 
   //create the matcher:
-  Ptr<DescriptorMatcher> matcher  = DescriptorMatcher::create( methodMatch );
+  Ptr<PointsMatcher> matcher = PointsMatcherOpticalFlow::create( "OpticalFlowPyrLK" );
+  //Ptr<PointsMatcher> matcher = PointsMatcher::create( methodMatch );
   //and the sequence analyzer:
-  SequenceAnalyzer motion_estim( vec_point_for_track, &images,
-    new PointsMatcher( matcher ) );
+  SequenceAnalyzer motion_estim( vec_point_for_track, &images, matcher );
 
   motion_estim.computeMatches( );
-  SequenceAnalyzer::keepOnlyCorrectMatches(motion_estim,2,0);
+  SequenceAnalyzer::keepOnlyCorrectMatches(motion_estim,4,0);
 
   cout<<"numbers of correct tracks:"<<
     motion_estim.getTracks( ).size( )<<endl;
@@ -229,5 +285,5 @@ int main( )
   pe.computeReconstruction( );
 
   //finally show reconstruction:
-  pe.viewEstimation();
+  pe.viewEstimation( false );
 }

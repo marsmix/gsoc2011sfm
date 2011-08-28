@@ -4,7 +4,6 @@
 #include <iostream>
 #include "libmv/base/vector.h"
 #include "libmv/numeric/numeric.h"
-#include "opencv2/core/eigen.hpp"
 
 #include "macro.h" //SFM_EXPORTS
 #include "SequenceAnalyzer.h"

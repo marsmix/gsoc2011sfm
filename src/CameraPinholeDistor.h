@@ -38,7 +38,11 @@ namespace OpencvSfM{
     * @param tangential_dist tangential dist parameters ( /f$p_1/f$ and /f$p_2/f$ )
     * @param wantedEstimation values which need an estimation
     */
-    CameraPinholeDistor( cv::Mat intra_params=cv::Mat::eye( 3, 3, CV_64F ),cv::Vec6d radial_dist=cv::Vec6d( 0.0,0.0,0.0,0.0,0.0,0.0 ),unsigned char nbRadialParam=6,cv::Vec2d tangential_dist=cv::Vec2d( 0.0,0.0 ),unsigned char wantedEstimation=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM|RADIAL_PARAM|TANGEANT_PARAM );
+    CameraPinholeDistor( cv::Mat intra_params=cv::Mat::eye( 3, 3, CV_64F ),
+      cv::Vec6d radial_dist=cv::Vec6d( 0.0,0.0,0.0,0.0,0.0,0.0 ),
+      unsigned char nbRadialParam=6,cv::Vec2d tangential_dist=cv::Vec2d( 0.0,0.0 ),
+      int img_w=640, int img_h=480,
+      unsigned char wantedEstimation=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM|RADIAL_PARAM|TANGEANT_PARAM );
     /**
     * Constructor where initial camera matrix is computed from the 3D-2D point correspondences.
     * Currently, the function only supports planar calibration patterns, i.e. patterns where each object point has z-coordinate =0.
@@ -56,6 +60,7 @@ namespace OpencvSfM{
       cv::Vec6d radial_dist=cv::Vec6d( 0.0,0.0,0.0,0.0,0.0,0.0 ),
       unsigned char nbRadialParam=6,
       cv::Vec2d tangential_dist=cv::Vec2d( 0.0,0.0 ),
+      int img_w=640, int img_h=480,
       unsigned char wantedEstimation=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM|RADIAL_PARAM|TANGEANT_PARAM );
     ~CameraPinholeDistor( );
 

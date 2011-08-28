@@ -7,8 +7,10 @@ using std::vector;
 
 namespace OpencvSfM{
 
-  Camera::Camera( )
+  Camera::Camera( int img_w, int img_h )
   {
+    img_width = img_w;
+    img_height = img_h;
   }
 
 
