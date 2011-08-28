@@ -92,6 +92,67 @@ namespace OpencvSfM{
     return track_consistance>=0;
   }
 
+  void TrackOfPoints::fusionDuplicates( std::vector<TrackOfPoints>& tracks )
+  {
+    //add to tracks_ the new matches:
+
+    size_t i = 0,
+      match_it_end = tracks.size( );
+
+    while ( i < match_it_end )
+    {
+      TrackOfPoints &point_matcher = tracks[i];
+
+      size_t j = i+1;//if j<i, already tested, and if i==j, don't have to...
+      while ( j < match_it_end )
+      {
+        TrackOfPoints &point_matcher1 = tracks[j];
+        //look for a commun point:
+        bool have_commun = false;
+        size_t nbT1 = point_matcher.point_indexes_.size(),
+          nbT2 = point_matcher1.point_indexes_.size();
+        for(size_t i1 = 0; i1<nbT2 && !have_commun; ++i1 )
+        {
+
+          for(size_t j1 = 0; j1<nbT1 && !have_commun; ++j1 )
+          {
+            have_commun = 
+              ( point_matcher1.images_indexes_[ i1 ] == 
+              point_matcher.images_indexes_[ j1 ] ) &&
+              ( point_matcher1.point_indexes_[ i1 ] == 
+              point_matcher.point_indexes_[ j1 ] );
+          }
+        }
+        if( have_commun )
+        {
+          //should mix and remove this track:
+          for(size_t i1 = 0; i1<nbT2 && !have_commun; ++i1 )
+          {//mix all points match:
+            point_matcher.addMatch( point_matcher1.images_indexes_[ i1 ],
+              point_matcher1.point_indexes_[ i1 ] );
+          }
+          int R, G, B;
+          R = (point_matcher1.color>>16) & 0x000000FF;
+          G = (point_matcher1.color>>8) & 0x000000FF;
+          B = (point_matcher1.color) & 0x000000FF;
+          R += (point_matcher.color>>16) & 0x000000FF;
+          G += (point_matcher.color>>8) & 0x000000FF;
+          B += (point_matcher.color) & 0x000000FF;
+          R /= 2; G /= 2; B /= 2;
+          point_matcher.color = (unsigned int)(
+            ((R<<16) & 0x00FF0000) | ((R<<8) & 0x0000FF00)| (B & 0x000000FF));
+          //remove this track:
+          match_it_end--;
+          tracks[ j ] = tracks[ match_it_end ];
+          tracks.pop_back();
+          j--;
+        }
+        j++;
+      }
+      i++;
+    }
+  }
+
   bool TrackOfPoints::containPoint( const int image_src,
     const int point_idx1 ) const
   {

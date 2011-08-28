@@ -49,6 +49,7 @@ namespace OpencvSfM{
   int PointsToTrack::computeKeypointsAndDesc( bool forcing_recalculation )
   {
     P_MUTEX(worker_exclusion);
+    nb_workers_++;
     if( !forcing_recalculation )
     {
       bool need_keypoints = keypoints_.empty( );
@@ -57,11 +58,8 @@ namespace OpencvSfM{
         impl_computeKeypoints_();
       if( need_descriptors )
       {
-        CV_Assert( nb_workers_ == 0 );
         impl_computeDescriptors_();
       }
-      else
-        nb_workers_++;
     }
     else
     {
@@ -86,6 +84,7 @@ namespace OpencvSfM{
   void PointsToTrack::computeDescriptors( )
   {
     P_MUTEX(worker_exclusion);
+    nb_workers_++;
     impl_computeDescriptors_();
     V_MUTEX(worker_exclusion);
   }

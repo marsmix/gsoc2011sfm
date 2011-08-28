@@ -47,6 +47,11 @@ namespace OpencvSfM{
     * n is the number of points and m is the desciptor size.
     */
     cv::Mat descriptors_;
+
+    /**
+    * When available, the picture from where points are detected
+    */
+    cv::Mat imageToAnalyse_;
     /**
     * When available, the color of each point can be stored here.
     */
@@ -148,6 +153,10 @@ namespace OpencvSfM{
     * @return descritors for each points in a matrix with size ( n*m ), where n is the number of points and m is the desciptor size.
     */
     cv::Mat getDescriptors( ) const {return descriptors_;};
+    /**
+    * Get the image used to compute points
+    */
+    inline cv::Mat getImage( ){return imageToAnalyse_;};
     /**
     * To show the points on image, use this function to draw points on it.
     * @param image Source image.

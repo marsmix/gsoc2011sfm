@@ -5,6 +5,8 @@
 #include "libmv/multiview/affine.h"
 #include "libmv/multiview/fundamental.h"
 #include "libmv/multiview/robust_fundamental.h"
+#include "libmv/multiview/focal_from_fundamental.h"
+#include "opencv2/core/eigen.hpp"
 
 #include <Eigen/Eigenvalues>
 
@@ -34,7 +36,7 @@ namespace OpencvSfM{
     for( unsigned int i = 0; i < n_points ; ++i )
       error_total += libmv::SymmetricEpipolarDistance( F, x1.col( i ), x2.col( i ) );
 
-    return error_total;//not needed: don't change during evaluation... /(double)n_points;
+    return error_total/(double)n_points;
   }
 
   /**Idea from Snavely : Modeling the World from Internet Photo Collections
@@ -52,7 +54,7 @@ namespace OpencvSfM{
     vector<int> masks( nPoints );
     double max_error = 1e9;
 
-    int num_iter=0, max_iter=MIN(1000,nPoints*20);
+    int num_iter=0, max_iter=MIN( 2500, nPoints*(nPoints-5) );
     for( num_iter=0; num_iter<max_iter; ++num_iter )
     {
       masks.assign( nPoints, 0 );
@@ -831,9 +833,9 @@ namespace OpencvSfM{
     int img1,img2;
     int nbMatches = images_graph.getHighestLink( img1,img2 );
     vector<ImageLink> bestMatches;
-    images_graph.getOrderedLinks( bestMatches, MIN(nbMatches/2,100) );
+    images_graph.getOrderedLinks( bestMatches, nbMatches*0.8 );
     double min_inliners=1e7;
-    int index_of_min=0;
+    int index_of_min=0;/*
     cv::Mat minFundamental;
     for( unsigned int cpt=0;cpt<bestMatches.size( );cpt++ )
     {
@@ -866,25 +868,61 @@ namespace OpencvSfM{
       }
     }
     //we will start the reconstruction using bestMatches[ index_of_min ]
-    //to avoid degenerate cases such as coincident cameras
-    img1 = bestMatches[ index_of_min ].imgSrc;
-    img2 = bestMatches[ index_of_min ].imgDest;
+    //to avoid degenerate cases such as coincident cameras*/
+
+    vector<int> images_computed;
+    int iter = 0;
+    bool not_correct;
+    int nbMax = 0, bestId = 0;/*
+    do
+    {
+      img1 = bestMatches[ index_of_min ].imgSrc;
+      img2 = bestMatches[ index_of_min ].imgDest;
+      cout<<img1<<", "<<img2<<endl;
+      //sequence_.showTracksBetween(img1, img2);
+
+      images_computed.clear();
+      images_computed.push_back( img1 );
+      images_computed.push_back( img2 );
+      camera_computed_[ img1 ] = true;
+      initialReconstruction( img1, img2 );
+    
+      //try to find more matches:
+      std::vector< TrackOfPoints > point_before = point_computed_;
+      cout<<point_computed_.size()<<endl;
+
+      not_correct = point_computed_.size() < nbMatches/3 ||
+        point_computed_.size() < point_before.size()-20;
+      if( point_computed_.size()>nbMax )
+      {
+        nbMax = point_computed_.size();
+        bestId = index_of_min;
+      }
+      point_computed_.clear();
+      camera_computed_[ img1 ] = false;
+      camera_computed_[ img2 ] = false;
+      index_of_min++;
+    } while ( index_of_min<bestMatches.size() );*/
+    bestId = bestMatches.size() - 1;
+    img1 = bestMatches[ bestId ].imgSrc;
+    img2 = bestMatches[ bestId ].imgDest;
     cout<<img1<<", "<<img2<<endl;
     //sequence_.showTracksBetween(img1, img2);
 
-    vector<int> images_computed;
+    images_computed.clear();
     images_computed.push_back( img1 );
     images_computed.push_back( img2 );
     camera_computed_[ img1 ] = true;
     initialReconstruction( img1, img2 );
-    
+
     //try to find more matches:
     std::vector< TrackOfPoints > point_before = point_computed_;
     cout<<"before"<<point_computed_.size()<<endl;
     addMoreMatches( img1, img2 );
     cout<<"after"<<point_computed_.size()<<endl;
-    if( point_computed_.size() < point_before.size()-20 )
+    if( point_before.size() > point_computed_.size() )
       point_computed_ = point_before;
+
 
     //bundleAdjustement();
 

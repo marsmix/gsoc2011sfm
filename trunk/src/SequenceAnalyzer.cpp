@@ -109,7 +109,7 @@ namespace OpencvSfM{
   void SequenceAnalyzer::computeMatches( bool printProgress )
   {
     //First compute missing features descriptors:
-    vector< Ptr< PointsToTrack > >::iterator it =
+    vector< Ptr< PointsToTrack > >::iterator matches_it =
       points_to_track_.begin( ),
       end_matches_it = points_to_track_.end( );
     MatchingThread::size_list = points_to_track_.size();
@@ -122,13 +122,21 @@ namespace OpencvSfM{
     MatchingThread::current_match_ = 0;
     MatchingThread::print_progress_ = printProgress;
 
+    //then init the fundamental matrix list:
+    for( size_t cpt = 0; cpt<list_fundamental_.size(); ++cpt )
+      list_fundamental_[0].clear();
+    list_fundamental_.clear();
+
+    for( size_t cpt = 0; cpt<MatchingThread::size_list; ++cpt )
+      list_fundamental_.push_back(
+      vector< cv::Ptr<Mat> > ( MatchingThread::size_list - cpt + 1 ) );
+
     //Try to match each picture with other:
     vector<Mat> masks;
-    vector< Ptr< PointsToTrack > >::iterator matches_it = points_to_track_.begin( );
 
     MatchingThread::mininum_points_matches = mininum_points_matches;
-    unsigned int nb_proc = boost::thread::hardware_concurrency()-1;
-    INIT_SEMAPHORE( MatchingThread::thread_concurr,nb_proc );
+    unsigned int nb_proc = boost::thread::hardware_concurrency();
+    INIT_SEMAPHORE( MatchingThread::thread_concurr, nb_proc );
     INIT_MUTEX( MatchingThread::thread_unicity );
 
     unsigned int i=0;
@@ -172,6 +180,7 @@ namespace OpencvSfM{
       tmp.color = (unsigned int)(
         ((R<<16) & 0x00FF0000) | ((R<<8) & 0x0000FF00)| (B & 0x000000FF));
     }
+    TrackOfPoints::fusionDuplicates( tracks_ );
   }
 
   void SequenceAnalyzer::keepOnlyCorrectMatches(

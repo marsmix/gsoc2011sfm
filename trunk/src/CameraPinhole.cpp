@@ -9,7 +9,10 @@ using cv::Range;
 
 namespace OpencvSfM{
 
-  CameraPinhole::CameraPinhole( cv::Mat intra_params/*=Mat::eye( 3, 3, CV_64F )*/,unsigned char wantedEstimation/*=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM*/ )
+  CameraPinhole::CameraPinhole( cv::Mat intra_params/*=Mat::eye( 3, 3, CV_64F )*/,
+     int img_w, int img_h,
+    unsigned char wantedEstimation/*=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM*/ )
+    :Camera( img_w, img_h)
   {
     CV_DbgAssert( intra_params.rows==3 && intra_params.cols==3 );
 
@@ -18,9 +21,12 @@ namespace OpencvSfM{
     this->estimation_needed_ = wantedEstimation;
   }
 
-  CameraPinhole::CameraPinhole( const std::vector< std::vector< cv::Point3f > >& objectPoints,
+  CameraPinhole::CameraPinhole(
+    const std::vector< std::vector< cv::Point3f > >& objectPoints,
     const std::vector< std::vector<cv::Point2f > >& imagePoints,
-    cv::Size imageSize, double aspectRatio/*=1.*/,unsigned char wantedEstimation )
+    cv::Size imageSize, double aspectRatio/*=1.*/,
+    int img_w, int img_h, unsigned char wantedEstimation )
+    :Camera( img_w, img_h)
   {
     Mat intra=initCameraMatrix2D( objectPoints,imagePoints,imageSize,aspectRatio );
     //to be sure that newParams has correct type:

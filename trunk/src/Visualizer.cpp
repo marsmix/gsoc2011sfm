@@ -28,7 +28,8 @@ namespace OpencvSfM{
     //Now get the corners in camera's coordinates:
     std::vector<cv::Vec2d> corners, real_coord;
     corners.push_back( cv::Vec2d( 0, 0 ) );
-    corners.push_back( cv::Vec2d( 640, 480 ) );
+    corners.push_back( cv::Vec2d( cam->getImgWidth(),
+      cam->getImgHeight()) );
 
     real_coord = cam->pixelToNormImageCoordinates( corners );
 
@@ -120,8 +121,7 @@ namespace OpencvSfM{
     sensor_msgs::PointCloud2 msg;
     pcl::toROSMsg( *my_cloud, msg );
     triangles.cloud = msg;
-    pcl::io::saveVTKFile ( ((std::string)"test")+name+((std::string)".vtk"),
-      triangles );
+    pcl::io::saveVTKFile ( ((std::string)"test_")+name+((std::string)".vtk"), triangles );
 
   }
   void Visualizer::add3DPointsColored( const std::vector<cv::Vec3d>& points,
@@ -158,7 +158,7 @@ namespace OpencvSfM{
     pcl::toROSMsg( *my_cloud, msg );
     triangles.cloud = msg;
     
-    pcl::io::saveVTKFile ( ((std::string)"test")+name+((std::string)".vtk"), triangles );
+    pcl::io::saveVTKFile ( ((std::string)"test_")+name+((std::string)".vtk"), triangles );
 
   }
 

@@ -11,8 +11,9 @@ namespace OpencvSfM{
 
   CameraPinholeDistor::CameraPinholeDistor( cv::Mat intra_params,
     cv::Vec6d radial_dist, unsigned char nbRadialParam,
-    cv::Vec2d tangential_dist, unsigned char wantedEstimation )
-    :CameraPinhole( intra_params,wantedEstimation )
+    cv::Vec2d tangential_dist, int img_w, int img_h,
+    unsigned char wantedEstimation )
+    :CameraPinhole( intra_params, img_w, img_h, wantedEstimation )
   {
     updateDistortionParameters( radial_dist,nbRadialParam,tangential_dist );
   }
@@ -22,8 +23,10 @@ namespace OpencvSfM{
     const std::vector< std::vector< cv::Point2f> >& imagePoints,
     cv::Size imageSize, double aspectRatio/*=1.*/,
     cv::Vec6d radial_dist, unsigned char nbRadialParam,
-    cv::Vec2d tangential_dist, unsigned char wantedEstimation )
-    :CameraPinhole( objectPoints,imagePoints,imageSize,aspectRatio,wantedEstimation )
+    cv::Vec2d tangential_dist, int img_w, int img_h,
+    unsigned char wantedEstimation )
+    :CameraPinhole( objectPoints,imagePoints,imageSize,aspectRatio,
+     img_w, img_h, wantedEstimation )
   {
     updateDistortionParameters( radial_dist,nbRadialParam,tangential_dist );
   }

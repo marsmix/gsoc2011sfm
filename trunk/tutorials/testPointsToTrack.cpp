@@ -45,10 +45,8 @@ NEW_TUTO( Points_Definitions, "How features can be defined",
     //if the images are loaded, find the points:
 
     cout<<"creation of two detection algorithm..."<<endl;
-    Ptr<FeatureDetector> fastDetect;
-    fastDetect=Ptr<FeatureDetector>( new SurfFeatureDetector( ) );
-    Ptr<DescriptorExtractor> SurfDetect;
-    SurfDetect=Ptr<DescriptorExtractor>( new SurfDescriptorExtractor( ) );
+    Ptr<FeatureDetector> fastDetect = FeatureDetector::create( "FAST" );
+    Ptr<DescriptorExtractor> SurfDetect = DescriptorExtractor::create( "SURF" );
 
     cout<<"now create the two set of points with features..."<<endl;
     Ptr<PointsToTrack> ptt1;
@@ -56,25 +54,24 @@ NEW_TUTO( Points_Definitions, "How features can be defined",
     Ptr<PointsToTrack> ptt2;
     ptt2=Ptr<PointsToTrack>( new PointsToTrackWithImage ( 1, secondImage,fastDetect,SurfDetect ));
 
-    cout<<"now try to find matches, so we create a matcher ( classic bruteForce )"<<endl<<endl;
-    Ptr<DescriptorMatcher> matcher;
-    matcher=Ptr<DescriptorMatcher>( new FlannBasedMatcher( ) );
+    cout<<"now try to find matches, so we create a matcher ( FlannBasedMatcher )"<<endl<<endl;
+    //The point matcher will now be created like this:
+    Ptr<PointsMatcher> matches = PointsMatcher::create( "FlannBased" );
+    //Ptr<PointsMatcher> matches = PointsMatcherOpticalFlow::create( "OpticalFlowPyrLK" );
 
     //The matches vector is:
     vector<DMatch> matchesVector;
 
-    //The point matcher will now be created like this:
-    PointsMatcher matches( matcher );
-
     //We want to find points in img1 which are also in img2.
     //So we set ptt2 as training data:
     cout<<"Add points of image 2 as references points"<<endl;
-    matches.add( ptt2 );
+    matches->add( ptt2 );
 
-    Ptr<PointsMatcher> matches2= matches.clone( );
+    Ptr<PointsMatcher> matches2= matches->clone( );
     matches2->add( ptt1 );
     //cross check matches:
-    matches.crossMatch( matches2,matchesVector );
+    matches->crossMatch( matches2,matchesVector );
+    //matches->match( ptt1,matchesVector );
 
     Mat outImg;
     cout<<"Displaying the "<<matchesVector.size( )<<"points..."<<endl;

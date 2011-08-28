@@ -33,6 +33,8 @@ namespace OpencvSfM{
   void MatchingThread::operator()()
   {
     Ptr<PointsToTrack> points_to_track_i=( *matches_ )[i];
+    double error_allowed = MAX( seq_analyser->images_[ i ].rows,
+      seq_analyser->images_[ i ].cols ) * 0.004;
 
     points_to_track_i->computeKeypointsAndDesc( false );
 
@@ -74,7 +76,8 @@ namespace OpencvSfM{
       if( size_match>8 )
       {
         //vector<KeyPoint> points1 = point_matcher->;
-        for( size_t cpt = 0; cpt < size_match; ++cpt ){
+        for( size_t cpt = 0; cpt < size_match; ++cpt )
+        {
           const cv::KeyPoint &key1 = point_matcher1->getKeypoint(
             matches_i_j[ cpt ].queryIdx );
           const cv::KeyPoint &key2 = point_matcher->getKeypoint(
@@ -88,12 +91,14 @@ namespace OpencvSfM{
         point_matcher1->clear();
         points_to_track_j->free_descriptors();
 
-        Mat fundam = cv::findFundamentalMat( srcP, destP, status, cv::FM_RANSAC, 1 );
+        Mat fundam = cv::findFundamentalMat( srcP, destP, status,
+          cv::FM_RANSAC, error_allowed );
 
         unsigned int nbErrors = 0, nb_iter=0;
         //refine the mathing :
         size_match = status.size( );
-        for( size_t cpt = 0; cpt < size_match; ++cpt ){
+        for( size_t cpt = 0; cpt < size_match; ++cpt )
+        {
         if( status[ cpt ] == 0 )
         {
           size_match--;
@@ -110,10 +115,11 @@ namespace OpencvSfM{
         }
       }
 
-        while( nbErrors > size_match/10 && nb_iter < 4 &&
+        while( nbErrors > size_match/10 && nb_iter < 3 &&
           matches_i_j.size( ) > mininum_points_matches )
         {
-          fundam = cv::findFundamentalMat( srcP, destP, status, cv::FM_RANSAC, 1.5 );
+          fundam = cv::findFundamentalMat( srcP, destP, status,
+            cv::FM_RANSAC, error_allowed*1.5 );
 
           //refine the mathing :
           nbErrors =0 ;
@@ -159,16 +165,22 @@ namespace OpencvSfM{
           }
         }
 
-        if( matches_i_j.size( ) > mininum_points_matches && nb_iter < 4 )
+        if( matches_i_j.size( ) > mininum_points_matches )
         {
+          Mat * copy_of_fund = new cv::Mat();
+          *copy_of_fund = fundam.clone();
           P_MUTEX( thread_unicity );
+          seq_analyser->list_fundamental_[i][j-i] = cv::Ptr< cv::Mat >(
+            copy_of_fund );
           seq_analyser->addMatches( matches_i_j,i,j );
           std::clog<<"find "<<matches_i_j.size( )<<
             " matches between "<<i<<" "<<j<<std::endl;
           V_MUTEX( thread_unicity );
-        }else
+        }
+        else
         {
-          std::clog<<"can't find matches between "<<i<<" "<<j<<std::endl;
+          std::clog<<"can't find matches between "<<i<<" "<<j<<
+            "; only "<<matches_i_j.size( )<<" matches"<<std::endl;
         }
 
       }

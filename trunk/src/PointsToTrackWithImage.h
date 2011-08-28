@@ -18,7 +18,6 @@ namespace OpencvSfM{
   protected:
     cv::Ptr<cv::FeatureDetector> feature_detector_;///<class which will find the points
     cv::Ptr<cv::DescriptorExtractor> descriptor_detector_;///<class which will compute the descriptors
-    cv::Mat imageToAnalyse_;///<Picture from where points are detected
     cv::Mat maskOfAnalyse_;///<Mask of analyse. Everything out of this mask is ignored.
     
     /**
@@ -71,10 +70,6 @@ namespace OpencvSfM{
     */
     void getColorOfPoints();
 
-    /**
-    * Get the image used to compute points
-    */
-    inline cv::Mat getImage( ){return imageToAnalyse_;};
   };
 
 }

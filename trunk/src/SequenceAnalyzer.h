@@ -11,7 +11,7 @@
 #include "opencv2/calib3d/calib3d.hpp"
 
 namespace OpencvSfM{
-
+  struct MatchingThread;
 
   /**
   * \brief This class tries to match points in the entire sequence.
@@ -24,6 +24,7 @@ namespace OpencvSfM{
   */
   class SFM_EXPORTS SequenceAnalyzer
   {
+    friend struct MatchingThread;
   protected:
     static int mininum_points_matches;///<Minimum points detected into an image to keep this estimation (set to 20)
     static int mininum_image_matches;///<Minimum images connections in a track to keep this estimation (usually set to 2)
@@ -62,6 +63,13 @@ namespace OpencvSfM{
     * of matches between theses two images
     */
     ImagesGraphConnection images_graph_;
+    /**
+    * A list of the fundamental matrix between each points*
+    * this list can have some NULL values as the fundamental matrix
+    * don't exist between every images...
+    * This matrix is uper-triangular, that is [2][1] exist, but [1][2] not...
+    */
+    std::vector< std::vector< cv::Ptr< cv::Mat > > > list_fundamental_;
   public:
     /**
     * Constructor taking a MotionProcessor to load images and a features detector
