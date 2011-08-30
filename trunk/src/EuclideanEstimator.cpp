@@ -141,7 +141,7 @@ namespace OpencvSfM{
   void EuclideanEstimator::bundleAdjustement( )
   {
     //wrap the lourakis SBA:
-    
+
     unsigned int n = point_computed_.size( ),   // number of points
       ncon = 0,// number of points (starting from the 1st) whose parameters should not be modified.
       m = 0,   // number of images (or camera)
@@ -198,7 +198,7 @@ namespace OpencvSfM{
       }
     }
     n=nbPoints;
-    
+
     //2D points:
     char *vmask = new char[ n*m ];//visibility mask: vmask[i, j]=1 if point i visible in image j, 0 otherwise.
     double *p = new double[m*cnp + n*pnp];//initial parameter vector p0: (a1, ..., am, b1, ..., bn).
@@ -331,7 +331,7 @@ namespace OpencvSfM{
     };
 
     double info[SBA_INFOSZ];
-    
+
     //use sba library
     int iter = sba_motstr_levmar_x(n, ncon, m, mcon, vmask, p, cnp, pnp, x, NULL, mnp,
         img_projsRTS_x, img_projsRTS_jac_x, (void*)&data, itmax, 0, opts, info);
@@ -692,7 +692,7 @@ namespace OpencvSfM{
       x2( 0,i ) = -pointNorm2[ i ][ 0 ];
       x2( 1,i ) = -pointNorm2[ i ][ 1 ];
     }
-    
+
     double error = robust5Points( x1, x2,
       intra_params_[ image1 ], intra_params_[ image2 ], E );
 
@@ -741,7 +741,7 @@ namespace OpencvSfM{
     if( extractor.find("ORB")!=std::string::npos ||
       extractor.find("BRIEF")!=std::string::npos)
       methodMatch = "BruteForce-Hamming";
-    Ptr<PointsMatcher> point_matcher = 
+    Ptr<PointsMatcher> point_matcher =
       new PointsMatcher( cv::DescriptorMatcher::create( methodMatch ) );
 
     Ptr<PointsToTrack> pointCollection = Ptr<PointsToTrack>(
@@ -758,7 +758,7 @@ namespace OpencvSfM{
     point_matcher1->add( pointCollection1 );
     point_matcher1->train( );
 
-    vector< cv::DMatch > matches_i_j = 
+    vector< cv::DMatch > matches_i_j =
       SequenceAnalyzer::simple_matching(point_matcher, point_matcher1 );
     //matches don't use the same indices... set correct one:
     vector<cv::KeyPoint>& kpImg1 =
@@ -886,7 +886,7 @@ namespace OpencvSfM{
       images_computed.push_back( img2 );
       camera_computed_[ img1 ] = true;
       initialReconstruction( img1, img2 );
-    
+
       //try to find more matches:
       std::vector< TrackOfPoints > point_before = point_computed_;
       cout<<point_computed_.size()<<endl;
@@ -1021,7 +1021,7 @@ namespace OpencvSfM{
       debugView.add3DPointsColored( tracks3D,colors, "Euclidean estimated" );
     else
       debugView.add3DPoints( tracks3D, "Euclidean estimated" );
-    
+
     for( unsigned int i = 0; i<cameras_.size( ) ; ++i )
       if( camera_computed_[i] )
       {
@@ -1031,7 +1031,7 @@ namespace OpencvSfM{
           cam_name.str() );
         cout<<cameras_[ i ].getTranslationVector()<<endl;
       }
-      
+
 
 
       debugView.runInteract( );

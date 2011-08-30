@@ -183,7 +183,7 @@ namespace OpencvSfM{
     * @param points output
     */
     static void read( const cv::FileNode& node, SequenceAnalyzer& points );
-    
+
     /**
     * Save the sequence into a YAML file.
     * @param fs Previously opened YAML file node
@@ -224,8 +224,9 @@ namespace OpencvSfM{
     * @param img1 index of source matches image
     * @param img2 index of destination matches image
     */
-    inline void addMatches( std::vector<cv::DMatch> &newMatches,
+    void addMatches( std::vector<cv::DMatch> &newMatches,
       unsigned int img1, unsigned int img2 );
+
     /**
     * This function add new Tracks
     * @param newTracks new Tracks to add
@@ -265,7 +266,7 @@ namespace OpencvSfM{
     */
     inline cv::Ptr<PointsMatcher> getMatchAlgo()
     { return match_algorithm_->clone( true ); };
-    
+
     /**
     * This will find matches between two points matchers
     * @param point_matcher first image
