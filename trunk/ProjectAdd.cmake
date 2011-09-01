@@ -11,14 +11,14 @@ macro(begin_new_project name)
 	file(GLOB files_srcs "*.cpp")
 	file(GLOB files_int_hdrs "*.h*")
 	source_group("Src" FILES ${files_srcs})
-	source_group("Include" FILES ${files_int_hdrs} ${CMAKE_BINARY_DIR}/config.h)
+	source_group("Include" FILES ${files_int_hdrs} ${CMAKE_BINARY_DIR}/config.h ${CMAKE_BINARY_DIR}/config_SFM.h)
 
 	#file(GLOB bin_hdrs "include/${name}/*.h*")
 	#source_group("Include" FILES ${bin_hdrs})
 
 	set(the_target "SfM_${name}")
 
-set(file_list_ ${files_srcs} ${files_int_hdrs} ${CMAKE_BINARY_DIR}/config_SFM.h)
+set(file_list_ ${files_srcs} ${files_int_hdrs})
 endmacro()
 
 macro(end_new_project name)
@@ -57,9 +57,10 @@ macro(end_new_project name)
 	target_link_libraries(${the_target} ${SFM_LINKER_LIBS} ${ARGN})
 
 	install(TARGETS ${the_target}
-	    RUNTIME DESTINATION bin COMPONENT main
-	    LIBRARY DESTINATION lib COMPONENT main
-	    ARCHIVE DESTINATION lib COMPONENT main)
+		EXPORT OpencvSFMLibraryDepends
+	    RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/" COMPONENT main
+	    LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/" COMPONENT main
+	    ARCHIVE DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/" COMPONENT main)
 
 	install(FILES ${files_int_hdrs}
 	    DESTINATION include/${name}
@@ -83,7 +84,7 @@ macro(new_executable name)
 
 	begin_new_project(${name})
 	
-	add_executable	(${the_target} ${file_list_})
+	add_executable(${the_target} ${file_list_})
 	
 	end_new_project(${name} ${ARGN})
 	

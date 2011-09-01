@@ -272,7 +272,6 @@ namespace OpencvSfM{
         cv::circle( outImg, center1, radius, color, 1, CV_AA );
         //cv::circle( outImg, center2, radius, color, 1, CV_AA );
         cv::line( outImg, center1, center2, color, 1, CV_AA );
-
       }
     }
 

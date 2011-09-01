@@ -130,7 +130,7 @@ int main( )
   int type_of_input = 1, loadCamera = 1;
   Mat K = Mat::eye(3,3,CV_64F);
   double* data_intra_param=( double* )K.data;
-  string imageDirectory =  "Medias/modelHouse/",//"Medias/templeSparseRing/",
+  string imageDirectory =  "Medias/bottle/",//"Medias/templeSparseRing/",
     methodDetect = "PyramidORB", methodExtract = "ORB", methodMatch = "FlannBased";
   MotionProcessor mp;
   Ptr<Camera> my_device;

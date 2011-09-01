@@ -1,0 +1,31 @@
+# - Config file for the OpencvSFM package
+# It defines the following variables
+#  OPENCVSFM_INCLUDE_DIRS   - include directories for OpencvSFM
+#  OPENCVSFM_LIBRARIES_DIRS - libraries directories 
+#  OPENCVSFM_LIBRARIES      - libraries to link against
+ 
+MESSAGE(STATUS "Looking for OpencvSfM...")
+
+# Compute paths
+get_filename_component(OPENCVSFM_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+if(EXISTS "${OPENCVSFM_CMAKE_DIR}/CMakeCache.txt")
+   # In build tree
+   include("${OPENCVSFM_CMAKE_DIR}/OpencvSFMBuildTreeSettings.cmake")
+else()
+   set(OPENCVSFM_INCLUDE_DIRS "@INSTALL_INCLUDE_DIR@")
+   set(OPENCVSFM_LIBRARIES_DIRS "@INSTALL_INCLUDE_DIR@")
+endif()
+
+
+IF ( OPENCVSFM_INCLUDE_DIRS )
+	# Our library dependencies (contains definitions for IMPORTED targets)
+	include("${OPENCVSFM_CMAKE_DIR}/OpencvSFMLibraryDepends.cmake")
+	 
+	# These are IMPORTED targets created by OpencvSFMLibraryDepends.cmake
+	set(OPENCVSFM_LIBRARIES SfM_core)
+	MESSAGE(STATUS "Found OpencvSfM...")
+	MESSAGE(STATUS "${OPENCVSFM_INCLUDE_DIRS}")
+	MESSAGE(STATUS "With libraries: ${OPENCVSFM_LIBRARIES}")
+ELSE ( OPENCVSFM_INCLUDE_DIRS )
+	MESSAGE(STATUS "Can't found OpencvSfM... Please build the library first (available here: http://code.google.com/p/gsoc2011sfm/)")
+ENDIF ( OPENCVSFM_INCLUDE_DIRS )

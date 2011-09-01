@@ -154,3 +154,39 @@ add_subdirectory( tutorials )
 add_subdirectory( YAML_loader )
 add_subdirectory( EuclideanReconstruction )
 #add_subdirectory( documents )
+   
+# The library config stuff goes here (to be able to use find_package(opencvSfM)
+# ===============================
+ 
+# Add all targets to the build-tree export set
+export(TARGETS SfM_core
+  FILE "${PROJECT_BINARY_DIR}/OpencvSFMLibraryDepends.cmake")
+ 
+# Export the package for use from the build-tree
+# (this registers the build-tree with a global CMake-registry)
+export(PACKAGE opencvSfM)
+ 
+# Create a OpencvSFMBuildTreeSettings.cmake file for the use from the build tree
+configure_file(CMakeModules/OpencvSFMBuildTreeSettings.cmake.in
+  "${PROJECT_BINARY_DIR}/OpencvSFMBuildTreeSettings.cmake" @ONLY)
+ 
+# Create the FooBarConfig.cmake and FooBarConfigVersion files
+configure_file(CMakeModules/OpencvSFMConfig.cmake.in
+  "${PROJECT_BINARY_DIR}/OpencvSFMConfig.cmake" @ONLY)
+configure_file(CMakeModules/OpencvSFMVersion.cmake.in
+  "${PROJECT_BINARY_DIR}/OpencvSFMVersion.cmake" @ONLY)
+ 
+# Install the export set for use with the install-tree
+install(EXPORT OpencvSFMLibraryDepends DESTINATION "${CMAKE_INSTALL_PREFIX}"
+  COMPONENT dev)
+install(FILES ${CMAKE_BINARY_DIR}/config_SFM.h DESTINATION "${CMAKE_INSTALL_PREFIX}/include/")
+
+INSTALL(FILES ${PROJECT_BINARY_DIR}/OpencvSFMConfig.cmake
+        DESTINATION "${CMAKE_ROOT}/Modules/"
+        COMPONENT headers
+        PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)
+        
+INSTALL(FILES ${PROJECT_BINARY_DIR}/OpencvSFMConfig.cmake
+        DESTINATION ${CMAKE_INSTALL_PREFIX}
+        COMPONENT headers
+        PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)
