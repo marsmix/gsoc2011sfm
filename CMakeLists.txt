@@ -153,7 +153,10 @@ add_subdirectory( src )
 add_subdirectory( tutorials )
 add_subdirectory( YAML_loader )
 add_subdirectory( EuclideanReconstruction )
-#add_subdirectory( documents )
+if( EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/documents" )
+  add_subdirectory( documents )
+  MESSAGE(STATUS "Create project named document")
+ENDIF (  )
    
 # The library config stuff goes here (to be able to use find_package(opencvSfM)
 # ===============================

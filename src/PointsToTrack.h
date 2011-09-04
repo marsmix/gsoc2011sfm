@@ -86,8 +86,9 @@ namespace OpencvSfM{
     virtual ~PointsToTrack( void );
     /**
     * To preserve memory, we use this method to free descriptors
+    * @param force if true, the descriptors are removed
     */
-    void free_descriptors();
+    void free_descriptors( bool force = false );
     
     /**
     * This method is used to compute both Keypoints and descriptors...
@@ -117,8 +118,13 @@ namespace OpencvSfM{
     * @param point Keypoints to add
     * @return index of the keypoint.
     */
-    inline unsigned int addKeypoint( cv::KeyPoint point )
-    {keypoints_.push_back( point ); return keypoints_.size( )-1;};
+    inline unsigned int addKeypoint( const cv::KeyPoint point )
+    {
+      P_MUTEX(worker_exclusion);
+      keypoints_.push_back( point );
+      V_MUTEX(worker_exclusion);
+      return keypoints_.size( )-1;
+    };
     /**
     * this method return the points coordinates and sometimes orientation and size
     * @return points coordinates and when available orientation and size
@@ -148,6 +154,12 @@ namespace OpencvSfM{
       CV_DbgAssert( index<keypoints_.size( ) );
       return keypoints_[ index ];
     };
+    /**
+    * this method return the closest points from parameter
+    * @param point coordinate of the point to search for
+    * @return index of the point
+    */
+    size_t getClosestKeypoint( cv::Point2f point ) const;
     /**
     * this method return the descritors for each points in a matrix with size ( n*m ), where n is the number of points and m is the desciptor size.
     * @return descritors for each points in a matrix with size ( n*m ), where n is the number of points and m is the desciptor size.

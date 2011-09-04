@@ -39,6 +39,45 @@ namespace OpencvSfM{
     //TODO
   }
 
+  uchar CameraPinhole::getNbMissingParams( ) const
+  {
+    int nbParams = 0;
+    if( (estimation_needed_ & FOCAL_PARAM) != 0 )
+      nbParams += 2;//2 focals
+    if( (estimation_needed_ & SKEW_PARAM) != 0 )
+      nbParams += 1;//1 param
+    if( (estimation_needed_ & PRINCIPAL_POINT_PARAM) != 0 )
+      nbParams += 2;//2 coord of principal point...
+    return nbParams;
+  }
+
+  void CameraPinhole::updateIntrinsic( double* values, uchar nbVal, bool add )
+  {
+    if( !add )
+      intra_params_ = Mat::zeros( 3, 3, CV_64F);
+
+    double* ptrIntraParam=( double* )intra_params_.data;
+    ptrIntraParam[ 8 ] = 1.0;
+    if( nbVal >= 1 )
+    {
+      ptrIntraParam[ 0 ] += values[ 0 ];
+      if( nbVal >= 3 )
+      {
+        ptrIntraParam[ 2 ] += values[ 1 ];
+        ptrIntraParam[ 5 ] += values[ 2 ];
+        if( nbVal >= 4 )
+        {
+          ptrIntraParam[ 4 ] = ptrIntraParam[ 0 ] * values[ 3 ];
+          if( nbVal >= 5 )
+          {
+            ptrIntraParam[ 1 ] += values[ 4 ];
+          }
+        }
+      }
+    }
+    this->inv_intra_params_ = intra_params_.inv( );
+  }
+
   void CameraPinhole::updateIntrinsicMatrix( cv::Mat newParams,
     unsigned char intraValues/*=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM*/ )
   {

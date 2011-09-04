@@ -16,8 +16,8 @@
 //FeatureDetector::create( "FAST" )
 #define POINT_METHOD "SIFT"
 #define POINT_DETECTOR FeatureDetector::create( "FAST" )
-#define DESCRIPTOR_METHOD "ORB"
-#define MATCHER_METHOD "BruteForce-Hamming"
+#define DESCRIPTOR_METHOD "SURF"
+#define MATCHER_METHOD "FlannBased"
 
 using namespace cv;
 using namespace OpencvSfM;

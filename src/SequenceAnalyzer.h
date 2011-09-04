@@ -121,9 +121,12 @@ namespace OpencvSfM{
     * It first compute missing features descriptor, then train each matcher.
     * Finally compute tracks of keypoints ( a track is a connected set of
     * matching keypoints across multiple images )
+    * @param  nbMaxThread st to a lower value if you experience out of memory exception.
+    * Indeed, if you have a lot of features, each thread will compute
+    * the descriptor for their working image, which can be really big...
     * @param  printProgress set to true is you want to view progress.
     */
-    void computeMatches( bool printProgress = true );
+    void computeMatches( uchar nbMaxThread = 64, bool printProgress = true );
     /**
     * This method keep only tracks with more than mininum_image_matches
     */

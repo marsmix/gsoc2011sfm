@@ -4,6 +4,7 @@
 #include "../src/StructureEstimator.h"
 #include "../src/EuclideanEstimator.h"
 #include "../src/Visualizer.h"
+#include "../src/MatcherSparseFlow.h"
 
 //////////////////////////////////////////////////////////////////////////
 //This file will not be in the final version of API, consider it like a tuto/draft...
@@ -93,8 +94,9 @@ NEW_TUTO( Model_House_test, "Using Model house data, run a SFM algorithm",
         IS_DIRECTORY);
       SequenceAnalyzer motion_estim( mp,
         FeatureDetector::create("FAST"),
-        DescriptorExtractor::create("ORB"),
-        PointsMatcher::create("BruteForce-HammingLUT") );
+        DescriptorExtractor::create("SURF"),
+        MatcherSparseFlow::create( "FlannBased", 2 ) );
+        //PointsMatcher::create("BruteForce-HammingLUT") );
 
       cout<<"Compute matches..."<<endl;
       motion_estim.computeMatches();

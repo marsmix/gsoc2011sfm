@@ -106,7 +106,7 @@ namespace OpencvSfM{
     images_.push_back( image );
   }
 
-  void SequenceAnalyzer::computeMatches( bool printProgress )
+  void SequenceAnalyzer::computeMatches( uchar nbMaxThread, bool printProgress )
   {
     //First compute missing features descriptors:
     vector< Ptr< PointsToTrack > >::iterator matches_it =
@@ -123,8 +123,6 @@ namespace OpencvSfM{
     MatchingThread::print_progress_ = printProgress;
 
     //then init the fundamental matrix list:
-    for( size_t cpt = 0; cpt<list_fundamental_.size(); ++cpt )
-      list_fundamental_[0].clear();
     list_fundamental_.clear();
 
     for( size_t cpt = 0; cpt<MatchingThread::size_list; ++cpt )
@@ -135,7 +133,7 @@ namespace OpencvSfM{
     vector<Mat> masks;
 
     MatchingThread::mininum_points_matches = mininum_points_matches;
-    unsigned int nb_proc = boost::thread::hardware_concurrency();
+    unsigned int nb_proc = MIN( nbMaxThread, boost::thread::hardware_concurrency() );
     INIT_SEMAPHORE( MatchingThread::thread_concurr, nb_proc );
     INIT_MUTEX( MatchingThread::thread_unicity );
 

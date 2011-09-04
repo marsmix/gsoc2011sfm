@@ -56,7 +56,7 @@ namespace OpencvSfM
     maskOfAnalyse_.release( );
   }
   
-  void PointsToTrackWithImage::getColorOfPoints()
+  void PointsToTrackWithImage::computeColorOfPoints()
   {
     //find color of points:
     RGB_values_.clear();
@@ -82,9 +82,10 @@ namespace OpencvSfM
         }
       case 3://RGB
         {
+          cv::KeyPoint& kp = keypoints_[i];
           uchar* ptr = (imageToAnalyse_.data +
-            (imageToAnalyse_.step*(int)keypoints_[i].pt.y) +
-            (int)keypoints_[i].pt.x * imageToAnalyse_.elemSize());
+            (imageToAnalyse_.step*(int)kp.pt.y) +
+            (int)kp.pt.x * imageToAnalyse_.elemSize());
           colorFinal = (unsigned int)((((int)ptr[2])<<16)|((int)ptr[1]<<8)|((int)ptr[0]));
           break;
         }
@@ -102,7 +103,7 @@ namespace OpencvSfM
   {
     this->keypoints_.clear();
     feature_detector_->detect( imageToAnalyse_,this->keypoints_,maskOfAnalyse_ );
-    getColorOfPoints();
+    computeColorOfPoints();
     return this->keypoints_.size();
   }
 
@@ -111,6 +112,6 @@ namespace OpencvSfM
     nb_workers_++;
     this->descriptors_.release();//in case some descriptors were already found...
     descriptor_detector_->compute( imageToAnalyse_,this->keypoints_,this->descriptors_ );
-    getColorOfPoints();//keypoints_ may have changed!
+    computeColorOfPoints();//keypoints_ may have changed!
   }
 }

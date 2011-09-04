@@ -113,6 +113,16 @@ namespace OpencvSfM{
     }
   }
 
+  uchar PointOfView::getNbMissingParams( ) const
+  {
+    int nbParams = 0;
+    if( (config_ & ROTATION_OK) == 0 )
+      nbParams += 3;//quaternion's vector part...
+    if( (config_ & TRANSLATION_OK) == 0 )
+      nbParams += 3;//translation's vector part...
+    return nbParams + device_->getNbMissingParams();
+  }
+
   cv::Vec2d PointOfView::project3DPointIntoImage( cv::Vec3d point ) const
   {
     //As we don't know what type of camera we use ( with/without disportion, fisheyes... )

@@ -55,6 +55,23 @@ namespace OpencvSfM{
       cv::Size imageSize, double aspectRatio=1., int img_w=640, int img_h=480,
       unsigned char wantedEstimation=FOCAL_PARAM|SKEW_PARAM|PRINCIPAL_POINT_PARAM );
     ~CameraPinhole( );
+    /**
+    * use this function to know which parameters are missing
+    * @return numbers of parameters needed for this camera
+    */
+    virtual uchar getNbMissingParams( ) const;
+    /**
+    * This method modify the intra parameters of the camera
+    * @param values array of intra parameters (order corresponds to SBA)
+    //K( 0,0 ) -> values[0]
+    //K( 2,0 ) -> values[1],
+    //K( 2,1 ) -> values[2],
+    //K( 1,1 )/K( 0,0 ) -> values[3]
+    //K( 1,0 ) -> values[4]
+    * @param nbVal nb values into array...
+    * @param add_to_intra if true, the vector is the delta to apply to each intra values
+    */
+    virtual void updateIntrinsic( double* values, uchar nbVal, bool add_to_intra );
 
     /**
     * this method can be used to update the intra parameters.

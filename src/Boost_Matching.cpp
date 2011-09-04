@@ -75,9 +75,12 @@ namespace OpencvSfM{
 
       if( size_match>8 )
       {
+        std::clog<<"Using crossMatch, found "<<matches_i_j.size( )<<
+          " matches between "<<i<<" "<<j<<std::endl;
         //vector<KeyPoint> points1 = point_matcher->;
         for( size_t cpt = 0; cpt < size_match; ++cpt )
         {
+          const cv::DMatch& match = matches_i_j[ cpt ];
           const cv::KeyPoint &key1 = point_matcher1->getKeypoint(
             matches_i_j[ cpt ].queryIdx );
           const cv::KeyPoint &key2 = point_matcher->getKeypoint(
@@ -173,16 +176,20 @@ namespace OpencvSfM{
           seq_analyser->list_fundamental_[i][j-i] = cv::Ptr< cv::Mat >(
             copy_of_fund );
           seq_analyser->addMatches( matches_i_j,i,j );
-          std::clog<<"find "<<matches_i_j.size( )<<
-            " matches between "<<i<<" "<<j<<std::endl;
+          std::clog<<"; find "<<matches_i_j.size( )<<
+            " real matches"<<std::endl;
           V_MUTEX( thread_unicity );
         }
         else
         {
-          std::clog<<"can't find matches between "<<i<<" "<<j<<
-            "; only "<<matches_i_j.size( )<<" matches"<<std::endl;
+          std::clog<<"Between "<<i<<" "<<j<<", can't find real matches"<<std::endl;
         }
 
+      }
+      else
+      {
+        std::clog<<"Using crossMatch, found only "<<matches_i_j.size( )<<
+          " matches between "<<i<<" "<<j<<std::endl;
       }
       j++;
     }

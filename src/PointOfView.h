@@ -80,6 +80,12 @@ namespace OpencvSfM{
     cv::Ptr<Camera> getIntraParameters( ) const{return device_;};
     
     /**
+    * use this function to know which parameters are missing
+    * @return numbers of parameters needed for this camera
+    */
+    uchar getNbMissingParams( ) const;
+    
+    /**
     * This method can convert 3D points from world coordinates to 2D points in pixel image coordinates
     * @param points 3D points in world coordinates.
     * @return 2D points in pixel image coordinates.

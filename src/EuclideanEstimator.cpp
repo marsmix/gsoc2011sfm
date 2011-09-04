@@ -992,13 +992,12 @@ namespace OpencvSfM{
       // Performs a bundle adjustment
       bundleAdjustement();
     }//*/
-    /*
-    for( unsigned int i = 0; i<cameras_.size( ) ; ++i )
-      camera_computed_[i] = true;
+    
 
-    point_computed_ = sequence_.getTracks();
-
-    bundleAdjustement();*/
+    //Triangulate the points:
+    StructureEstimator se( &sequence_, &this->cameras_ );
+    point_computed_ = se.computeStructure( images_computed );
+    se.removeOutliersTracks( 2 );
 
   }
 
