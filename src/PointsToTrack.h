@@ -43,7 +43,7 @@ namespace OpencvSfM{
     std::vector<cv::KeyPoint> keypoints_;
     /**
     * this attribute will store descritors for each points in a matrix
-    * with size ( n*m ), where 
+    * with size ( n*m ), where
     * n is the number of points and m is the desciptor size.
     */
     cv::Mat descriptors_;
@@ -89,7 +89,7 @@ namespace OpencvSfM{
     * @param force if true, the descriptors are removed
     */
     void free_descriptors( bool force = false );
-    
+
     /**
     * This method is used to compute both Keypoints and descriptors...
     * @param forcing_recalculation if true previous keypoints are removed...
@@ -159,7 +159,7 @@ namespace OpencvSfM{
     * @param point coordinate of the point to search for
     * @return index of the point
     */
-    size_t getClosestKeypoint( cv::Point2f point ) const;
+    size_t getClosestKeypoint( cv::Point2f point );
     /**
     * this method return the descritors for each points in a matrix with size ( n*m ), where n is the number of points and m is the desciptor size.
     * @return descritors for each points in a matrix with size ( n*m ), where n is the number of points and m is the desciptor size.
@@ -190,14 +190,14 @@ namespace OpencvSfM{
       else
         return 0;
     }
-    
+
     /**
     * Load the points from a YAML file.
     * @param node Previously opened YAML file node
     * @param points output
     */
     static void read( const cv::FileNode& node, PointsToTrack& points );
-    
+
     /**
     * Save the points into a YAML file.
     * @param fs Previously opened YAML file node
@@ -214,7 +214,7 @@ static inline void cv::write( cv::FileStorage& fs, const std::string& name,
   OpencvSfM::PointsToTrack::write( fs,points );
 };
 //! reads vector of keypoints from the specified file storage node
-static inline void cv::read( const cv::FileNode& node, OpencvSfM::PointsToTrack& points, 
+static inline void cv::read( const cv::FileNode& node, OpencvSfM::PointsToTrack& points,
   OpencvSfM::PointsToTrack defaultValue = OpencvSfM::PointsToTrack( ) )
 {
   OpencvSfM::PointsToTrack::read( node,points );

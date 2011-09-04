@@ -45,7 +45,7 @@ namespace OpencvSfM{
     descriptors_.release( );
     PointsToTrack::glob_number_images_--;
   }
-  
+
   int PointsToTrack::computeKeypointsAndDesc( bool forcing_recalculation )
   {
     P_MUTEX(worker_exclusion);
@@ -106,8 +106,8 @@ namespace OpencvSfM{
       {
         Mat newDescriptors( this->keypoints_.size( ), this->descriptors_.cols,
           this->descriptors_.type( ) );
-        newDescriptors( 
-          cv::Rect( 0, 0, this->descriptors_.cols,this->descriptors_.rows ) ) = 
+        newDescriptors(
+          cv::Rect( 0, 0, this->descriptors_.cols,this->descriptors_.rows ) ) =
           this->descriptors_;
 
         newDescriptors( cv::Rect( 0, this->descriptors_.rows,
@@ -208,7 +208,7 @@ namespace OpencvSfM{
     }
   }
 
-  size_t PointsToTrack::getClosestKeypoint( cv::Point2f point ) const
+  size_t PointsToTrack::getClosestKeypoint( cv::Point2f point )
   {
     P_MUTEX(worker_exclusion);
     size_t nb_points = keypoints_.size(),
