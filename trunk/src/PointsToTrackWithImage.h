@@ -68,7 +68,7 @@ namespace OpencvSfM{
     /**
     * This method is used to get color for each points...
     */
-    void getColorOfPoints();
+    void computeColorOfPoints();
 
   };
 

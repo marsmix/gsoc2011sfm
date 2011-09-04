@@ -10,6 +10,7 @@
 #include <boost/filesystem.hpp>   // includes all needed Boost.Filesystem declarations
 
 #include "EuclideanEstimator.h"
+#include "MatcherSparseFlow.h"
 #include "CameraPinholeDistor.h"
 #include "PointOfView.h"
 
@@ -130,7 +131,7 @@ int main( )
   int type_of_input = 1, loadCamera = 1;
   Mat K = Mat::eye(3,3,CV_64F);
   double* data_intra_param=( double* )K.data;
-  string imageDirectory =  "Medias/bottle/",//"Medias/templeSparseRing/",
+  string imageDirectory =  "Medias/modelHouse/",//"Medias/templeSparseRing/",
     methodDetect = "PyramidORB", methodExtract = "ORB", methodMatch = "FlannBased";
   MotionProcessor mp;
   Ptr<Camera> my_device;
@@ -269,7 +270,8 @@ int main( )
   cout<<"The complexity is O( n^2 ), so be patient..."<<endl;
 
   //create the matcher:
-  Ptr<PointsMatcher> matcher = PointsMatcherOpticalFlow::create( "OpticalFlowPyrLK" );
+  //Ptr<PointsMatcher> matcher = PointsMatcherOpticalFlow::create( "OpticalFlowPyrLK" );
+  Ptr<PointsMatcher> matcher = MatcherSparseFlow::create( "FlannBased", 2 );
   //Ptr<PointsMatcher> matcher = PointsMatcher::create( methodMatch );
   //and the sequence analyzer:
   SequenceAnalyzer motion_estim( vec_point_for_track, &images, matcher );

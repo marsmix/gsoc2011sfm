@@ -65,6 +65,24 @@ namespace OpencvSfM{
     ~CameraPinholeDistor( );
 
     /**
+    * use this function to know which parameters are missing
+    * @return numbers of parameters needed for this camera
+    */
+    virtual uchar getNbMissingParams( ) const;
+    /**
+    * This method modify the intra parameters of the camera
+    * @param values array of intra parameters (order corresponds to SBA)
+    //K( 0,0 ) -> values[0]
+    //K( 2,0 ) -> values[1],
+    //K( 2,1 ) -> values[2],
+    //K( 1,1 )/K( 0,0 ) -> values[3]
+    //K( 1,0 ) -> values[4]
+    * @param nbVal nb values into array...
+    * @param add_to_intra if true, the vector is the delta to apply to each intra values
+    */
+    virtual void updateIntrinsic( double* values, uchar nbVal, bool add_to_intra );
+
+    /**
     * this method can be used to update the intra parameters.
     * @param radial_dist values of the new radial distortions parameters
     * @param nbRadialParam number of radial dist parameters ( 0, 2, 3 or 6 )

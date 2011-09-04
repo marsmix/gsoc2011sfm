@@ -3,7 +3,7 @@
 #include "../src/PointsToTrackWithImage.h"
 #include "../src/MotionProcessor.h"
 #include "../src/SequenceAnalyzer.h"
-#include "../src/PointsMatcher.h"
+#include "../src/MatcherSparseFlow.h"
 #include <opencv2/calib3d/calib3d.hpp>
 
 //////////////////////////////////////////////////////////////////////////
@@ -56,7 +56,8 @@ NEW_TUTO( Points_Definitions, "How features can be defined",
 
     cout<<"now try to find matches, so we create a matcher ( FlannBasedMatcher )"<<endl<<endl;
     //The point matcher will now be created like this:
-    Ptr<PointsMatcher> matches = PointsMatcher::create( "FlannBased" );
+    //Ptr<PointsMatcher> matches = PointsMatcher::create( "FlannBased" );
+    Ptr<PointsMatcher> matches = MatcherSparseFlow::create( "FlannBased", 2 );
     //Ptr<PointsMatcher> matches = PointsMatcherOpticalFlow::create( "OpticalFlowPyrLK" );
 
     //The matches vector is:

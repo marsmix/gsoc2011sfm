@@ -35,6 +35,22 @@ namespace OpencvSfM{
     //TODO
   }
 
+  uchar CameraPinholeDistor::getNbMissingParams( ) const
+  {
+    int nbParams = CameraPinhole::getNbMissingParams( );
+    if( (estimation_needed_ & RADIAL_PARAM) != 0 )
+      nbParams += nb_radial_params_;//2 focals
+    if( (estimation_needed_ & TANGEANT_PARAM) != 0 )
+      nbParams += nb_tangent_params_;//1 param
+    return nbParams;
+  }
+
+  void CameraPinholeDistor::updateIntrinsic( double* values, uchar nbVal, bool add )
+  {
+    CameraPinhole::updateIntrinsic( values, nbVal, add );
+    //TODO!
+  }
+
   void CameraPinholeDistor::updateDistortionParameters(
     const cv::Vec6d& radial_dist, unsigned char nbRadialParam,
     const cv::Vec2d& tangential_dist,unsigned char wantedEstimation )

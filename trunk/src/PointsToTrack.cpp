@@ -26,10 +26,10 @@ namespace OpencvSfM{
     INIT_MUTEX(worker_exclusion);
   }
 
-  void PointsToTrack::free_descriptors()
+  void PointsToTrack::free_descriptors( bool force )
   {
     P_MUTEX(worker_exclusion);
-    if(nb_workers_<=1)
+    if(nb_workers_<=1 || force)
     {//if equal to 0, descriptors_ is already empty...
       nb_workers_ = 0;
       descriptors_.release( );
@@ -56,6 +56,7 @@ namespace OpencvSfM{
       bool need_descriptors = need_keypoints || descriptors_.empty( );
       if( need_keypoints )
         impl_computeKeypoints_();
+      cv::KeyPointsFilter::runByKeypointSize( keypoints_, 3 );
       if( need_descriptors )
       {
         impl_computeDescriptors_();
@@ -76,10 +77,10 @@ namespace OpencvSfM{
   {
     P_MUTEX(worker_exclusion);
     impl_computeKeypoints_();
+    cv::KeyPointsFilter::runByKeypointSize( keypoints_, 3 );
     V_MUTEX(worker_exclusion);
     return keypoints_.size( );
   }
-
 
   void PointsToTrack::computeDescriptors( )
   {
@@ -91,12 +92,13 @@ namespace OpencvSfM{
 
   void PointsToTrack::addKeypoints( std::vector<cv::KeyPoint> keypoints,cv::Mat descriptors/*=cv::Mat( )*/,bool computeMissingDescriptor/*=false*/ )
   {
+    P_MUTEX(worker_exclusion);
     //add the keypoints to the end of our points vector:
     this->keypoints_.insert( this->keypoints_.end( ),keypoints.begin( ),keypoints.end( ) );
 
 
-    cv::KeyPointsFilter::runByKeypointSize( keypoints_,
-      std::numeric_limits<float>::epsilon( ) );
+    cv::KeyPointsFilter::runByKeypointSize( keypoints_, 3 );
+    V_MUTEX(worker_exclusion);
 
     if( !computeMissingDescriptor )
     {
@@ -205,4 +207,25 @@ namespace OpencvSfM{
       }
     }
   }
+
+  size_t PointsToTrack::getClosestKeypoint( cv::Point2f point ) const
+  {
+    P_MUTEX(worker_exclusion);
+    size_t nb_points = keypoints_.size(),
+      idx_min = 0;
+    float dist_min = 1e10;
+    for(size_t i = 0; i<nb_points ; ++i)
+    {
+      const cv::KeyPoint& kp = keypoints_[i];
+      float dist = sqrt( (point.x - kp.pt.x)*(point.x - kp.pt.x)
+        + (point.y - kp.pt.y) * (point.y - kp.pt.y) );
+      if( dist<dist_min )
+      {
+        dist_min = dist;
+        idx_min = i;
+      }
+    }
+    V_MUTEX(worker_exclusion);
+    return idx_min;
+  };
 }
