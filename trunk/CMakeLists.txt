@@ -163,7 +163,7 @@ ENDIF (  )
  
 # Add all targets to the build-tree export set
 export(TARGETS SfM_core
-  FILE "${PROJECT_BINARY_DIR}/OpencvSFMLibraryDepends.cmake")
+  FILE "${CMAKE_INSTALL_PREFIX}/OpencvSFMLibraryDepends.cmake")
  
 # Export the package for use from the build-tree
 # (this registers the build-tree with a global CMake-registry)
@@ -180,8 +180,6 @@ configure_file(CMakeModules/OpencvSFMVersion.cmake.in
   "${PROJECT_BINARY_DIR}/OpencvSFMVersion.cmake" @ONLY)
  
 # Install the export set for use with the install-tree
-install(EXPORT OpencvSFMLibraryDepends DESTINATION "${CMAKE_INSTALL_PREFIX}"
-  COMPONENT dev)
 install(FILES ${CMAKE_BINARY_DIR}/config_SFM.h DESTINATION "${CMAKE_INSTALL_PREFIX}/include/")
 
 INSTALL(FILES ${PROJECT_BINARY_DIR}/OpencvSFMConfig.cmake
@@ -190,6 +188,11 @@ INSTALL(FILES ${PROJECT_BINARY_DIR}/OpencvSFMConfig.cmake
         PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)
         
 INSTALL(FILES ${PROJECT_BINARY_DIR}/OpencvSFMConfig.cmake
+        DESTINATION ${CMAKE_INSTALL_PREFIX}
+        COMPONENT headers
+        PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)
+		
+INSTALL(FILES ${PROJECT_BINARY_DIR}/OpencvSFMBuildTreeSettings.cmake
         DESTINATION ${CMAKE_INSTALL_PREFIX}
         COMPONENT headers
         PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)

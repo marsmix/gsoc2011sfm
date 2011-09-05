@@ -280,6 +280,14 @@ namespace OpencvSfM{
       cv::Ptr<PointsMatcher> point_matcher,
       cv::Ptr<PointsMatcher> point_matcher1,
       int mininum_points_matches = 10);
+    
+    /**
+    * Once points have been triangulated, use this method to remove
+    * 2D points who don't have 3D projection
+    * @param motion_estim sequence to work on
+    */
+    static void removePointsWithoutProjection(
+      SequenceAnalyzer &motion_estim );
   };
 
 }

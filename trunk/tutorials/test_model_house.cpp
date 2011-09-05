@@ -5,6 +5,7 @@
 #include "../src/EuclideanEstimator.h"
 #include "../src/Visualizer.h"
 #include "../src/MatcherSparseFlow.h"
+#include "../src/bundle_related.h"
 
 //////////////////////////////////////////////////////////////////////////
 //This file will not be in the final version of API, consider it like a tuto/draft...
@@ -93,8 +94,8 @@ NEW_TUTO( Model_House_test, "Using Model house data, run a SFM algorithm",
       mp.setInputSource( FROM_SRC_ROOT( "Medias/modelHouse/" ),
         IS_DIRECTORY);
       SequenceAnalyzer motion_estim( mp,
-        FeatureDetector::create("FAST"),
-        DescriptorExtractor::create("SURF"),
+        FeatureDetector::create("SURF"),
+        DescriptorExtractor::create("SIFT"),
         MatcherSparseFlow::create( "FlannBased", 2 ) );
         //PointsMatcher::create("BruteForce-HammingLUT") );
 
@@ -125,7 +126,7 @@ NEW_TUTO( Model_House_test, "Using Model house data, run a SFM algorithm",
     FileStorage fsRead( pathFileTracks, FileStorage::READ );
     FileNode myPtt = fsRead.getFirstTopLevelNode( );
     SequenceAnalyzer motion_estim( myPtt, &images,
-      new PointsMatcher( DescriptorMatcher::create( "BruteForce-Hamming" ) ) );
+      new PointsMatcher( DescriptorMatcher::create( "FlannBased" ) ) );
     fsRead.release( );
 
     SequenceAnalyzer::keepOnlyCorrectMatches( motion_estim, 3, 0 );
@@ -169,12 +170,14 @@ NEW_TUTO( Model_House_test, "Using Model house data, run a SFM algorithm",
 
       cout<<"Bundle adjustement..."<<endl;
       pe.bundleAdjustement();//test bundle adjustement...
+      full_bundle( motion_estim, cameras );
       pe.viewEstimation( false );
     }
     else
     {
-      //SequenceAnalyzer::keepOnlyCorrectMatches(motion_estim,3,0);
+      SequenceAnalyzer::keepOnlyCorrectMatches(motion_estim,3,0);
       pe.computeReconstruction();
+      full_bundle( motion_estim, cameras );
       pe.viewEstimation( false );
     }
   }

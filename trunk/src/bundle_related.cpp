@@ -16,8 +16,7 @@ namespace OpencvSfM{
 
 
   //TODO: intra parameters are badly integrated:
-  //1) when using the same intra parameters in multiple cameras, the bundle don't take this into account
-  //      That is, the bundle can't minimize nrj when cameras share the intra parameters...
+  //1) when multiple cameras share the same intra parameters, computation is not optimized
   //2) Skew and ratio of focal are not correctly estimated... See how this can be improved!
   void full_bundle( SequenceAnalyzer &sequence,
     std::vector<PointOfView>& cameras)
@@ -42,7 +41,6 @@ namespace OpencvSfM{
     //because some points are sometime not visible:
     vector<int> idx_cameras;
 
-    libmv::vector< libmv::Mat3 > intra_p;
     std::vector<bool> pointOK;
     int nbPoints = 0;
     for ( j = 0; j < n; ++j )
@@ -96,6 +94,8 @@ namespace OpencvSfM{
 
     libmv::vector< Eigen::Quaterniond > init_rotation;
     libmv::vector< libmv::Vec3 > init_translat;
+    libmv::vector< libmv::Mat3 > intra_p;
+    libmv::vector< int > idx_intra;
     //update each variable:
     int idx_visible = 0;
     double *p_local = p;
@@ -105,11 +105,38 @@ namespace OpencvSfM{
       libmv::Mat3 intra_param, rotation_mat;
       libmv::Vec3 translation_vec;
       cv::Ptr<Camera> intra=cameras[ idx_cam ].getIntraParameters( );
+      //is this camera shared?
+      const std::vector<PointOfView*> & relV = intra->getRelatedViews();
+
+      int idx_cam_intra = -1;
+      for(size_t cpt = 0; cpt<relV.size() && idx_cam_intra<0; cpt++)
+      {
+        for(int cpt1 = 0; (cpt1<intra_p.size()) && (idx_cam_intra<0); cpt1++)
+        {
+          int idx_cam_bis = idx_intra[ cpt1 ];
+          if ( idx_cam_bis!=idx_cam && (&cameras[ idx_cam_bis ]) == relV[ cpt ] )
+          {
+            std::clog<<"intra params for camera "<< i <<
+              " are the same params than camera: "<<idx_cam_bis<<std::endl;
+            idx_cam_intra = idx_cam_bis;
+          }
+        }
+      }
+
       cv::cv2eigen( intra->getIntraMatrix( ).t(), intra_param );
+      if( idx_cam_intra<0 )
+      {
+        idx_intra.push_back( intra_p.size() );
+        intra_p.push_back( intra_param );
+      }
+      else
+      {//as this intra parameter is shared, it will not being updated during bundle!
+        idx_intra.push_back( idx_cam_intra );
+      }
+
       cv::cv2eigen( cameras[ idx_cam ].getRotationMatrix( ), rotation_mat );
       cv::cv2eigen( cameras[ idx_cam ].getTranslationVector( ), translation_vec );
 
-      intra_p.push_back( intra_param );
       init_rotation.push_back( (Eigen::Quaterniond)rotation_mat );
       init_translat.push_back( translation_vec );
 
@@ -164,7 +191,7 @@ namespace OpencvSfM{
       }
     }
 
-    bundle_datas data(intra_p,init_rotation,init_translat,
+    bundle_datas data(idx_intra,intra_p,init_rotation,init_translat,
       cnp, pnp, mnp,ncon, mcon);
     data.points3D = points3D_values;
 
@@ -201,15 +228,17 @@ namespace OpencvSfM{
         cv::cv2eigen( cameras[ idx_cam ].getRotationMatrix( ), rotation_mat );
         cv::cv2eigen( cameras[ idx_cam ].getTranslationVector( ), translation_vec );
 
-        libmv::Mat3& K = data.intraParams[ idx_cam ];
-        double Kparms[] = {K( 0,0 ) + p_local[0], K( 2,0 ) + p_local[1],
-          K( 2,1 ) + p_local[2], p_local[3], K( 1,0 ) + p_local[4] };
-
+        int idx_intra = data.idx[i];
+        libmv::Mat3& K = data.intraParams[ idx_intra ];
+        double* pIntra=p+idx_intra*cnp;
+        double Kparms[] = {K( 0,0 ) + pIntra[0], K( 2,0 ) + pIntra[1],
+          K( 2,1 ) + pIntra[2], pIntra[3], K( 1,0 ) + pIntra[4] };
+        /*
         std::cout<<std::endl<<"old intra : "<<intra->getIntraMatrix()<<std::endl;
-        std::cout<<idx_cam<<"; "<<
-          p_local[0]<<" "<<p_local[1]<<" "<<p_local[2]<<" "<<p_local[3]<<std::endl;
+        std::cout<<idx_intra<<"; "<<
+          pIntra[0]<<" "<<pIntra[1]<<" "<<pIntra[2]<<" "<<pIntra[3]<<std::endl;
         intra->updateIntrinsic( Kparms, 5, false );
-        std::cout<<"new intra : "<<intra->getIntraMatrix()<<std::endl;
+        std::cout<<"new intra : "<<intra->getIntraMatrix()<<std::endl;*/
 
         Eigen::Quaterniond rot_init = data.rotations[i];
         double c1 = p_local[5];
@@ -324,10 +353,12 @@ namespace OpencvSfM{
     for(j=0; j<m; ++j){
       /* j-th camera parameters */
       libmv::Mat3 rotation;
-      libmv::Mat3& K = datas->intraParams[j];
-      Eigen::Quaterniond rot_init = datas->rotations[j];
 
+      int idx_intra = datas->idx[j];
+      libmv::Mat3& K = datas->intraParams[ idx_intra ];
       double Kparms[] = {K( 0,0 ),K( 2,0 ),K( 2,1 ),K( 1,1 )/K( 0,0 ),K( 1,0 )};
+
+      Eigen::Quaterniond rot_init = datas->rotations[j];
       // full quat for initial rotation estimate:
       double pr0[] = {rot_init.w(), rot_init.x(), rot_init.y(), rot_init.z()};
       libmv::Mat34 proj;
@@ -384,18 +415,21 @@ namespace OpencvSfM{
     for(j=0; j<m; ++j){
       /* j-th camera parameters */
       libmv::Mat3 rotation;
-      libmv::Mat3& K = datas->intraParams[j];
+
+      int idx_intra = datas->idx[j];
+      libmv::Mat3& K = datas->intraParams[ idx_intra ];
+      double* pIntra=p+idx_intra*cnp;
+      double Kparms[] = {K( 0,0 ) + pIntra[0], K( 2,0 ) + pIntra[1],
+        K( 2,1 ) + pIntra[2], 1, 0};//pIntra[3], K( 1,0 ) + pIntra[4] };
+
       Eigen::Quaterniond rot_init = datas->rotations[j];
 
       // full quat for initial rotation estimate:
       double pr0[] = {rot_init.w(), rot_init.x(), rot_init.y(), rot_init.z()};
       libmv::Mat34 proj;
 
-      pqr=pa+j*cnp;
-      double Kparms[] = {K( 0,0 ) + pqr[0], K( 2,0 ) + pqr[1],
-        K( 2,1 ) + pqr[2], 1,0};//pqr[3], K( 1,0 ) + pqr[4] };
-      pqr = pqr+5;//skip the intra parameters...
-      pt=pqr+3; // quaternion vector part has 3 elements
+      pqr=pa + j*cnp + 5;//skip the intra parameters...
+      pt=pqr + 3; // quaternion vector part has 3 elements
       libmv::Vec3 translat = datas->translations[j];
       double trans[3] = {
         pt[0] + translat(0),
@@ -448,10 +482,13 @@ namespace OpencvSfM{
     for(j=0; j<m; ++j){
       /* j-th camera parameters */
       libmv::Mat3 rotation;
-      libmv::Mat3& K = datas->intraParams[j];
+
+      int idx_intra = datas->idx[j];
+      libmv::Mat3& K = datas->intraParams[ idx_intra ];
+      double Kparms[] = {K( 0,0 ),K( 2,0 ),K( 2,1 ),K( 1,1 )/K( 0,0 ),K( 1,0 )};
+
       Eigen::Quaterniond rot_init = datas->rotations[j];
 
-      double Kparms[] = {K( 0,0 ),K( 2,0 ),K( 2,1 ),K( 1,1 )/K( 0,0 ),K( 1,0 )};
       // full quat for initial rotation estimate:
       double pr0[] = {rot_init.w(), rot_init.x(), rot_init.y(), rot_init.z()};
       libmv::Mat34 proj;

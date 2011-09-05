@@ -20,6 +20,7 @@ namespace OpencvSfM{
   */
   struct bundle_datas
   {
+    libmv::vector< int >& idx;///<index of intra parameters of each cameras (in case of shared intra parameters)
     libmv::vector< libmv::Mat3 >& intraParams;///<list of intra parameters of each cameras
     libmv::vector< Eigen::Quaterniond >& rotations;///<list of rotations matrix of each cameras
     libmv::vector< libmv::Vec3 >& translations;///<list of translation vector of each cameras
@@ -32,7 +33,8 @@ namespace OpencvSfM{
 
     /**
     * Construct a bundle helper object.
-    * @param i list of intra parameters of each cameras
+    * @param index list of corresponding intra parameters of each cameras
+    * @param i list of intra parameters of each cameras (size can be < than m thanks to idx)
     * @param r list of rotations matrix of each cameras
     * @param t list of translation vector of each cameras
     * @param c number of parameters for ONE camera
@@ -41,11 +43,13 @@ namespace OpencvSfM{
     * @param n number of points (starting from the 1st) whose parameters should not be modified.
     * @param m number of cameras (starting from the 1st) whose parameters should not be modified.
     */
-    bundle_datas(libmv::vector< libmv::Mat3 >& i,
+    bundle_datas(libmv::vector< int >& index,
+      libmv::vector< libmv::Mat3 >& i,
       libmv::vector< Eigen::Quaterniond >& r,
       libmv::vector< libmv::Vec3 >& t,
       int c, int p, int mp, int n, int m)
-      :intraParams(i),rotations(r),translations(t),cnp(c), pnp(p),mnp(mp), mcon(m),ncon(n)
+      :idx(index),intraParams(i),rotations(r),translations(t),
+      cnp(c), pnp(p),mnp(mp), mcon(m),ncon(n)
     {
       points3D = NULL;
     }
@@ -103,4 +107,4 @@ namespace OpencvSfM{
   void img_projsRTS_jac_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *jac, void *adata);
 }
 
-#endif
+#endif 

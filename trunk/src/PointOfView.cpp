@@ -52,6 +52,22 @@ namespace OpencvSfM{
     device_->pointsOfView_.push_back( this );
   };
 
+  PointOfView::PointOfView( const PointOfView& ref )
+  {
+    this->device_ = ref.device_;
+
+    this->projection_matrix_ = ref.projection_matrix_.clone();
+
+    this->rotation_=projection_matrix_( Range::all( ),Range( 0,3 ));
+    this->translation_ = projection_matrix_( Range::all( ),Range( 3,4 ));
+
+    this->config_ = ref.config_;
+
+    //as we are a new point of view (a copy of an existing one),
+    //we should add our address into device_:
+    device_->pointsOfView_.push_back( this );
+  };
+
 
   PointOfView::PointOfView( cv::Mat projection_matrix )
     : projection_matrix_( 3, 4, CV_64F )

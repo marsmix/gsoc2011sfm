@@ -8,7 +8,7 @@ MESSAGE(STATUS "Looking for OpencvSfM...")
 
 # Compute paths
 get_filename_component(OPENCVSFM_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
-if(EXISTS "${OPENCVSFM_CMAKE_DIR}/CMakeCache.txt")
+if(EXISTS "${OPENCVSFM_CMAKE_DIR}/OpencvSFMBuildTreeSettings.cmake")
    # In build tree
    include("${OPENCVSFM_CMAKE_DIR}/OpencvSFMBuildTreeSettings.cmake")
 else()
@@ -21,8 +21,12 @@ IF ( OPENCVSFM_INCLUDE_DIRS )
 	# Our library dependencies (contains definitions for IMPORTED targets)
 	include("${OPENCVSFM_CMAKE_DIR}/OpencvSFMLibraryDepends.cmake")
 	 
-	# These are IMPORTED targets created by OpencvSFMLibraryDepends.cmake
-	set(OPENCVSFM_LIBRARIES SfM_core)
+if(WIN32)
+  SET(OPENCVSFM_LIBRARIES SfM_core debug SfM_core@SfM_lib_DLLVERSION@@SfM_lib_DEBUG_POSTFIX@ optimized SfM_core@SfM_lib_DLLVERSION@)
+else()
+  set(OPENCVSFM_LIBRARIES SfM_core)
+endif()
+
 	MESSAGE(STATUS "Found OpencvSfM...")
 	MESSAGE(STATUS "${OPENCVSFM_INCLUDE_DIRS}")
 	MESSAGE(STATUS "With libraries: ${OPENCVSFM_LIBRARIES}")
