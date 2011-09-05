@@ -140,8 +140,8 @@ int main(int argc, char *argv[])
   {
     string name_of_file = iter->path( ).string( );
 
-    transform(name_of_file.begin(), name_of_file.end(),
-      name_of_file.begin(),tolower);
+    std::transform(name_of_file.begin(), name_of_file.end(),
+      name_of_file.begin(),::tolower);
     if( name_of_file.find(".yml")!=string::npos )
       loadPoints( name_of_file );
 
