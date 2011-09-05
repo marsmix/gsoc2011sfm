@@ -13,7 +13,6 @@ namespace OpencvSfM{
     img_height = img_h;
   }
 
-
   Camera::~Camera( void )
   {
   }

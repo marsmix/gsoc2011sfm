@@ -689,4 +689,55 @@ namespace OpencvSfM{
     return matches_i_j;
   };
 
+
+  void SequenceAnalyzer::removePointsWithoutProjection(
+    SequenceAnalyzer &motion_estim )
+  {
+    vector<TrackOfPoints>::size_type key_size = motion_estim.tracks_.size( );
+    int idImage=-1, idPoint=-1;
+    vector< Ptr<PointsToTrack> > new_ptt;
+    //initialisation of empty vector
+    int before = 0, after = 0;
+    for( size_t i=0; i<motion_estim.points_to_track_.size(); i++ )
+    {
+      Ptr<PointsToTrack> ptt = Ptr<PointsToTrack>(
+        new PointsToTrackWithImage( i, motion_estim.images_[i] ));
+      new_ptt.push_back( ptt );
+      before += motion_estim.points_to_track_[i]->getKeypoints().size();
+    }
+    for ( size_t i=0; i < key_size; i++ )
+    {
+      TrackOfPoints &track = motion_estim.tracks_[ i ];
+      unsigned int nbPoints = track.getNbTrack( );
+      if( nbPoints > 0 && !track.point3D.empty( ) )
+      {
+        nbPoints = track.images_indexes_.size();
+        for ( unsigned int j = 0; j < nbPoints ; j++ )
+        {
+          if( track.good_values[j] )
+          {
+            idImage = track.images_indexes_[ j ];
+            idPoint = track.point_indexes_[ j ];
+            if( idImage>=0 && idPoint>=0 )
+            {
+
+              const cv::KeyPoint kpt = 
+                motion_estim.points_to_track_[ idImage ]->
+                getKeypoints( )[ idPoint ];
+              track.point_indexes_[ j ] = new_ptt[ idImage ]->addKeypoint( kpt );
+            }
+          }
+        }
+      }
+    }
+    motion_estim.points_to_track_ = new_ptt;
+    for( size_t i=0; i<motion_estim.points_to_track_.size(); i++ )
+    {
+      Ptr<PointsToTrack> ptt = Ptr<PointsToTrack>(
+        new PointsToTrackWithImage( i, motion_estim.images_[i] ));
+      new_ptt.push_back( ptt );
+      after += motion_estim.points_to_track_[i]->getKeypoints().size();
+    }
+    std::cout<<" before "<<before<<", after "<<after<<std::endl;
+  }
 }

@@ -120,6 +120,7 @@ vector<PointOfView> loadCameras( string nameFile )
     return loadCamerasModelHouse( nameFile );
   if( nameFile.find("_par.txt")!=string::npos )
     return loadCamerasTemple( nameFile );
+  return vector<PointOfView>();
 }
 
 int main( )

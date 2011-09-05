@@ -159,7 +159,6 @@ namespace OpencvSfM{
     vector<int> idx_cameras;
     idx_cameras.push_back( index_origin );
 
-    libmv::vector< libmv::Mat3 > intra_p;
     std::vector<bool> pointOK;
     int nbPoints = 0;
     for ( j = 0; j < n; ++j )
@@ -211,12 +210,15 @@ namespace OpencvSfM{
 
     libmv::vector< Eigen::Quaterniond > init_rotation;
     libmv::vector< libmv::Vec3 > init_translat;
+    libmv::vector< libmv::Mat3 > intra_p;
+    libmv::vector< int > idx_intra;
     //update each variable:
     int idx_visible = 0;
     double *p_local = p;
     for ( i=0; i < m; ++i )
     {//for each camera:
       int idx_cam = idx_cameras[i];
+      idx_intra.push_back( i );//indeed, every intra parameters are distinct...
       intra_p.push_back( intra_params_[idx_cam] );
       //extrinsic parameters only (intra are know in euclidean reconstruction)
       init_rotation.push_back( (Eigen::Quaterniond)rotations_[ idx_cam ] );
@@ -276,7 +278,7 @@ namespace OpencvSfM{
       }
     }
 
-    bundle_datas data(intra_p,init_rotation,init_translat,
+    bundle_datas data(idx_intra,intra_p,init_rotation,init_translat,
       cnp, pnp, mnp,ncon, mcon);
     data.points3D = points3D_values;
 
@@ -513,11 +515,13 @@ namespace OpencvSfM{
 
     libmv::vector< Eigen::Quaterniond > init_rotation;
     libmv::vector< libmv::Vec3 > init_translat;
+    libmv::vector< int > idx_intra;
     //update each variable:
     double *p_local = p;
     for ( i=0; i < m; ++i )
     {//for each camera:
       int idx_cam = idx_cameras[i];
+      idx_intra.push_back( i );
       intra_p.push_back( intra_params_[idx_cam] );
       //extrinsic parameters only (intra are know in euclidean reconstruction)
       init_rotation.push_back( (Eigen::Quaterniond)rotations_[ idx_cam ] );
@@ -573,7 +577,7 @@ namespace OpencvSfM{
     };
 
     double info[SBA_INFOSZ];
-    bundle_datas data(intra_p,init_rotation, init_translat,
+    bundle_datas data(idx_intra,intra_p,init_rotation, init_translat,
       cnp, 3, mnp, 0, mcon);
     data.points3D = points3D_values;
     //use sba library
@@ -1022,13 +1026,12 @@ namespace OpencvSfM{
       debugView.add3DPoints( tracks3D, "Euclidean estimated" );
 
     for( unsigned int i = 0; i<cameras_.size( ) ; ++i )
-      if( camera_computed_[i] )
+      //if( camera_computed_[i] )
       {
         std::stringstream cam_name;
         cam_name<<"Cam"<< ( i+1 );
         debugView.addCamera( cameras_[ i ],
           cam_name.str() );
-        cout<<cameras_[ i ].getTranslationVector()<<endl;
       }
 
 

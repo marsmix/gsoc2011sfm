@@ -39,7 +39,7 @@ NEW_TUTO( Track_creation, "Learn how you can compute tracks from a list of pictu
     inputDirectory = FROM_SRC_ROOT( "Medias/templeSparseRing/" );
   MotionProcessor mp;
   //first load images:
-  //Here we will a folder with a lot of images, but we can do the same thing with any other type of input
+  //Here we will open a folder with a lot of images, but we can do the same thing with any other type of input
   if( !mp.setInputSource( inputDirectory,IS_DIRECTORY ) )
   {
     cout<<"Can't find dataset"<<endl;

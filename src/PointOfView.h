@@ -69,6 +69,10 @@ namespace OpencvSfM{
     */
     PointOfView( cv::Mat projection_matrix );
     /**
+    * Copy constructor
+    */
+    PointOfView( const PointOfView& ref );
+    /**
     * Destructor of PointOfView, release all vectors... TODO: define how we should release the vectors...
     */
     virtual ~PointOfView( void );

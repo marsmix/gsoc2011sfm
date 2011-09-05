@@ -120,10 +120,36 @@ namespace OpencvSfM{
     */
     inline unsigned int addKeypoint( const cv::KeyPoint point )
     {
+      double dist = 1e6;
       P_MUTEX(worker_exclusion);
-      keypoints_.push_back( point );
+      size_t nb_points = keypoints_.size(),
+        close_p = 0;
+      float dist_min = 1e10;
+      for(size_t i = 0; i<nb_points ; ++i)
+      {
+        const cv::KeyPoint& kp = keypoints_[i];
+        float dist = sqrt( (point.pt.x - kp.pt.x)*(point.pt.x - kp.pt.x)
+          + (point.pt.y - kp.pt.y) * (point.pt.y - kp.pt.y) );
+        if( dist<dist_min )
+        {
+          dist_min = dist;
+          close_p = i;
+        }
+      }
+      if( close_p < keypoints_.size() )
+      {
+        cv::KeyPoint& point_close = keypoints_[close_p];
+        dist = sqrt(
+          (point_close.pt.x - point.pt.x)*(point_close.pt.x - point.pt.x) +
+          (point_close.pt.y - point.pt.y)*(point_close.pt.y - point.pt.y) );
+      }
+      if( dist > 1.0 )
+      {
+        keypoints_.push_back( point );
+        close_p = keypoints_.size() - 1;
+      }
       V_MUTEX(worker_exclusion);
-      return keypoints_.size( )-1;
+      return close_p;
     };
     /**
     * this method return the points coordinates and sometimes orientation and size

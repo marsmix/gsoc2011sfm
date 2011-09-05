@@ -66,6 +66,13 @@ namespace OpencvSfM{
     */
     virtual uchar getNbMissingParams( ) const{return 0;};
     /**
+    * use this function to know which parameters are missing
+    * @return numbers of parameters needed for this camera
+    */
+    virtual const std::vector<PointOfView*> getRelatedViews( ) const {
+      return pointsOfView_;
+    };
+    /**
     * get the width of the images taken by this camera
     */
     int getImgWidth() const { return img_width;};
