@@ -163,7 +163,7 @@ ENDIF (  )
  
 # Add all targets to the build-tree export set
 export(TARGETS SfM_core
-  FILE "${CMAKE_INSTALL_PREFIX}/OpencvSFMLibraryDepends.cmake")
+  FILE "${PROJECT_BINARY_DIR}/OpencvSFMLibraryDepends.cmake")
  
 # Export the package for use from the build-tree
 # (this registers the build-tree with a global CMake-registry)
@@ -181,6 +181,9 @@ configure_file(CMakeModules/OpencvSFMVersion.cmake.in
  
 # Install the export set for use with the install-tree
 install(FILES ${CMAKE_BINARY_DIR}/config_SFM.h DESTINATION "${CMAKE_INSTALL_PREFIX}/include/")
+
+install(FILES ${PROJECT_BINARY_DIR}/OpencvSFMLibraryDepends.cmake
+        DESTINATION "${CMAKE_INSTALL_PREFIX}/")
 
 INSTALL(FILES ${PROJECT_BINARY_DIR}/OpencvSFMConfig.cmake
         DESTINATION "${CMAKE_ROOT}/Modules/"
