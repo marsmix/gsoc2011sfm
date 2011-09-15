@@ -70,7 +70,13 @@ namespace OpencvSfM{
     * descriptors extractor...
     */
     virtual void impl_computeDescriptors_( ){};
-
+    /**
+    * Use this function to filter point by distance between each other
+    * Not thread safe!
+    * @param dist_min minimum distance allowed between points
+    */
+    void impl_filterByDistance_( double dist_min );
+    
   public:
     /**
     * this constructor create an object with available information...
@@ -116,9 +122,12 @@ namespace OpencvSfM{
     /**
     * This method is used to add a keypoint at the end of the points vector...
     * @param point Keypoints to add
-    * @return index of the keypoint.
+    * @param min_dist minimumù distance between wanted point to add and any existing point...
+    * If below this threshold, the point will not being added and the index returned will be
+    * the index of the closest point...
+    * @return index of the added keypoint.
     */
-    inline unsigned int addKeypoint( const cv::KeyPoint point )
+    inline unsigned int addKeypoint( const cv::KeyPoint point, double min_dist=1.0 )
     {
       double dist = 1e6;
       P_MUTEX(worker_exclusion);
@@ -136,14 +145,7 @@ namespace OpencvSfM{
           close_p = i;
         }
       }
-      if( close_p < keypoints_.size() )
-      {
-        cv::KeyPoint& point_close = keypoints_[close_p];
-        dist = sqrt(
-          (point_close.pt.x - point.pt.x)*(point_close.pt.x - point.pt.x) +
-          (point_close.pt.y - point.pt.y)*(point_close.pt.y - point.pt.y) );
-      }
-      if( dist > 1.0 )
+      if( dist_min > min_dist )
       {
         keypoints_.push_back( point );
         close_p = keypoints_.size() - 1;
@@ -177,7 +179,7 @@ namespace OpencvSfM{
     */
     inline const cv::KeyPoint& getKeypoint( unsigned int index ) const
     {
-      CV_DbgAssert( index<keypoints_.size( ) );
+      //CV_DbgAssert( index<keypoints_.size( ) );
       return keypoints_[ index ];
     };
     /**
@@ -216,6 +218,12 @@ namespace OpencvSfM{
       else
         return 0;
     }
+    
+    /**
+    * Use this function to filter point by distance between each other
+    * @param dist_min minimum distance allowed between points
+    */
+    void filterByDistance( double dist_min );
 
     /**
     * Load the points from a YAML file.

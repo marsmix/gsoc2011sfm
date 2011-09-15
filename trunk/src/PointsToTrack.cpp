@@ -49,36 +49,72 @@ namespace OpencvSfM{
   int PointsToTrack::computeKeypointsAndDesc( bool forcing_recalculation )
   {
     P_MUTEX(worker_exclusion);
-    nb_workers_++;
+    bool need_descriptors = true;
+    bool need_keypoints = true;
     if( !forcing_recalculation )
     {
-      bool need_keypoints = keypoints_.empty( );
-      bool need_descriptors = need_keypoints || descriptors_.empty( );
+      need_keypoints = keypoints_.empty( );
+      need_descriptors = need_keypoints || descriptors_.empty( );
       if( need_keypoints )
         impl_computeKeypoints_();
-      cv::KeyPointsFilter::runByKeypointSize( keypoints_, 3 );
-      if( need_descriptors )
-      {
-        impl_computeDescriptors_();
-      }
     }
     else
-    {
       impl_computeKeypoints_();
-      impl_computeDescriptors_();
-    }
 
+    if( need_keypoints )//as points have been computed, refilter them:
+      impl_filterByDistance_( 3 );
+
+    nb_workers_++;
+
+    if( need_descriptors )
+      impl_computeDescriptors_();
     V_MUTEX(worker_exclusion);
     return keypoints_.size( );
   }
 
+  void PointsToTrack::impl_filterByDistance_( double dist_min )
+  {
+    return;
+    bool discard_data = false;
+    size_t nb_points = keypoints_.size();
+    for(size_t i = 0; i<nb_points ; ++i)
+    {
+      const cv::KeyPoint& kp = keypoints_[i];
+      for(size_t j = i+1; j<nb_points ; ++j)
+      {
+        const cv::KeyPoint& kp1 = keypoints_[j];
+        float dist = sqrt( (kp.pt.x - kp1.pt.x)*(kp.pt.x - kp1.pt.x)
+          + (kp.pt.y - kp1.pt.y) * (kp.pt.y - kp1.pt.y) );
+        if( dist<dist_min )
+        {
+          //we have to remove this point!
+          discard_data = true;
+          nb_points--;
+          keypoints_[ j ] = keypoints_[ nb_points ];
+          j--;
+          keypoints_.pop_back();
+        }
+      }
+    }
+    if( discard_data )
+    {
+      if( nb_workers_>=1 && descriptors_.empty( ) )
+        impl_computeDescriptors_();//recompute the descriptors...
+    }
+  }
+  void PointsToTrack::filterByDistance( double dist_min )
+  {
+    P_MUTEX(worker_exclusion);
+    impl_filterByDistance_( dist_min );
+    V_MUTEX(worker_exclusion);
+  }
 
   int PointsToTrack::computeKeypoints( )
   {
     P_MUTEX(worker_exclusion);
     impl_computeKeypoints_();
-    cv::KeyPointsFilter::runByKeypointSize( keypoints_, 3 );
     V_MUTEX(worker_exclusion);
+    filterByDistance( 3 );
     return keypoints_.size( );
   }
 
@@ -92,13 +128,14 @@ namespace OpencvSfM{
 
   void PointsToTrack::addKeypoints( std::vector<cv::KeyPoint> keypoints,cv::Mat descriptors/*=cv::Mat( )*/,bool computeMissingDescriptor/*=false*/ )
   {
+    if( keypoints.size()==0 )
+      return;//nothing to do...
     P_MUTEX(worker_exclusion);
     //add the keypoints to the end of our points vector:
     this->keypoints_.insert( this->keypoints_.end( ),keypoints.begin( ),keypoints.end( ) );
 
-
-    cv::KeyPointsFilter::runByKeypointSize( keypoints_, 3 );
     V_MUTEX(worker_exclusion);
+    filterByDistance( 3 );
 
     if( !computeMissingDescriptor )
     {
@@ -154,7 +191,7 @@ namespace OpencvSfM{
 
     //as the loaded PointsToTrack can't recompute the descriptors_, set the nbworkers
     //to a high value (this will disable free_descriptors to release descriptor ;)
-    points.nb_workers_ = 1e5;
+    points.nb_workers_ = 999999;
 
     cv::FileNode node_colors = node[ "colors" ];
     if( !node_colors.empty( ) )

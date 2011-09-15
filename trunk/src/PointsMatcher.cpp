@@ -59,8 +59,10 @@ namespace OpencvSfM{
   {
     P_MUTEX( thread_concurr );
     matcher_->clear( );
+    /*
     for(size_t i = 0; i<pointCollection_.size(); ++i)
       pointCollection_[i]->free_descriptors();
+      */
     V_MUTEX( thread_concurr );
   }
 
@@ -447,11 +449,11 @@ namespace OpencvSfM{
     vector<vector<DMatch> >& matches, float maxDistance,
     const vector<Mat>& masks, bool compactResult )
   {
-    float tmp = max_distance;
+    double tmp = max_distance;
     vector<DMatch> matchesTmp;
     match( queryPoints, matchesTmp, masks );
     matches.push_back(matchesTmp);
-    max_distance = tmp;
+    max_distance = tmp;//restore the old value of max_distance
   }
 
   bool PointsMatcherOpticalFlow::empty( ) const

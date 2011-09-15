@@ -84,6 +84,16 @@ namespace OpencvSfM{
       cv::Ptr<cv::DescriptorExtractor> descriptor_extractor,
       cv::Ptr<PointsMatcher> match_algorithm );
     /**
+    * Constructor with a features detector, descriptor and matcher.
+    * @param feature_detector Algorithm to use for features detection ( see http://opencv.willowgarage.com/documentation/cpp/common_interfaces_for_feature_detection_and_descriptor_extraction.html#featuredetector )
+    * @param descriptor_extractor Algorithm to use for descriptors detection ( see http://opencv.willowgarage.com/documentation/cpp/common_interfaces_for_feature_detection_and_descriptor_extraction.html#descriptorextractor )
+    * @param match_algorithm algorithm to match points of each images
+    */
+    SequenceAnalyzer( 
+      cv::Ptr<cv::FeatureDetector> feature_detector,
+      cv::Ptr<cv::DescriptorExtractor> descriptor_extractor,
+      cv::Ptr<PointsMatcher> match_algorithm );
+    /**
     * Constructor taking a vector of points to track and a PointsMatcher
     * algorithm to find matches.
     * @param images input images. Points should be in the same order!
@@ -108,12 +118,21 @@ namespace OpencvSfM{
     */
     ~SequenceAnalyzer( void );
     /**
-    * This method add new image to track. When adding, if the matches are not
+    * This method add new image to pipeline. When adding, if the matches are not
     * computed, use automatically computeMatches to compute them!
+    * This new image will be added to tracks when calling computeMatches
     * @param image New image
     * @param points extracted points with features vectors.
     */
-    void addNewImage( cv::Mat image,
+    void addImageToPipeline( cv::Mat image,
+      cv::Ptr<PointsToTrack> points = cv::Ptr<PointsToTrack>( ) );
+    /**
+    * This method add new image to tracks. When adding, if the matches are not
+    * computed, first compute them and mix them to existing tracks!
+    * @param image New image
+    * @param points extracted points with features vectors.
+    */
+    void addImageToTracks( cv::Mat image,
       cv::Ptr<PointsToTrack> points = cv::Ptr<PointsToTrack>( ) );
 
     /**
@@ -177,8 +196,14 @@ namespace OpencvSfM{
     void showTracks( int img_to_show, int timeBetweenImg );
     /**
     * Use this function to print the matches between two images
+    * @param img1 first index of image
+    * @param img2 second index of image
+    * @param img image where tracks will be print
+    * @param should_print if true the output is displayed
+    * @return image with tracks printed on it
     */
-    void showTracksBetween( unsigned int img1, unsigned int img2 );
+    cv::Mat showTracksBetween( unsigned int img1, unsigned int img2,
+      cv::Mat img = cv::Mat(), bool should_print = true );
 
     /**
     * Load the sequence from a YAML file.
@@ -279,7 +304,7 @@ namespace OpencvSfM{
     static std::vector< cv::DMatch > simple_matching(
       cv::Ptr<PointsMatcher> point_matcher,
       cv::Ptr<PointsMatcher> point_matcher1,
-      int mininum_points_matches = 10);
+      unsigned int mininum_points_matches = 10);
     
     /**
     * Once points have been triangulated, use this method to remove
