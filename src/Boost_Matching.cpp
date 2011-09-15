@@ -66,6 +66,7 @@ namespace OpencvSfM{
 
       vector< cv::DMatch > matches_i_j;
       point_matcher->crossMatch( point_matcher1, matches_i_j, masks );
+      //point_matcher->match( points_to_track_j,matches_i_j );
 
       //First compute points matches:
       unsigned int size_match=matches_i_j.size( );
@@ -75,13 +76,13 @@ namespace OpencvSfM{
 
       if( size_match>8 )
       {
-        std::clog<<"Using crossMatch, found "<<matches_i_j.size( )<<
+        std::clog<<"Using match, found "<<matches_i_j.size( )<<
           " matches between "<<i<<" "<<j<<std::endl;
         //vector<KeyPoint> points1 = point_matcher->;
         for( size_t cpt = 0; cpt < size_match; ++cpt )
         {
           const cv::DMatch& match = matches_i_j[ cpt ];
-          const cv::KeyPoint &key1 = point_matcher1->getKeypoint(
+          const cv::KeyPoint &key1 = points_to_track_j->getKeypoint(
             matches_i_j[ cpt ].queryIdx );
           const cv::KeyPoint &key2 = point_matcher->getKeypoint(
             matches_i_j[ cpt ].trainIdx );
@@ -91,7 +92,7 @@ namespace OpencvSfM{
         }
 
         //free some memory:
-        point_matcher1->clear();
+        //point_matcher1->clear();
         points_to_track_j->free_descriptors();
 
         Mat fundam = cv::findFundamentalMat( srcP, destP, status,
@@ -118,7 +119,7 @@ namespace OpencvSfM{
         }
       }
 
-        while( nbErrors > size_match/10 && nb_iter < 3 &&
+        while( nbErrors > 40 && nb_iter < 3 &&
           matches_i_j.size( ) > mininum_points_matches )
         {
           fundam = cv::findFundamentalMat( srcP, destP, status,

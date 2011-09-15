@@ -876,10 +876,10 @@ namespace OpencvSfM{
 
     vector<int> images_computed;
     int iter = 0;
-    bool not_correct;
     int nbMax = 0, bestId = 0;/*
     do
     {
+      bool not_correct;
       img1 = bestMatches[ index_of_min ].imgSrc;
       img2 = bestMatches[ index_of_min ].imgDest;
       cout<<img1<<", "<<img2<<endl;
@@ -997,12 +997,12 @@ namespace OpencvSfM{
       bundleAdjustement();
     }//*/
     
-
+    
     //Triangulate the points:
     StructureEstimator se( &sequence_, &this->cameras_ );
     point_computed_ = se.computeStructure( images_computed );
     se.removeOutliersTracks( 2 );
-
+    
   }
 
   void EuclideanEstimator::viewEstimation( bool coloredPoints )

@@ -109,7 +109,6 @@ namespace OpencvSfM
 
   void PointsToTrackWithImage::impl_computeDescriptors_( )
   {
-    nb_workers_++;
     this->descriptors_.release();//in case some descriptors were already found...
     descriptor_detector_->compute( imageToAnalyse_,this->keypoints_,this->descriptors_ );
     computeColorOfPoints();//keypoints_ may have changed!

@@ -55,7 +55,8 @@ SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules/)#because some "find...
 include( ProjectAdd.cmake REQUIRED )
 
 FIND_PACKAGE( OpenCV REQUIRED )
-set( SFM_LINKER_LIBS ${OpenCV_LIBS} )
+set( SFM_LINKER_LIBS "${OpenCV_LIBS}" )
+  MESSAGE(STATUS "OpenCV_LIBS : ${OpenCV_LIBS}")
 
 
 # Unfortunately boost puts the version number into the
