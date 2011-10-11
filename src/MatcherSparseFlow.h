@@ -24,7 +24,7 @@ namespace OpencvSfM{
   public:
     /**
     * Construct a new point matcher using the name of the opticalflow algorithm.
-    * @param name_of_algo name of the matching algo (see http://opencv.willowgarage.com/documentation/cpp/features2d_common_interfaces_of_descriptor_matchers.html)
+    * @param matcher the matching algo (see http://opencv.willowgarage.com/documentation/cpp/features2d_common_interfaces_of_descriptor_matchers.html)
     * @param dist_allowed in pixel, the threshold to know if a match is close
     * enough to the predicted position
     */

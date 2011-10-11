@@ -77,6 +77,7 @@ namespace OpencvSfM{
     /**
     * Find the position of a new camera
     * @param image index of the wanted camera
+    * @param max_reprojection maximum reprojection error to consider that a camera position is acceptable
     */
     bool cameraResection( unsigned int image, int max_reprojection = 50 );
 

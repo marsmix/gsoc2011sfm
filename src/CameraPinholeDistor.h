@@ -36,6 +36,8 @@ namespace OpencvSfM{
     * @param radial_dist radial dist parameters ( /f$k_1/f$ to /f$k_6/f$ )
     * @param nbRadialParam number of radial dist parameters ( 0, 2, 3 or 6 )
     * @param tangential_dist tangential dist parameters ( /f$p_1/f$ and /f$p_2/f$ )
+    * @param img_w width of images the camera produce
+    * @param img_h height of images the camera produce
     * @param wantedEstimation values which need an estimation
     */
     CameraPinholeDistor( cv::Mat intra_params=cv::Mat::eye( 3, 3, CV_64F ),
@@ -53,6 +55,8 @@ namespace OpencvSfM{
     * @param radial_dist radial dist parameters ( /f$k_1/f$ to /f$k_6/f$ )
     * @param nbRadialParam number of radial dist parameters ( 0, 2, 3 or 6 )
     * @param tangential_dist tangential dist parameters ( /f$p_1/f$ and /f$p_2/f$ )
+    * @param img_w width of images the camera produce
+    * @param img_h height of images the camera produce
     * @param wantedEstimation values which need an estimation
     */
     CameraPinholeDistor( const std::vector<std::vector<cv::Point3f> >& objectPoints,

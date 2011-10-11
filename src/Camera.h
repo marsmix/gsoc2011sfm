@@ -56,6 +56,8 @@ namespace OpencvSfM{
     std::vector<PointOfView*> pointsOfView_;///<vector of the differents positions of the camera.
     /**
     * As this class is virtual, we can't create a new empty camera...
+    * @param img_w width of images the camera produce
+    * @param img_h height of images the camera produce
     */
     Camera( int img_w=640, int img_h=480 );
   public:

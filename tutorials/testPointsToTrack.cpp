@@ -25,7 +25,9 @@ NEW_TUTO( Points_Definitions, "How features can be defined",
 
   //first load images:
   //Here we will a folder with a lot of images, but we can do the same thing with any other type of input
-  mp.setInputSource( FROM_SRC_ROOT( "Medias/temple/" ),IS_DIRECTORY );
+  string img_src = "D:/Travail/These/Determination caracteristiques camera/GSoC/medias/";
+  //FROM_SRC_ROOT( "Medias/temple/" )
+  mp.setInputSource( img_src,IS_DIRECTORY );
 
   //Configure input ( not needed, but show how we can do
   mp.setProperty( CV_CAP_PROP_CONVERT_RGB,0 );//Only greyscale, due to SIFT
@@ -45,8 +47,8 @@ NEW_TUTO( Points_Definitions, "How features can be defined",
     //if the images are loaded, find the points:
 
     cout<<"creation of two detection algorithm..."<<endl;
-    Ptr<FeatureDetector> fastDetect = FeatureDetector::create( "FAST" );
-    Ptr<DescriptorExtractor> SurfDetect = DescriptorExtractor::create( "SURF" );
+    Ptr<FeatureDetector> fastDetect = FeatureDetector::create( "SIFT" );
+    Ptr<DescriptorExtractor> SurfDetect = DescriptorExtractor::create( "SIFT" );
 
     cout<<"now create the two set of points with features..."<<endl;
     Ptr<PointsToTrack> ptt1;
@@ -54,11 +56,24 @@ NEW_TUTO( Points_Definitions, "How features can be defined",
     Ptr<PointsToTrack> ptt2;
     ptt2=Ptr<PointsToTrack>( new PointsToTrackWithImage ( 1, secondImage,fastDetect,SurfDetect ));
 
-    cout<<"now try to find matches, so we create a matcher ( FlannBasedMatcher )"<<endl<<endl;
+    cout<<"now try to find matches, so we create a matcher"<<endl;
     //The point matcher will now be created like this:
-    //Ptr<PointsMatcher> matches = PointsMatcher::create( "FlannBased" );
-    Ptr<PointsMatcher> matches = MatcherSparseFlow::create( "FlannBased", 2 );
-    //Ptr<PointsMatcher> matches = PointsMatcherOpticalFlow::create( "OpticalFlowPyrLK" );
+    Ptr<PointsMatcher> matches;
+
+    cout<<"Which one do you want to use?\n(0) FlannBased\n(1)MatcherSparseFlow\n(2)OpticalFlow?"<<endl;
+    int rep;
+    cin>>rep;
+    switch (rep)
+    {
+    case 0:
+      matches = PointsMatcher::create( "FlannBased" );
+      break;
+    case 1:
+      matches = MatcherSparseFlow::create( "FlannBased", 15 );
+      break;
+    default:
+      matches = PointsMatcherOpticalFlow::create( "OpticalFlowPyrLK" );
+    }
 
     //The matches vector is:
     vector<DMatch> matchesVector;
@@ -71,6 +86,7 @@ NEW_TUTO( Points_Definitions, "How features can be defined",
     Ptr<PointsMatcher> matches2= matches->clone( );
     matches2->add( ptt1 );
     //cross check matches:
+    //matches2->crossMatch( matches,matchesVector );
     matches->crossMatch( matches2,matchesVector );
     //matches->match( ptt1,matchesVector );
 
