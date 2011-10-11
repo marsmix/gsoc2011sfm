@@ -981,15 +981,25 @@ namespace OpencvSfM{
 
         if( new_id_image >= 0 )
         {
+          initialReconstruction( old_id_image, new_id_image );
           if( cameraResection( new_id_image, 50*(nbIter/4.0+1.0) ) )
           {
             images_computed.push_back( new_id_image );
+            
             std::vector< TrackOfPoints > point_before = point_computed_;
             cout<<"before"<<point_computed_.size()<<endl;
-            addMoreMatches( old_id_image, new_id_image );
+            //addMoreMatches( old_id_image, new_id_image );
             cout<<"after"<<point_computed_.size()<<endl;
             if( point_computed_.size() < point_before.size() )
               point_computed_ = point_before;
+              
+            //Triangulate the points:
+            StructureEstimator se( &sequence_, &this->cameras_ );
+            point_computed_ = se.computeStructure( images_computed, 2 );
+          }
+          else
+          {
+            camera_computed_[ new_id_image ] = false;
           }
         }
       }

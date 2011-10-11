@@ -36,6 +36,8 @@ namespace OpencvSfM{
     /**
     * Constructor with ( or not ) intra parameters.
     * @param intra_params matrix of intra parameters ( 3*3 )
+    * @param img_w width of images the camera produce
+    * @param img_h height of images the camera produce
     * @param wantedEstimation values which need an estimation
     */
     CameraPinhole( cv::Mat intra_params=cv::Mat::eye( 3, 3, CV_64F ),
@@ -48,6 +50,8 @@ namespace OpencvSfM{
     * @param imagePoints The vector of vectors of the corresponding image points. See http://opencv.willowgarage.com/documentation/cpp/calib3d_camera_calibration_and_3d_reconstruction.html#cv-calibratecamera
     * @param imageSize The image size in pixels; used to initialize the principal point
     * @param aspectRatio If it is zero or negative, both \f$f_x\f$  and \f$f_y\f$  are estimated independently. Otherwise \f$f_x=f_y * aspectRatio\f$ 
+    * @param img_w width of images the camera produce
+    * @param img_h height of images the camera produce
     * @param wantedEstimation values which need an estimation
     */
     CameraPinhole( const std::vector<std::vector<cv::Point3f> >& objectPoints,

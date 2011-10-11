@@ -35,7 +35,6 @@ namespace OpencvSfM{
     * Constructor of a thread.
     * @param seq_analyser the sequence related infos
     * @param i Index of source image. This image will be matched against every other
-    * @param matches_it iterator of every Points for track (points of other images to match)
     */
     MatchingThread(cv::Ptr<SequenceAnalyzer> seq_analyser,unsigned int i);
 

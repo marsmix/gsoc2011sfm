@@ -108,6 +108,7 @@ namespace OpencvSfM{
     * Constructor taking a list of images and a FileNode
     * @param images input images. Points should be in the same order!
     * @param file YAML file to get points and matches
+    * @param match_algorithm algorithm to match points of each images
     */
     SequenceAnalyzer( cv::FileNode file,
       std::vector<cv::Mat> *images = NULL,
@@ -298,7 +299,7 @@ namespace OpencvSfM{
     /**
     * This will find matches between two points matchers
     * @param point_matcher first image
-    * @param point_matcher second image
+    * @param point_matcher1 second image
     * @param mininum_points_matches minimum matches allowed
     */
     static std::vector< cv::DMatch > simple_matching(

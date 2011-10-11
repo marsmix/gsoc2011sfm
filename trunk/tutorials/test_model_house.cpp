@@ -125,11 +125,14 @@ NEW_TUTO( Model_House_test, "Using Model house data, run a SFM algorithm",
 
     FileStorage fsRead( pathFileTracks, FileStorage::READ );
     FileNode myPtt = fsRead.getFirstTopLevelNode( );
+    
     SequenceAnalyzer motion_estim( myPtt, &images,
-      new PointsMatcher( DescriptorMatcher::create( "FlannBased" ) ) );
+      MatcherSparseFlow::create( "FlannBased", 15 )
+      //PointsMatcher::create( "FlannBased" )
+      );
     fsRead.release( );
 
-    SequenceAnalyzer::keepOnlyCorrectMatches( motion_estim, 3, 0 );
+    SequenceAnalyzer::keepOnlyCorrectMatches( motion_estim, 3, 1 );
     vector<TrackOfPoints> &tracks=motion_estim.getTracks( );
     if(rep=="0")
     {
