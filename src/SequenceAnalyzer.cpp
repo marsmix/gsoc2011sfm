@@ -510,7 +510,16 @@ namespace OpencvSfM{
     //initialisation of all empty vectors
     for( int i=0; i<nb_pictures; i++ )
     {
-      Ptr<PointsToTrack> ptt = Ptr<PointsToTrack>( new PointsToTrackWithImage( i, me.images_[i] ));
+      Ptr<PointsToTrack> ptt;
+      if( i<me.images_.size() )
+      {
+        ptt = Ptr<PointsToTrack>( 
+          new PointsToTrackWithImage( i, me.images_[i] ));
+      }
+      else
+      {
+        ptt = Ptr<PointsToTrack>( new PointsToTrack( i ));
+      }
       me.points_to_track_.push_back( ptt );
 
       Ptr<PointsMatcher> p_m = Ptr<PointsMatcher>( new PointsMatcher(
@@ -525,7 +534,7 @@ namespace OpencvSfM{
     //tracks are stored in the following form:
     //list of track where a track is stored like this:
     // nbPoints idImage1 point1  idImage2 point2 ...
-    if( node_TrackPoints.empty( ) || !node_TrackPoints.isSeq( ) )
+    if( node_TrackPoints.empty( ) || !node_TrackPoints.isSeq() )
       CV_Error( CV_StsError, "SequenceAnalyzer FileNode is not correct!" );
     cv::FileNodeIterator it = node_TrackPoints.begin( ),
       it_end = node_TrackPoints.end( );
